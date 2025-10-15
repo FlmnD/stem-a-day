@@ -5,3 +5,8 @@
 - Game problems rotate daily
 - Learn concepts through our learn tab
 - More STEM subjects added in the future
+
+## Install
+- Node JS LTS
+- Docker
+- Python 12
