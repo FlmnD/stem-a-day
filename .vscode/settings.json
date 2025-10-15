@@ -1,0 +1,19 @@
+{
+    // Use the project's TypeScript version
+    "typescript.tsdk": "frontend/node_modules/typescript/lib",
+    // Eslint settings
+    "eslint.workingDirectories": [
+        {
+            "directory": "frontend",
+            "changeProcessCWD": true
+        }
+    ],
+    "eslint.useFlatConfig": true,
+    // Enable Tailwind class name suggestions
+    "tailwindCSS.experimental.classRegex": [
+        [
+            "class(Name)?=\\\"([^\\\"]*)\\\"",
+            "[\"'`]([^\"'`]*).*?[\"'`]"
+        ]
+    ]
+}
