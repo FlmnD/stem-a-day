@@ -8,6 +8,7 @@ import LogoStrip from "@/components/sections/home/LogoStrip";
 import CallToAction from "@/components/sections/home/CallToAction";
 
 export default function Home() {
+  //home page
   return (
     <main className="min-h-[calc(100dvh-3.5rem)] bg-gradient-to-b from-sky-50 via-white to-white">
       <Hero />
