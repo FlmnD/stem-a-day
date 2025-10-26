@@ -1,124 +1,149 @@
-"use client";
+'use client';
+import { useState, useMemo } from "react";
+import elementsJSON from "../../../../elements.json";
 
-import React, { useState, useEffect } from "react";
-
-interface ElementType {
+interface ElementData {
   name: string;
   symbol: string;
-  atomicNumber: number;
-  atomicMass: number | string;
-  groupBlock: string;
-  standardState: string;
-  bondingType: string;
-  yearDiscovered: string;
+  number: number;
+  atomic_mass: number;
+  group?: number;
 }
 
-export default function YeezleEasy() {
-  const [elements, setElements] = useState<ElementType[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<ElementType[]>([]);
-  const [guesses, setGuesses] = useState<ElementType[]>([]);
-  const [target, setTarget] = useState<ElementType | null>(null);
-  const [message, setMessage] = useState("");
+interface Guess {
+  element: string;
+  symbol: string;
+  atomicNumber: number;
+  atomicMass: number;
+  ionCharge: number;
+}
 
-  // Fetch elements from API
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch("https://neelpatel05.pythonanywhere.com/periodictablejson");
-        if (!res.ok) throw new Error("Network response was not ok");
-        const data = await res.json();
-        setElements(data);
-        setTarget(data[Math.floor(Math.random() * data.length)]);
-      } catch (err) {
-        console.error("Failed to fetch element data:", err);
-      }
-    }
-    fetchData();
-  }, []);
+const yellowRange = {
+  atomicNumber: 5,
+  atomicMass: 15,
+  ionCharge: 2,
+};
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const query = searchQuery.trim().toLowerCase();
-    if (!query) return;
-    const results = elements.filter(
-      (el) =>
-        el.name.toLowerCase().startsWith(query) ||
-        el.symbol.toLowerCase().startsWith(query)
+const elementsData: ElementData[] = elementsJSON.elements;
+
+export default function EasyYeezle() {
+  const [guesses, setGuesses] = useState<Guess[]>([]);
+  const [input, setInput] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const safeIonCharge = (e: ElementData) =>
+    e.group !== undefined ? (e.group <= 2 ? e.group : e.group - 10) : 0;
+
+  const filteredOptions = useMemo(() => {
+    if (!input) return [];
+    return elementsData.filter(
+      (e) =>
+        e.name.toLowerCase().includes(input.toLowerCase()) ||
+        e.symbol.toLowerCase().includes(input.toLowerCase())
     );
-    setSearchResults(results);
+  }, [input]);
+
+  const addGuess = (element: ElementData) => {
+    const newGuess: Guess = {
+      element: element.name,
+      symbol: element.symbol,
+      atomicNumber: element.number,
+      atomicMass: element.atomic_mass,
+      ionCharge: safeIonCharge(element),
+    };
+    setGuesses([...guesses, newGuess]);
+    setInput("");
+    setShowDropdown(false);
   };
 
-  const addGuess = (element: ElementType) => {
-    if (target && element.name === target.name) {
-      setGuesses([...guesses, element]);
-      setMessage("🎉 You Win! You found the element!");
-    } else {
-      setGuesses([...guesses, element]);
-      if (guesses.length >= 5) {
-        setMessage(`❌ You Lose! The element was ${target?.name}`);
-      }
-    }
-    setSearchResults([]);
-    setSearchQuery("");
+  const getColor = (guessValue: number, actualValue: number, range: number) => {
+    if (guessValue === actualValue) return "bg-green-300";
+    if (Math.abs(guessValue - actualValue) <= range) return "bg-yellow-300";
+    return "";
   };
 
   return (
-    <div className="flex flex-col items-center p-6">
-      <h1 className="text-3xl font-bold mb-4">Yeezle Easy Mode</h1>
+    <div className="min-h-screen flex flex-col items-center justify-start py-10 bg-gray-100">
+      <h1 className="text-3xl font-bold mb-6">Easy Yeezle</h1>
 
-      <form onSubmit={handleSearch} className="mb-4 w-full max-w-md">
+      <div className="relative w-96 mb-6">
         <input
           type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search element or symbol (press Enter)"
-          className="w-full border p-2 rounded italic text-gray-500"
+          className="w-full px-4 py-2 border rounded shadow focus:outline-none"
+          placeholder="Type element name or symbol"
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value);
+            setShowDropdown(true);
+          }}
+          onFocus={() => setShowDropdown(true)}
         />
-      </form>
+        {showDropdown && filteredOptions.length > 0 && (
+          <div className="absolute z-10 w-full max-h-60 overflow-y-auto bg-white border rounded mt-1 shadow">
+            {filteredOptions.map((e) => (
+              <div
+                key={e.number}
+                className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                onClick={() => addGuess(e)}
+              >
+                {e.name} ({e.symbol})
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-      {searchResults.length > 0 && (
-        <div className="bg-white shadow rounded p-2 mb-4 max-h-48 overflow-y-auto w-full max-w-md">
-          {searchResults.map((el) => (
-            <div
-              key={el.name}
-              onClick={() => addGuess(el)}
-              className="cursor-pointer hover:bg-gray-100 p-2 rounded"
-            >
-              {el.name} ({el.symbol})
-            </div>
-          ))}
-        </div>
-      )}
-
-      <table className="border-collapse border border-gray-400 w-full max-w-2xl text-center">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="border border-gray-400 p-2">Element</th>
-            <th className="border border-gray-400 p-2">Symbol</th>
-            <th className="border border-gray-400 p-2">Atomic #</th>
-            <th className="border border-gray-400 p-2">Atomic Mass</th>
-            <th className="border border-gray-400 p-2">Group Block</th>
-          </tr>
-        </thead>
-        <tbody>
-          {guesses.map((el, idx) => (
-            <tr key={idx}>
-              <td className="border p-2">{el.name}</td>
-              <td className="border p-2">{el.symbol}</td>
-              <td className="border p-2">{el.atomicNumber}</td>
-              <td className="border p-2">{el.atomicMass}</td>
-              <td className="border p-2">{el.groupBlock}</td>
+      <div className="overflow-x-auto w-full max-w-4xl">
+        <table className="min-w-full bg-white rounded shadow">
+          <thead>
+            <tr className="bg-gray-200 text-left">
+              <th className="px-4 py-2 border">Element</th>
+              <th className="px-4 py-2 border">Symbol</th>
+              <th className="px-4 py-2 border">Atomic Number</th>
+              <th className="px-4 py-2 border">Atomic Mass</th>
+              <th className="px-4 py-2 border">Ion Charge</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {message && (
-        <div className="mt-6 p-4 bg-gray-100 rounded text-xl font-semibold">
-          {message}
-        </div>
-      )}
+          </thead>
+          <tbody>
+            {guesses.map((g, i) => {
+              const actual = elementsData.find((e) => e.name === g.element)!;
+              return (
+                <tr key={i} className="text-center">
+                  <td className="border px-4 py-2">{g.element}</td>
+                  <td className="border px-4 py-2">{g.symbol}</td>
+                  <td
+                    className={`border px-4 py-2 ${getColor(
+                      g.atomicNumber,
+                      actual.number,
+                      yellowRange.atomicNumber
+                    )}`}
+                  >
+                    {g.atomicNumber}
+                  </td>
+                  <td
+                    className={`border px-4 py-2 ${getColor(
+                      g.atomicMass,
+                      actual.atomic_mass,
+                      yellowRange.atomicMass
+                    )}`}
+                  >
+                    {g.atomicMass}
+                  </td>
+                  <td
+                    className={`border px-4 py-2 ${getColor(
+                      g.ionCharge,
+                      safeIonCharge(actual),
+                      yellowRange.ionCharge
+                    )}`}
+                  >
+                    {g.ionCharge}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
