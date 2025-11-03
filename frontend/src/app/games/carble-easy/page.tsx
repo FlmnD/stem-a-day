@@ -8,8 +8,9 @@ interface ElementData {
   atomic_number: number;
   atomic_mass: number;
   ion_charge: string;
-  group: number; // Column
-  period: number; // Row
+  group: number;
+  period: number;
+  block: string;
 }
 
 interface Guess {
@@ -20,11 +21,7 @@ interface Guess {
   ionCharge: number;
 }
 
-const yellowRange = {
-  atomicNumber: 5,
-  atomicMass: 15,
-  ionCharge: 2,
-};
+const yellowRange = { atomicNumber: 5, atomicMass: 15, ionCharge: 2 };
 
 const elementsData: ElementData[] = (elementsJSON as any[]).map((e) => ({
   element_name: e.element_name,
@@ -34,6 +31,7 @@ const elementsData: ElementData[] = (elementsJSON as any[]).map((e) => ({
   ion_charge: e.ion_charge,
   group: e.group ?? 1,
   period: e.period ?? 1,
+  block: e.block ?? "s",
 }));
 
 const learnDefinitions = [
@@ -50,12 +48,12 @@ export default function EasyCarble() {
   const [gameOver, setGameOver] = useState(false);
   const [won, setWon] = useState(false);
 
-  const safeIonCharge = (e: ElementData) =>
-    e.group !== undefined ? (e.group <= 2 ? e.group : e.group - 10) : 0;
+  const safeIonCharge = (e: ElementData) => (e.group !== undefined ? (e.group <= 2 ? e.group : e.group - 10) : 0);
 
   const startNewGame = () => {
-    const randomIndex = Math.floor(Math.random() * elementsData.length);
-    setTargetElement(elementsData[randomIndex]);
+    const sAndPElements = elementsData.filter((e) => e.block !== "d" && e.block !== "f");
+    const randomIndex = Math.floor(Math.random() * sAndPElements.length);
+    setTargetElement(sAndPElements[randomIndex]);
     setGuesses([]);
     setInput("");
     setShowDropdown(false);
@@ -63,16 +61,12 @@ export default function EasyCarble() {
     setWon(false);
   };
 
-  useEffect(() => {
-    startNewGame();
-  }, []);
+  useEffect(() => { startNewGame(); }, []);
 
   const filteredOptions = useMemo(() => {
     if (!input) return [];
     return elementsData.filter(
-      (e) =>
-        e.element_name.toLowerCase().includes(input.toLowerCase()) ||
-        e.symbol.toLowerCase().includes(input.toLowerCase())
+      (e) => e.element_name.toLowerCase().includes(input.toLowerCase()) || e.symbol.toLowerCase().includes(input.toLowerCase())
     );
   }, [input]);
 
@@ -91,12 +85,10 @@ export default function EasyCarble() {
     setInput("");
     setShowDropdown(false);
 
-    if (element.element_name === targetElement.element_name) {
+    if (element.symbol === targetElement.symbol) {
       setWon(true);
       setGameOver(true);
-    } else if (guesses.length + 1 >= 8) {
-      setGameOver(true);
-    }
+    } else if (guesses.length + 1 >= 8) setGameOver(true);
   };
 
   const getColorNumeric = (guessValue: number, actualValue: number, range: number) => {
@@ -105,9 +97,7 @@ export default function EasyCarble() {
     return "";
   };
 
-  const getColorString = (guessValue: string, actualValue: string) => {
-    return guessValue === actualValue ? "bg-green-300" : "";
-  };
+  const getColorString = (guessValue: string, actualValue: string) => guessValue === actualValue ? "bg-green-300" : "";
 
   const displayRows = gameOver && targetElement ? [...guesses, {
     element_name: targetElement.element_name,
@@ -118,7 +108,6 @@ export default function EasyCarble() {
   }] : guesses;
 
   const guessedSymbols = guesses.map(g => g.symbol);
-
   const periods = Array.from({ length: 7 }, (_, i) => i + 1);
   const groups = Array.from({ length: 18 }, (_, i) => i + 1);
 
@@ -130,13 +119,11 @@ export default function EasyCarble() {
       <div className="w-full max-w-4xl mb-6 p-4 bg-white rounded shadow">
         <h2 className="text-xl font-semibold mb-2">Learn:</h2>
         <ul className="list-disc list-inside">
-          {learnDefinitions.map(ld => (
-            <li key={ld.term}><strong>{ld.term}:</strong> {ld.definition}</li>
-          ))}
+          {learnDefinitions.map(ld => <li key={ld.term}><strong>{ld.term}:</strong> {ld.definition}</li>)}
         </ul>
       </div>
 
-      {/* Periodic Table */}
+      {/* Periodic Table Reference */}
       <div className="mb-6">
         {periods.map(period => (
           <div key={period} className="flex gap-1">
@@ -144,11 +131,13 @@ export default function EasyCarble() {
               const element = elementsData.find(e => e.period === period && e.group === group);
               if (!element) return <div key={group} className="w-8 h-8"></div>;
               const guessed = guessedSymbols.includes(element.symbol);
-              const isAnswer = gameOver && element.symbol === targetElement?.symbol;
+              const isAnswer = element.symbol === targetElement?.symbol && gameOver;
               return (
                 <div
                   key={element.symbol}
-                  className={`w-8 h-8 flex items-center justify-center text-xs border rounded ${guessed ? "bg-gray-300" : "bg-white"} ${isAnswer ? "bg-green-400 font-bold" : ""}`}
+                  className={`w-8 h-8 flex items-center justify-center text-xs border rounded
+                    ${guessed ? "bg-gray-300" : "bg-white"}
+                    ${isAnswer ? "bg-green-500 font-bold text-white" : ""}`}
                 >
                   {element.symbol}
                 </div>
@@ -158,7 +147,7 @@ export default function EasyCarble() {
         ))}
       </div>
 
-      {/* Input */}
+      {/* Input & Dropdown */}
       <div className="relative w-96 mb-6">
         <input
           type="text"
@@ -173,7 +162,7 @@ export default function EasyCarble() {
           <div className="absolute z-10 w-full max-h-60 overflow-y-auto bg-white border rounded mt-1 shadow">
             {filteredOptions.map((e) => (
               <div
-                key={e.element_name}
+                key={e.symbol}
                 className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
                 onClick={() => addGuess(e)}
               >
@@ -188,12 +177,9 @@ export default function EasyCarble() {
       {gameOver && (
         <div className="mb-4 flex flex-col items-center gap-2">
           <div className={`p-2 rounded ${won ? "bg-green-200" : "bg-red-200"}`}>
-            {won ? "Congratulations! You guessed the element!" : `Game Over! The correct element was ${targetElement?.element_name} (${targetElement?.symbol})`}
+            {won ? "Congratulations! You guessed the element!" : `Game Over! Correct: ${targetElement?.element_name} (${targetElement?.symbol})`}
           </div>
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600"
-            onClick={startNewGame}
-          >
+          <button className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600" onClick={startNewGame}>
             Play Again
           </button>
         </div>
@@ -216,21 +202,11 @@ export default function EasyCarble() {
               const actual = targetElement!;
               return (
                 <tr key={i} className="text-center">
-                  <td className={`border px-4 py-2 ${getColorString(g.element_name, actual.element_name)}`}>
-                    {g.element_name}
-                  </td>
-                  <td className={`border px-4 py-2 ${getColorString(g.symbol, actual.symbol)}`}>
-                    {g.symbol}
-                  </td>
-                  <td className={`border px-4 py-2 ${getColorNumeric(g.atomicNumber, actual.atomic_number, yellowRange.atomicNumber)}`}>
-                    {g.atomicNumber}
-                  </td>
-                  <td className={`border px-4 py-2 ${getColorNumeric(g.atomicMass, actual.atomic_mass, yellowRange.atomicMass)}`}>
-                    {g.atomicMass}
-                  </td>
-                  <td className={`border px-4 py-2 ${getColorNumeric(g.ionCharge, safeIonCharge(actual), yellowRange.ionCharge)}`}>
-                    {g.ionCharge}
-                  </td>
+                  <td className={`border px-4 py-2 ${getColorString(g.element_name, actual.element_name)}`}>{g.element_name}</td>
+                  <td className={`border px-4 py-2 ${getColorString(g.symbol, actual.symbol)}`}>{g.symbol}</td>
+                  <td className={`border px-4 py-2 ${getColorNumeric(g.atomicNumber, actual.atomic_number, yellowRange.atomicNumber)}`}>{g.atomicNumber}</td>
+                  <td className={`border px-4 py-2 ${getColorNumeric(g.atomicMass, actual.atomic_mass, yellowRange.atomicMass)}`}>{g.atomicMass}</td>
+                  <td className={`border px-4 py-2 ${getColorNumeric(g.ionCharge, safeIonCharge(actual), yellowRange.ionCharge)}`}>{g.ionCharge}</td>
                 </tr>
               );
             })}
