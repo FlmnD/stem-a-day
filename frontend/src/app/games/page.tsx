@@ -9,7 +9,7 @@ export default function Games() {
         <section className="min-h-[calc(100dvh-3.5rem)] bg-gradient-to-b from-sky-50 via-white to-white px-6 py-10">
             <h1 className="text-3xl font-bold text-sky-800 mb-2">Chemistry Games</h1>
             <p className="text-gray-600 mb-10">
-                Test your periodic table skills with our Yeezle challenges!
+                Test your periodic table skills with our Carble challenges!
             </p>
 
             <div className="grid md:grid-cols-2 gap-8">
@@ -18,7 +18,7 @@ export default function Games() {
                     <div className="flex items-center gap-3 mb-2">
                         <FlaskConical className="text-sky-500" size={24} />
                         <h2 className="text-xl font-semibold text-gray-800">
-                            Element Characteristics Yeezle
+                            Carble: Common Characteristics
                         </h2>
                     </div>
                     <p className="text-sm text-gray-500 mb-4">Difficulty: <span className="font-medium text-green-600">Easy</span></p>
@@ -34,7 +34,7 @@ export default function Games() {
                         <span>Green = exact match</span>
                     </div>
                     <Link
-                        href="/games/yeezle-easy"
+                        href="/games/carble-easy"
                         className="inline-block bg-sky-500 hover:bg-sky-600 text-white font-medium py-2 px-4 rounded-lg transition-all"
                     >
                         Play Easy Version
@@ -46,7 +46,7 @@ export default function Games() {
                     <div className="flex items-center gap-3 mb-2">
                         <Atom className="text-red-500" size={24} />
                         <h2 className="text-xl font-semibold text-gray-800">
-                            Periodic Trends Yeezle
+                            Yeezle: Periodic Trends
                         </h2>
                     </div>
                     <p className="text-sm text-gray-500 mb-4">Difficulty: <span className="font-medium text-red-600">Hard</span></p>
@@ -62,7 +62,7 @@ export default function Games() {
                         <span>Green = exact match</span>
                     </div>
                     <Link
-                        href="/games/yeezle-hard"
+                        href="/games/carble-hard"
                         className="inline-block bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-all"
                     >
                         Play Hard Version

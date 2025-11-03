@@ -5,53 +5,55 @@ import elementsJSON from "../../../../elements.json";
 interface ElementData {
   element_name: string;
   symbol: string;
-  atomic_number: number;
-  atomic_mass: number;
-  ion_charge: string;
   group: number; // Column
   period: number; // Row
+  electronegativity: number | null;
+  electron_affinity: number | null;
+  first_ionization_energy: number | null;
+  atomic_radius: number | null;
 }
 
 interface Guess {
   element_name: string;
   symbol: string;
-  atomicNumber: number;
-  atomicMass: number;
-  ionCharge: number;
+  electronegativity: number;
+  electronAffinity: number;
+  ionizationEnergy: number;
+  atomicRadius: number;
 }
 
 const yellowRange = {
-  atomicNumber: 5,
-  atomicMass: 15,
-  ionCharge: 2,
+  electronegativity: 2,
+  electronAffinity: 25,
+  ionizationEnergy: 50,
+  atomicRadius: 25,
 };
 
 const elementsData: ElementData[] = (elementsJSON as any[]).map((e) => ({
   element_name: e.element_name,
   symbol: e.symbol,
-  atomic_number: e.atomic_number,
-  atomic_mass: e.atomic_mass,
-  ion_charge: e.ion_charge,
   group: e.group ?? 1,
   period: e.period ?? 1,
+  electronegativity: e.electronegativity ?? 0,
+  electron_affinity: e.electron_affinity ?? 0,
+  first_ionization_energy: e.first_ionization_energy ?? 0,
+  atomic_radius: e.atomic_radius ?? 0,
 }));
 
 const learnDefinitions = [
-  { term: "Atomic Number", definition: "The number of protons in an atom." },
-  { term: "Atomic Mass", definition: "The mass of an atom, usually in atomic mass units (amu)." },
-  { term: "Ion Charge", definition: "The net charge of an atom when it gains or loses electrons." },
+  { term: "Electronegativity", definition: "Measure of how strongly an atom attracts electrons in a bond." },
+  { term: "Electron Affinity", definition: "Energy released when an atom gains an electron." },
+  { term: "1st Ionization Energy", definition: "Energy required to remove the first electron from a neutral atom." },
+  { term: "Atomic Radius", definition: "Approximate size of an atom." },
 ];
 
-export default function EasyYeezle() {
+export default function HardCarble() {
   const [guesses, setGuesses] = useState<Guess[]>([]);
   const [input, setInput] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [targetElement, setTargetElement] = useState<ElementData | null>(null);
   const [gameOver, setGameOver] = useState(false);
   const [won, setWon] = useState(false);
-
-  const safeIonCharge = (e: ElementData) =>
-    e.group !== undefined ? (e.group <= 2 ? e.group : e.group - 10) : 0;
 
   const startNewGame = () => {
     const randomIndex = Math.floor(Math.random() * elementsData.length);
@@ -66,6 +68,8 @@ export default function EasyYeezle() {
   useEffect(() => {
     startNewGame();
   }, []);
+
+  const safeValue = (val: number | null) => val ?? 0;
 
   const filteredOptions = useMemo(() => {
     if (!input) return [];
@@ -82,9 +86,10 @@ export default function EasyYeezle() {
     const newGuess: Guess = {
       element_name: element.element_name,
       symbol: element.symbol,
-      atomicNumber: element.atomic_number,
-      atomicMass: element.atomic_mass,
-      ionCharge: safeIonCharge(element),
+      electronegativity: safeValue(element.electronegativity),
+      electronAffinity: safeValue(element.electron_affinity),
+      ionizationEnergy: safeValue(element.first_ionization_energy),
+      atomicRadius: safeValue(element.atomic_radius),
     };
 
     setGuesses([...guesses, newGuess]);
@@ -112,22 +117,24 @@ export default function EasyYeezle() {
   const displayRows = gameOver && targetElement ? [...guesses, {
     element_name: targetElement.element_name,
     symbol: targetElement.symbol,
-    atomicNumber: targetElement.atomic_number,
-    atomicMass: targetElement.atomic_mass,
-    ionCharge: safeIonCharge(targetElement),
+    electronegativity: safeValue(targetElement.electronegativity),
+    electronAffinity: safeValue(targetElement.electron_affinity),
+    ionizationEnergy: safeValue(targetElement.first_ionization_energy),
+    atomicRadius: safeValue(targetElement.atomic_radius)
   }] : guesses;
 
   const guessedSymbols = guesses.map(g => g.symbol);
 
+  // Create a grid for periodic table (rows: 1-7, columns: 1-18)
   const periods = Array.from({ length: 7 }, (_, i) => i + 1);
   const groups = Array.from({ length: 18 }, (_, i) => i + 1);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start py-10 bg-gray-100">
-      <h1 className="text-3xl font-bold mb-6">Easy Yeezle</h1>
+      <h1 className="text-3xl font-bold mb-6">Carble: Periodic Trends</h1>
 
       {/* Learn Section */}
-      <div className="w-full max-w-4xl mb-6 p-4 bg-white rounded shadow">
+      <div className="w-full max-w-5xl mb-6 p-4 bg-white rounded shadow">
         <h2 className="text-xl font-semibold mb-2">Learn:</h2>
         <ul className="list-disc list-inside">
           {learnDefinitions.map(ld => (
@@ -136,7 +143,7 @@ export default function EasyYeezle() {
         </ul>
       </div>
 
-      {/* Periodic Table */}
+      {/* Periodic Table Grid */}
       <div className="mb-6">
         {periods.map(period => (
           <div key={period} className="flex gap-1">
@@ -184,7 +191,7 @@ export default function EasyYeezle() {
         )}
       </div>
 
-      {/* Win/Lose + Play Again */}
+      {/* Win/Lose Message + Play Again */}
       {gameOver && (
         <div className="mb-4 flex flex-col items-center gap-2">
           <div className={`p-2 rounded ${won ? "bg-green-200" : "bg-red-200"}`}>
@@ -200,15 +207,16 @@ export default function EasyYeezle() {
       )}
 
       {/* Guess Table */}
-      <div className="overflow-x-auto w-full max-w-4xl">
+      <div className="overflow-x-auto w-full max-w-5xl">
         <table className="min-w-full bg-white rounded shadow">
           <thead>
             <tr className="bg-gray-200 text-center">
               <th className="px-4 py-2 border">Element</th>
               <th className="px-4 py-2 border">Symbol</th>
-              <th className="px-4 py-2 border">Atomic Number (+/-5)</th>
-              <th className="px-4 py-2 border">Atomic Mass (+/-15)</th>
-              <th className="px-4 py-2 border">Ion Charge (+/-2)</th>
+              <th className="px-4 py-2 border">Electronegativity (+/-2)</th>
+              <th className="px-4 py-2 border">Electron Affinity (+/-25)</th>
+              <th className="px-4 py-2 border">1st Ionization Energy (+/-50)</th>
+              <th className="px-4 py-2 border">Atomic Radius (+/-25)</th>
             </tr>
           </thead>
           <tbody>
@@ -222,14 +230,17 @@ export default function EasyYeezle() {
                   <td className={`border px-4 py-2 ${getColorString(g.symbol, actual.symbol)}`}>
                     {g.symbol}
                   </td>
-                  <td className={`border px-4 py-2 ${getColorNumeric(g.atomicNumber, actual.atomic_number, yellowRange.atomicNumber)}`}>
-                    {g.atomicNumber}
+                  <td className={`border px-4 py-2 ${getColorNumeric(g.electronegativity, safeValue(actual.electronegativity), yellowRange.electronegativity)}`}>
+                    {g.electronegativity}
                   </td>
-                  <td className={`border px-4 py-2 ${getColorNumeric(g.atomicMass, actual.atomic_mass, yellowRange.atomicMass)}`}>
-                    {g.atomicMass}
+                  <td className={`border px-4 py-2 ${getColorNumeric(g.electronAffinity, safeValue(actual.electron_affinity), yellowRange.electronAffinity)}`}>
+                    {g.electronAffinity}
                   </td>
-                  <td className={`border px-4 py-2 ${getColorNumeric(g.ionCharge, safeIonCharge(actual), yellowRange.ionCharge)}`}>
-                    {g.ionCharge}
+                  <td className={`border px-4 py-2 ${getColorNumeric(g.ionizationEnergy, safeValue(actual.first_ionization_energy), yellowRange.ionizationEnergy)}`}>
+                    {g.ionizationEnergy}
+                  </td>
+                  <td className={`border px-4 py-2 ${getColorNumeric(g.atomicRadius, safeValue(actual.atomic_radius), yellowRange.atomicRadius)}`}>
+                    {g.atomicRadius}
                   </td>
                 </tr>
               );
