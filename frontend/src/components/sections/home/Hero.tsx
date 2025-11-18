@@ -40,7 +40,7 @@ export default function Hero() {
                      dark:border-gray-800 dark:bg-black/60 dark:text-teal-200"
                 >
                     <SparklesIcon className="h-4 w-4 text-sky-600 dark:text-teal-300" />
-                    Learn smarter in 5 minutes a day
+                    Learn smarter in 6-7 minutes a day
                 </span>
 
                 <h1 className="mt-5 text-balance text-4xl font-extrabold tracking-tight sm:text-6xl">
@@ -54,11 +54,10 @@ export default function Hero() {
                 </h1>
 
                 <p className="mx-auto mt-4 max-w-2xl text-pretty text-gray-700 dark:text-gray-300 sm:text-lg">
-                    Daily bite-sized lessons across Math, Physics, CS, and Engineering. Build real intuition
-                    with visuals, mini-quizzes, and spaced review.
+                    Daily byte-sized lessons across various chemistry topics. Build real intuition
+                    with visuals, mini-games, and lessons.
                 </p>
 
-                {/* value chips */}
                 <ul className="mx-auto mt-6 flex max-w-2xl flex-wrap items-center justify-center gap-2 text-sm text-sky-900 dark:text-teal-200">
                     {["No ads", "Spaced review", "Interactive practice"].map((t) => (
                         <li
@@ -76,7 +75,7 @@ export default function Hero() {
                     <Button as="a" href="/signup" variant="primary">
                         Start learning free
                     </Button>
-                    <Button as="a" href="/features" variant="outline">
+                    <Button as="a" href="/games" variant="outline">
                         See how it works
                     </Button>
                 </div>
@@ -100,7 +99,7 @@ export default function Hero() {
                 </div>
 
                 <p className="mt-4 text-xs text-sky-900/70 dark:text-gray-400">
-                    No ads. Cancel anytime. Built for students &amp; teachers.
+                    No ads. Built for students &amp; teachers.
                 </p>
             </div>
         </section>

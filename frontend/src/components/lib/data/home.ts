@@ -1,7 +1,7 @@
 export const featureItems = [
-    { title: "Daily bites", desc: "5–7 minute lessons that fit anywhere.", icon: "book" },
-    { title: "Interactive practice", desc: "Instant feedback with guided hints.", icon: "bolt" },
-    { title: "Spaced review", desc: "Auto-review cards that make it stick.", icon: "repeat" },
+    { title: "Daily bytes", desc: "6–7 minute games that fit anywhere.", icon: "book" },
+    { title: "Lessons", desc: "Instant feedback with guided hints.", icon: "bolt" },
+    { title: "Spaced review", desc: "Play games daily to make it stick.", icon: "repeat" },
 ];
 
 export const dailyLessons = [
@@ -11,29 +11,28 @@ export const dailyLessons = [
 ];
 
 export const statsData = [
-    { k: "Learners", v: "12k+" },
-    { k: "Avg. daily time", v: "6m 12s" },
-    { k: "Practice problems", v: "1,800+" },
-    { k: "Courses", v: "24" },
+    {k: "Subject", v: "1"},
+    { k: "Games", v: "5" },
+    { k: "Lessons", v: "6" },
+    { k: "Daily Commitment", v: "5 minutes" },
 ];
 
 export const testimonialItems = [
-    { name: "Sara — AP Calc", quote: "Related rates finally clicked—short & clear." },
-    { name: "Noah — Robotics", quote: "Perfect quick physics refresh before meetings." },
-    { name: "Ava — UIL CS", quote: "Mini-quizzes are 🔥—fast feedback, no fluff." },
+    { name: "Dhyan — Chemistry", quote: "Intermolecular forces finally make sense!" },
+    { name: "Preethi — Chemistry", quote: "Perfect molarity refresher before my test." },
 ];
 
 export const faqItems = [
     {
         q: "Is it really only a few minutes a day?",
-        a: "Yes—each lesson is 5–7 minutes, with optional practice.",
+        a: "Yes—each game is around 6–7 minutes, with optional lessons.",
     },
     {
         q: "Do I need an account?",
-        a: "Sample lessons free. Sign up to track progress and get spaced review.",
+        a: "Sign up to track progress and access the full experience.",
     },
     {
         q: "Is it free?",
-        a: "Core lessons are free. Premium adds advanced practice & analytics.",
+        a: "Everything is free!",
     },
 ];

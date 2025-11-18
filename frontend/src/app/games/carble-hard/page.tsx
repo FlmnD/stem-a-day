@@ -122,7 +122,6 @@ export default function HardCarble() {
     <div className="min-h-screen flex flex-col items-center justify-start py-10 bg-gray-100">
       <h1 className="text-3xl font-bold mb-6">Carble: Periodic Trends</h1>
 
-      {/* Learn Section */}
       <div className="w-full max-w-5xl mb-6 p-4 bg-white rounded shadow">
         <h2 className="text-xl font-semibold mb-2">Learn:</h2>
         <ul className="list-disc list-inside">
@@ -130,7 +129,6 @@ export default function HardCarble() {
         </ul>
       </div>
 
-      {/* Periodic Table */}
       <div className="mb-6">
         {periods.map(period => (
           <div key={period} className="flex gap-1">
@@ -154,7 +152,6 @@ export default function HardCarble() {
         ))}
       </div>
 
-      {/* Input */}
       <div className="relative w-96 mb-6">
         <input
           type="text"
@@ -180,7 +177,6 @@ export default function HardCarble() {
         )}
       </div>
 
-      {/* Win/Lose + Play Again */}
       {gameOver && (
         <div className="mb-4 flex flex-col items-center gap-2">
           <div className={`p-2 rounded ${won ? "bg-green-200" : "bg-red-200"}`}>
@@ -192,7 +188,6 @@ export default function HardCarble() {
         </div>
       )}
 
-      {/* Guess Table */}
       <div className="overflow-x-auto w-full max-w-5xl">
         <table className="min-w-full bg-white rounded shadow">
           <thead>
