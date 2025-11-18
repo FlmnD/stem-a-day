@@ -25,6 +25,7 @@ interface Guess {
 
 const yellowRange = { electronegativity: 2, electronAffinity: 25, ionizationEnergy: 50, atomicRadius: 25 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const elementsData: ElementData[] = (elementsJSON as any[]).map((e) => ({
   element_name: e.element_name,
   symbol: e.symbol,

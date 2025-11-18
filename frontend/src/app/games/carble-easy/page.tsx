@@ -23,6 +23,7 @@ interface Guess {
 
 const yellowRange = { atomicNumber: 5, atomicMass: 15, ionCharge: 2 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const elementsData: ElementData[] = (elementsJSON as any[]).map((e) => ({
   element_name: e.element_name,
   symbol: e.symbol,
