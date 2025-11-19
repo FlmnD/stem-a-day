@@ -6,7 +6,7 @@ import { Star, FlaskConical, Atom } from "lucide-react";
 
 export default function Games() {
     return (
-        <section className="min-h-[calc(100dvh-3.5rem)] bg-gradient-to-b from-sky-50 via-white to-white px-6 py-10">
+        <section className="min-h-[calc(100dvh-3.5rem)] bg-linear-to-b from-sky-50 via-white to-white px-6 py-10">
             <h1 className="text-3xl font-bold text-sky-800 mb-2">Chemistry Games</h1>
             <p className="text-gray-600 mb-10">
                 Test your periodic table skills with our Carble challenges!

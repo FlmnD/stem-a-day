@@ -10,3 +10,6 @@
 - Node JS LTS
 - Docker
 - Python 12
+
+## Check
+- Why lucide-react isn't automatically installed with npm install

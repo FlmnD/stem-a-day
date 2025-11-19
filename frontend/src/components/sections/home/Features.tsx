@@ -6,7 +6,7 @@ export default function Features() {
     const iconMap = { book: BookIcon, bolt: BoltIcon, repeat: RepeatIcon } as const;
 
     return (
-        <section className="bg-white">
+        <section className="bg-sky-50/60">
             <div className="mx-auto max-w-6xl px-4 py-16">
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     {featureItems.map(({ title, desc, icon }) => {

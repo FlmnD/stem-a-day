@@ -5,16 +5,17 @@ export const featureItems = [
 ];
 
 export const dailyLessons = [
-    { tag: "Physics", title: "Why g ≈ 9.8? Dimensional reasoning", time: "6 min" },
-    { tag: "Calculus", title: "Related rates: cones made easy", time: "7 min" },
-    { tag: "CS", title: "Two’s complement in under 5", time: "5 min" },
+    { tag: "Chemistry", title: "Common Characteristics", time: "6 min" },
+    { tag: "Chemistry", title: "Periodic Trends", time: "7 min" },
+    { tag: "Chemistry", title: "Nomenclature", time: "6 min" },
+    {tag: "Chemistry", title: "Intermolecular Forces", time: "7 min"}
 ];
 
 export const statsData = [
     {k: "Subject", v: "1"},
     { k: "Games", v: "5" },
-    { k: "Lessons", v: "6" },
-    { k: "Daily Commitment", v: "5 minutes" },
+    { k: "Lessons", v: "10" },
+    { k: "Daily Commitment", v: "6-7 min" },
 ];
 
 export const testimonialItems = [

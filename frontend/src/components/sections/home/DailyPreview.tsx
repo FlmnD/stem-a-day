@@ -12,7 +12,7 @@ export default function DailyPreview() {
                             View all lessons →
                         </a>
                     </div>
-                    <ul className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+                    <ul className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-4">
                         {dailyLessons.map((l) => (
                             <li
                                 key={l.title}
