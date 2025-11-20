@@ -12,7 +12,6 @@ export default function Home() {
   return (
     <main className="min-h-[calc(100dvh-3.5rem)] bg-linear-to-b from-sky-50 via-white to-white">
       <Hero />
-      {/* <LogoStrip /> */}
       <Features />
       <DailyPreview />
       <Stats />

@@ -8,6 +8,8 @@ app = FastAPI()
 # Change in production code
 origins = [
     "http://localhost:3000",
+    "http://localhost:8000",
+    "http://localhost:8001",
 ]
 
 app.add_middleware(
