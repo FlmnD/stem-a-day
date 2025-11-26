@@ -1,3 +1,4 @@
+//carble hard page
 'use client';
 import { useState, useMemo, useEffect } from "react";
 import elementsJSON from "../../../../elements.json";
@@ -8,6 +9,7 @@ interface ElementData {
   group: number;
   period: number;
   block: string;
+  atomic_number: number;
   electronegativity: number | null;
   electron_affinity: number | null;
   first_ionization_energy: number | null;
@@ -25,13 +27,13 @@ interface Guess {
 
 const yellowRange = { electronegativity: 2, electronAffinity: 25, ionizationEnergy: 50, atomicRadius: 25 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const elementsData: ElementData[] = (elementsJSON as any[]).map((e) => ({
   element_name: e.element_name,
   symbol: e.symbol,
   group: e.group ?? 1,
   period: e.period ?? 1,
   block: e.block ?? "s",
+  atomic_number: e.atomic_number,
   electronegativity: e.electronegativity ?? 0,
   electron_affinity: e.electron_affinity ?? 0,
   first_ionization_energy: e.first_ionization_energy ?? 0,
@@ -69,14 +71,34 @@ export default function HardCarble() {
   const safeValue = (val: number | null) => val ?? 0;
 
   const filteredOptions = useMemo(() => {
-    if (!input) return [];
-    return elementsData.filter(
-      (e) => e.element_name.toLowerCase().includes(input.toLowerCase()) || e.symbol.toLowerCase().includes(input.toLowerCase())
+    if (!input) return elementsData.sort((a, b) => a.atomic_number - b.atomic_number);
+
+    const lowerInput = input.toLowerCase();
+
+    const matches = elementsData.filter(
+      (e) =>
+        e.symbol.toLowerCase().includes(lowerInput) ||
+        e.element_name.toLowerCase().includes(lowerInput)
     );
+
+    matches.sort((a, b) => {
+      const aSymbolMatch = a.symbol.toLowerCase() === lowerInput ? 0 : 1;
+      const bSymbolMatch = b.symbol.toLowerCase() === lowerInput ? 0 : 1;
+      if (aSymbolMatch !== bSymbolMatch) return aSymbolMatch - bSymbolMatch;
+
+      return a.atomic_number - b.atomic_number;
+    });
+
+    return matches;
   }, [input]);
 
   const addGuess = (element: ElementData) => {
     if (!targetElement || gameOver) return;
+
+    if (guesses.some(g => g.symbol === element.symbol)) {
+      alert("Already guessed!");
+      return;
+    }
 
     const newGuess: Guess = {
       element_name: element.element_name,
@@ -130,6 +152,7 @@ export default function HardCarble() {
       </div>
 
       <div className="mb-6">
+        {/* Regular 7 periods */}
         {periods.map(period => (
           <div key={period} className="flex gap-1">
             {groups.map(group => {
@@ -140,9 +163,18 @@ export default function HardCarble() {
               return (
                 <div
                   key={element.symbol}
-                  className={`w-8 h-8 flex items-center justify-center text-xs border rounded
-                    ${guessed ? "bg-gray-300" : "bg-white"}
+                  className={`w-8 h-8 flex items-center justify-center text-xs border rounded cursor-pointer
+                    ${guessed ? "bg-gray-300" : ""}
                     ${isAnswer ? "bg-green-500 font-bold text-white" : ""}`}
+                  onClick={() => addGuess(element)}
+                  title={
+                    `Element: ${element.element_name}\n` +
+                    `Symbol: ${element.symbol}\n` +
+                    (element.electronegativity !== undefined ? `Electronegativity: ${element.electronegativity}\n` : '') +
+                    (element.electron_affinity !== undefined ? `Electron Affinity: ${element.electron_affinity}\n` : '') +
+                    (element.first_ionization_energy !== undefined ? `1st Ionization Energy: ${element.first_ionization_energy}\n` : '') +
+                    (element.atomic_radius !== undefined ? `Atomic Radius: ${element.atomic_radius}` : '')
+                  }
                 >
                   {element.symbol}
                 </div>
@@ -151,8 +183,66 @@ export default function HardCarble() {
           </div>
         ))}
       </div>
+      
+      {/* Lanthanides */}
+      <div className="flex gap-1 mt-2">
+        {elementsData
+          .filter(e => e.period === 6 && e.block === 'f')
+          .map(element => {
+            const guessed = guessedSymbols.includes(element.symbol);
+            const isAnswer = element.symbol === targetElement?.symbol && gameOver;
+            return (
+              <div
+                key={element.symbol}
+                className={`w-8 h-8 flex items-center justify-center text-xs border rounded cursor-pointer
+                  ${guessed ? "bg-gray-300" : ""}
+                  ${isAnswer ? "bg-green-500 font-bold text-white" : ""}`}
+                onClick={() => addGuess(element)}
+                title={
+                  `Element: ${element.element_name}\n` +
+                  `Symbol: ${element.symbol}\n` +
+                  (element.electronegativity !== undefined ? `Electronegativity: ${element.electronegativity}\n` : '') +
+                  (element.electron_affinity !== undefined ? `Electron Affinity: ${element.electron_affinity}\n` : '') +
+                  (element.first_ionization_energy !== undefined ? `1st Ionization Energy: ${element.first_ionization_energy}\n` : '') +
+                  (element.atomic_radius !== undefined ? `Atomic Radius: ${element.atomic_radius}` : '')
+                }
+              >
+                {element.symbol}
+              </div>
+            );
+          })}
+      </div>
 
-      <div className="relative w-96 mb-6">
+      {/* Actinides */}
+      <div className="flex gap-1 mt-1">
+        {elementsData
+          .filter(e => e.period === 7 && e.block === 'f')
+          .map(element => {
+            const guessed = guessedSymbols.includes(element.symbol);
+            const isAnswer = element.symbol === targetElement?.symbol && gameOver;
+            return (
+              <div
+                key={element.symbol}
+                className={`w-8 h-8 flex items-center justify-center text-xs border rounded cursor-pointer
+                  ${guessed ? "bg-gray-300" : ""}
+                  ${isAnswer ? "bg-green-500 font-bold text-white" : ""}`}
+                onClick={() => addGuess(element)}
+                title={
+                  `Element: ${element.element_name}\n` +
+                  `Symbol: ${element.symbol}\n` +
+                  (element.electronegativity !== undefined ? `Electronegativity: ${element.electronegativity}\n` : '') +
+                  (element.electron_affinity !== undefined ? `Electron Affinity: ${element.electron_affinity}\n` : '') +
+                  (element.first_ionization_energy !== undefined ? `1st Ionization Energy: ${element.first_ionization_energy}\n` : '') +
+                  (element.atomic_radius !== undefined ? `Atomic Radius: ${element.atomic_radius}` : '')
+                }
+              >
+                {element.symbol}
+              </div>
+            );
+          })}
+      </div>
+
+      <div className="relative w-96 mt-6 mb-4">
         <input
           type="text"
           className="w-full px-4 py-2 border rounded shadow focus:outline-none"
@@ -160,9 +250,10 @@ export default function HardCarble() {
           value={input}
           onChange={(e) => { setInput(e.target.value); setShowDropdown(true); }}
           onFocus={() => setShowDropdown(true)}
+          onBlur={() => setTimeout(() => setShowDropdown(false), 120)}
           disabled={gameOver}
         />
-        {showDropdown && filteredOptions.length > 0 && (
+        {showDropdown && (
           <div className="absolute z-10 w-full max-h-60 overflow-y-auto bg-white border rounded mt-1 shadow">
             {filteredOptions.map((e) => (
               <div
@@ -176,11 +267,16 @@ export default function HardCarble() {
           </div>
         )}
       </div>
+      
+      {/* Hint note */}
+      <div className="mb-4 text-sm text-gray-700 italic">
+        When in doubt, choose Carbon, the center of life!
+      </div>
 
       {gameOver && (
         <div className="mb-4 flex flex-col items-center gap-2">
           <div className={`p-2 rounded ${won ? "bg-green-200" : "bg-red-200"}`}>
-            {won ? "Congratulations! You guessed the element!" : `Game Over! Correct: ${targetElement?.element_name} (${targetElement?.symbol})`}
+            {won ? "Congratulations! You guessed the element!" : `Game Over! You Lost! The element was ${targetElement?.element_name} (${targetElement?.symbol})!`}
           </div>
           <button className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600" onClick={startNewGame}>
             Play Again
