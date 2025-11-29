@@ -4,7 +4,7 @@ export default function Hero() {
     return (
         <section
             className="relative overflow-hidden
-                 bg-gradient-to-b from-sky-50 via-white to-white
+                 bg-linear-to-b from-sky-50 via-white to-white
                  dark:from-black dark:via-[#0b0b0b] dark:to-[#0b0b0b]"
         >
       
@@ -18,7 +18,7 @@ export default function Hero() {
             
                 <div
                     className="absolute right-[-20%] top-[10%] h-[50vh] w-[60vw] rounded-full blur-2xl
-                     bg-gradient-to-br from-emerald-300/50 to-sky-300/40
+                     bg-linear-to-br from-emerald-300/50 to-sky-300/40
                      dark:from-teal-600/30 dark:to-emerald-700/20"
                 />
     
@@ -45,7 +45,7 @@ export default function Hero() {
 
                 <h1 className="mt-5 text-balance text-4xl font-extrabold tracking-tight sm:text-6xl">
                     <span
-                        className="bg-gradient-to-r from-sky-700 via-sky-600 to-emerald-600
+                        className="bg-linear-to-r from-sky-700 via-sky-600 to-emerald-600
                        dark:from-teal-300 dark:via-teal-400 dark:to-emerald-300
                        bg-clip-text text-transparent"
                     >
@@ -87,8 +87,8 @@ export default function Hero() {
                        dark:border-gray-800 dark:bg-black/60"
                     >
                         <div
-                            className="aspect-[16/9] w-full rounded-xl border
-                         border-sky-200 bg-gradient-to-br from-sky-50 to-emerald-50
+                            className="aspect-video w-full rounded-xl border
+                         border-sky-200 bg-linear-to-br from-sky-50 to-emerald-50
                          dark:border-gray-800 dark:from-gray-900 dark:to-gray-900"
                         >
                             <div className="grid h-full w-full place-items-center text-sky-500 dark:text-teal-300">

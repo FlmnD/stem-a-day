@@ -31,12 +31,12 @@ export default function Navbar() {
             className={cn(
                 "sticky top-0 z-50 w-full border-b transition-colors duration-300 backdrop-blur",
                 "border-sky-100 bg-white/85",
-                "dark:!border-gray-800 dark:!bg-black"
+                "dark:border-gray-800! dark:bg-black!"
             )}
         >
             <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
                 <Link href="/" className="font-semibold tracking-tight text-sky-900 dark:text-white">
-                    <span className="bg-gradient-to-r from-sky-700 via-sky-600 to-emerald-600 dark:from-teal-300 dark:via-teal-400 dark:to-emerald-300 bg-clip-text text-transparent">
+                    <span className="bg-linear-to-r from-sky-700 via-sky-600 to-emerald-600 dark:from-teal-300 dark:via-teal-400 dark:to-emerald-300 bg-clip-text text-transparent">
                         STEM a Day
                     </span>
                 </Link>
