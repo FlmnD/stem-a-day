@@ -49,8 +49,8 @@ export default function Games() {
                     </div>
                     <p className="text-sm text-gray-500 mb-4">Difficulty: <span className="font-medium text-red-600">Hard</span></p>
                     <p className="text-gray-700 mb-6">
-                        Test your mastery of <strong>periodic trends</strong>: electronegativity,
-                        electron affinity, ionization energy, and atomic radius.  
+                        Test your mastery of <strong>periodic trends</strong>: atomic radius,
+                         ionization energy, and electronegativity.  
                         Use logic to guess the element in 8 tries!
                     </p>
                     <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">

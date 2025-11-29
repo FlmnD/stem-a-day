@@ -21,7 +21,6 @@ export function CarbleEasyArticle(): Article {
                     An <strong>element</strong> is a pure substance that cannot be broken down or transformed
                     into another substance.
                 </p>
-
                 <h3 className="font-semibold">Atom</h3>
                 <p className="mb-1">
                     An <strong>atom</strong> is the smallest chemical particle of an element. It includes:
@@ -31,32 +30,40 @@ export function CarbleEasyArticle(): Article {
                     <li>Negative <strong>electrons</strong></li>
                     <li>Neutral <strong>neutrons</strong></li>
                 </ul>
+                {/* "Learn more about elements and atoms at *external hyperlink for resource website*." */}
+
                 <p className="italic text-gray-600 mb-4">
                     <img src="/atomic and mass number.jpg" alt="atomic and mass number example" height="300" width="200" />
                 </p>
+                {/* "Learn more about atomic mass and mass number at *external hyperlink for resource website*." */}
 
                 <h3 className="font-semibold">Atomic Number</h3>
                 <p className="mb-2">
                     The <strong>atomic number</strong> is the number of protons in an atom.
                     On the periodic table, assume protons ≈ electrons ≈ neutrons (simplified model).
+                    The atomic number increases by one as one proton is added to create the next element on the periodic table.
+                    An element is defined by there number of protons it has. One proton is always a Hydrogen atom. Two protons is always a Helium atom and so on.
                 </p>
                 <p className="mb-2">Examples:</p>
                 <ul className="list-disc ml-6 mb-3">
-                    <li>Hydrogen → 1</li>
-                    <li>Helium → 2</li>
-                    <li>Carbon → 6</li>
+                    <li>Hydrogen: 1</li>
+                    <li>Helium: 2</li>
+                    <li>Carbon: 6</li>
                 </ul>
                 <p className="mb-4">
-                    It increases by one as you move <strong>left → right</strong> across a period
-                    and increases dramatically as you move <strong>top → bottom</strong>.
+                    It <strong>increases by one</strong> as you move left → right <strong>across a period</strong>
+                     and <strong>increases dramatically</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
                     <img src="/4 protons diagram.png" alt="atom diagram example" height="300" width="200" />
                 </p>
+                {/* "Learn more about atomic number at *external hyperlink for resource website*." */}
 
                 <h3 className="font-semibold">Atomic Mass</h3>
                 <p className="mb-2">
                     Atomic mass (or mass number) is the mass of an atom.
+                    Mass number should increase by about 1-3 amu for each proceeding element to account for an additional proton and neutron (and practically weightless electron).
+                    (Be aware that the periodic table is an average based on the probability of atoms for each element, so <strong>values will vary from theoretical</strong> and experimental values.)
                     Approximate values:
                 </p>
                 <ul className="list-disc ml-6 mb-3">
@@ -64,59 +71,58 @@ export function CarbleEasyArticle(): Article {
                     <li>1 neutron ≈ 1 amu</li>
                     <li>1 electron (e⁻) ≈ 0 amu (so electrons barely affect mass)</li>
                 </ul>
-
                 <p className="mb-2">Examples:</p>
                 <ul className="list-disc ml-6 mb-3">
                     <li>Hydrogen: 1 p + 1 e⁻ → ~1 amu</li>
                     <li>Helium: 2 p + 2 n + 2 e⁻ → ~4 amu</li>
                     <li>Carbon: 6 p + 6 n + 6 e⁻ → ~12 amu</li>
                 </ul>
-
                 <p className="mb-4">
-                    Mass increases across each row (<strong>left → right</strong>)
-                    and increases significantly down a group (<strong>top → bottom</strong>).
+                    It <strong>increases</strong> as you move left → right <strong>across a period</strong>
+                     and <strong>increases dramatically</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
                     <img src="/the structure of atom.jpg" alt="the structure of atom diagram" height="300" width="200" />
                 </p>
+                {/* "Learn more about atomic mass at *external hyperlink for resource website*." */}
 
                 <h3 className="font-semibold">Ionic Charge</h3>
                 <p className="mb-2">
                     The <strong>ionic charge</strong> is the charge an atom gets when it loses or gains electrons.
+                    Charge is only depends on how many valence (outermost) electrons an atom originally has.
+                    It can then lose all those electrons or gain more electrons in order to have a full valence shell (typically of 8 electrons but 2 for H and He).
                 </p>
                 <p className="mb-3 italic text-gray-700">Reminder: electrons have a negative charge!</p>
-
                 <p className="mb-2">Examples:</p>
                 <ul className="list-disc ml-6 mb-3">
-                    <li>Hydrogen → +</li>
-                    <li>Carbon → 0</li>
-                    <li>Fluorine → –</li>
-                    <li>Neon → 0</li>
+                    <li>Hydrogen: +</li>
+                    <li>Carbon: 0</li>
+                    <li>Fluorine: –</li>
+                    <li>Neon: 0</li>
                 </ul>
-
                 <p className="font-semibold mb-2">General Patterns:</p>
                 <ul className="list-disc ml-6 mb-4">
-                    <li>Metals → positive charge</li>
-                    <li>Nonmetals → negative charge</li>
-                    <li>Transition metals → variable charges</li>
-                    <li>Noble gases → 0 charge</li>
+                    <li>Metals: positive charge</li>
+                    <li>Nonmetals: negative charge</li>
+                    <li>Transition metals: variable charges</li>
+                    <li>Noble gases: 0 charge</li>
                 </ul>
-
                 <p className="font-semibold mb-2">Charge by Group:</p>
                 <ul className="list-disc ml-6 mb-3">
-                    <li>Group 1 → +</li>
-                    <li>Group 2 → 2+</li>
-                    <li>Groups 3–12 → varies</li>
-                    <li>Group 13 → 3+</li>
-                    <li>Group 14 → 4+ or 0</li>
-                    <li>Group 15 → 3–</li>
-                    <li>Group 16 → 2–</li>
-                    <li>Group 17 → –</li>
-                    <li>Group 18 → 0</li>
+                    <li>Group 1: +</li>
+                    <li>Group 2: 2+</li>
+                    <li>Groups 3–12: varies</li>
+                    <li>Group 13: 3+</li>
+                    <li>Group 14: 4+ or 0</li>
+                    <li>Group 15: 3–</li>
+                    <li>Group 16: 2–</li>
+                    <li>Group 17: –</li>
+                    <li>Group 18: 0</li>
                 </ul>
                 <p className="italic text-gray-600">
                     <img src="/4 diagrams ionic charge.gif" alt="4 atom diagrams" height="400" width="300" />
                 </p>
+                {/* "Learn more about ionic charge at *external hyperlink for resource website*." */}
             </div>
         </>
     );
@@ -124,24 +130,131 @@ export function CarbleEasyArticle(): Article {
 
 export function CarbleHardArticle(): Article {
 
-    const learnDefinitions = [
+    /*const learnDefinitions = [
         { term: "Electronegativity", definition: "Measure of how strongly an atom attracts electrons in a bond." },
         { term: "Electron Affinity", definition: "Energy released when an atom gains an electron." },
         { term: "1st Ionization Energy", definition: "Energy required to remove the first electron from a neutral atom." },
         { term: "Atomic Radius", definition: "Approximate size of an atom." },
-    ];
-
+    ];*/
+    
     return (
         <>
-            <h1 className="text-3xl font-bold mb-6">Carble: Periodic Trends</h1>
+            {/*<h1 className="text-3xl font-bold mb-6">Carble: Periodic Trends</h1>
 
             <div className="w-full max-w-5xl mb-6 p-4 bg-white rounded shadow">
                 <h2 className="text-xl font-semibold mb-2">Learn:</h2>
                 <ul className="list-disc list-inside">
                     {learnDefinitions.map(ld => <li key={ld.term}><strong>{ld.term}:</strong> {ld.definition}</li>)}
                 </ul>
-            </div>
+            </div>*/}
 
+            <h1 className="text-3xl font-bold mb-6">Carble: Periodic Trends</h1>
+
+            <div className="max-w-3xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
+                <h2 className="text-xl font-bold mb-3">Learn About the Essentials!</h2>
+
+                <p className="mb-4">
+                    Learn about elements, atoms, electronegativity, ionization energy, and atomic radius here!
+                    These hints will help you play the game successfully, so don’t skip them.
+                    You should spend at least <strong>6–7 minutes</strong> learning before starting the game.
+                    If you need more help, feel free to explore the external links.
+                    <strong> Enjoy learning and playing!</strong>
+                </p>
+
+                <h3 className="font-semibold">Element</h3>
+                <p className="mb-3">
+                    An <strong>element</strong> is a pure substance that cannot be broken down or transformed
+                    into another substance.
+                </p>
+                <h3 className="font-semibold">Atom</h3>
+                <p className="mb-1">
+                    An <strong>atom</strong> is the smallest chemical particle of an element. It includes:
+                </p>
+                <ul className="list-disc ml-6 mb-3">
+                    <li>Positive <strong>protons</strong></li>
+                    <li>Negative <strong>electrons</strong></li>
+                    <li>Neutral <strong>neutrons</strong></li>
+                </ul>
+                {/* "Learn more about elements and atoms at *external hyperlink for resource website*." */}
+
+                <p className="italic text-gray-600 mb-4">
+                    {/* periodic trends picture with patterns (arrows across periodic table) for atomic radius, ionization energy, and electronegativity (with null group 18 column for electronegativity) */}
+                    {/*<img src="/atomic and mass number.jpg" alt="atomic and mass number example" height="300" width="200" />*/}
+                </p>
+                {/* "Learn more about periodic trends at *external hyperlink for resource website*." */}
+
+                <h3 className="font-semibold">Atomic Radius</h3>
+                <p className="mb-2">
+                    Atomic radius (similar to ionic radius) is the distance between the nucleus and valence (outermost) shell of an atom. It is the approximate size of an atom.
+                    As more protons are added to the nucleus to create new elements, forces between the nucleus and electrons are strengthened due to opposite charge attractions, pulling electrons closer into the atom and reducing the atomic radius.
+                    But atoms with more electron shells have larger atomic radii because the outermost shell is farther from the nucleus.
+                </p>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-3">
+                    <li>Hydrogen: 53</li>
+                    <li>Sodium: 190</li>
+                    <li>Carbon: 67</li>
+                </ul>
+                <p className="mb-4">
+                    It <strong>decreases</strong> as you move left → right <strong>across a period</strong>
+                     and <strong>increases</strong> as you move top → bottom <strong>down a group</strong>.
+                </p>
+                <p className="italic text-gray-600 mb-4">
+                    {/* atomic radius example diagrams picture */}
+                    {/*<img src="/the structure of atom.jpg" alt="the structure of atom diagram" height="300" width="200" />*/}
+                </p>
+                {/* "Learn more about atomic radius at *external hyperlink for resource website*." */}
+
+                <h3 className="font-semibold">(1st) Ionization Energy</h3>
+                <p className="mb-2">
+                    The <strong>ionization energy</strong> is the energy is takes to <strong>remove an electron</strong> from a neutral atom.
+                    There are multiple ionization energies for each atom, but we will only focus on the first ionization energy. This is the energy it takes to remove the FIRST electron. Second refers to the next electron removed and so on.
+                    As more protons are added to the nucleus to create new elements, forces between increased electrons and the nucleus strengthen due to opposite charge attractions, increasing ionization energy, the energy needed to break these forces.
+                    But atoms with more electron shells have lower ionization energies because the outermost shell is farther from the nucleus, weakening these forces.
+                    Examples:
+                </p>
+                <p className="mb-3 italic text-gray-700">Note: Noble gases (group 18) have super high ionization energies because they want to keep and not lose ANY electrons from their full valence shell! </p>
+                <ul className="list-disc ml-6 mb-3">
+                    <li>Hydrogen: 1312</li>
+                    <li>Helium: 2372.3</li>
+                    <li>Carbon: 1086.5</li>
+                    <li>Neon: 2080.7</li>
+                </ul>
+                <p className="mb-4">
+                    It <strong>increases dramatically</strong> as you move left → right <strong>across a period</strong>
+                     and <strong>decreases</strong> as you move top → bottom <strong>down a group</strong>.
+                </p>
+                <p className="italic text-gray-600">
+                    {/* first ionization energy example diagrams picture */}
+                    {/*<img src="/4 diagrams ionic charge.gif" alt="4 atom diagrams" height="400" width="300" />*/}
+                </p>
+                {/* "Learn more about ionization energy at *external hyperlink for resource website*." */}
+
+                <h3 className="font-semibold">Electronegativity</h3>
+                <p className="mb-2">
+                    The <strong>electronegativity</strong> is a measure of how well an atom attracts electrons. It is the strength of attraction forces between external electrons and an atom's nucleus.
+                    As more protons are added to the nucleus to create new elements, forces between the nucleus and electrons are strengthened due to opposite charge attractions, more easily attracting electrons to join the atom and increasing electronegativity.
+                    But atoms with more electron shells have less electronegativity because the nucleus's force of attraction is less effective on electrons farther away, outside the atom's many electron shells.
+                    (Fun and common fact: Flourine is the most electronegative element!)
+                </p>
+                <p className="mb-3 italic text-gray-700">Note: Noble gases (group 18) do not have electronegativities! They want to keep their full valence shell, not attract new electrons. </p>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-3">
+                    <li>Hydrogen: 2.2</li>
+                    <li>Helium: null</li>
+                    <li>Carbon: 2.55</li>
+                    <li>Flourine: 3.98</li>
+                </ul>
+                <p className="mb-4">
+                    It <strong>increases dramatically</strong> as you move left → right <strong>across a period</strong>
+                     and <strong>decreases</strong> as you move top → bottom <strong>down a group</strong>.
+                </p>
+                <p className="italic text-gray-600 mb-4">
+                    {/* electronegativity example diagrams picture */}
+                    {/*<img src="/4 protons diagram.png" alt="atom diagram example" height="300" width="200" />*/}
+                </p>
+                {/* "Learn more about electronegativity at *external hyperlink for resource website*." */}
+            </div>
         </>
     );
 }
@@ -169,7 +282,7 @@ export function CarbleEasyLesson(): Lesson {
                     <li>
                         <strong>Access element properties</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Hover your mouse over any element to view its name, atomic number, atomic mass, and ionic charge</li>
+                            <li>Hover your mouse over any element to view its name, symbol, atomic number, atomic mass, and ionic charge</li>
                             <li>After you guess an element, its properties will appear in the game table with color hints that help you win</li>
                         </ul>
                     </li>
@@ -209,7 +322,7 @@ export function CarbleHardLesson(): Lesson {
                     <li>
                         <strong>Access element properties</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Hover your mouse over any element to view its name, atomic number, atomic mass, and ionic charge</li>
+                            <li>Hover your mouse over any element to view its name, symbol, electronegativity, ionization energy, and atomic radius</li>
                             <li>After you guess an element, its properties will appear in the game table with color hints that help you win</li>
                         </ul>
                     </li>

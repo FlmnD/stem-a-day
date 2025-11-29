@@ -9,10 +9,10 @@ export interface ElementData {
     group: number;
     period: number;
     block: string;
-    electronegativity: number;
-    electron_affinity: number;
-    first_ionization_energy: number;
     atomic_radius: number;
+    //electron_affinity: number;
+    first_ionization_energy: number;
+    electronegativity: number;
 };
 
 export interface EasyGuess {
@@ -26,10 +26,10 @@ export interface EasyGuess {
 export interface HardGuess {
     element_name: string;
     symbol: string;
-    electronegativity: number;
-    electronAffinity: number;
-    ionizationEnergy: number;
     atomicRadius: number;
+    //electronAffinity: number;
+    ionizationEnergy: number;
+    electronegativity: number;
 };
 
 export const elementsData: ElementData[] = (elementsJSON as any[]).map((e) => ({
@@ -41,10 +41,10 @@ export const elementsData: ElementData[] = (elementsJSON as any[]).map((e) => ({
     group: e.group,
     period: e.period,
     block: e.block,
-    electronegativity: e.electronegativity,
-    electron_affinity: e.electron_affinity,
-    first_ionization_energy: e.first_ionization_energy,
     atomic_radius: e.atomic_radius,
+    //electron_affinity: e.electron_affinity,
+    first_ionization_energy: e.first_ionization_energy,
+    electronegativity: e.electronegativity,
 }));
 
 export enum Guess {

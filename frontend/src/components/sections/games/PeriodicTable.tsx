@@ -16,10 +16,9 @@ const getTableTitle = (guessFormat: Guess, element: ElementData) => {
     if (guessFormat == Guess.HardGuess) {
         return `Element: ${element.element_name}\n` +
             `Symbol: ${element.symbol}\n` +
-            `Electronegativity: ${element.electronegativity}\n` +
-            `Electron Affinity: ${element.electron_affinity}\n` +
-            `1st Ionization Energy: ${element.first_ionization_energy}\n`+
-            `Atomic Radius: ${element.atomic_radius}`;
+            `Atomic Radius: ${element.atomic_radius}\n` +
+            `Ionization Energy: ${element.first_ionization_energy}\n`+
+            `Electronegativity: ${element.electronegativity}`;
     } else {
         return `Element: ${element.element_name}\n` +
             `Symbol: ${element.symbol}\n` +

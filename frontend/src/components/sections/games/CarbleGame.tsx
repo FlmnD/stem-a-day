@@ -21,7 +21,7 @@ function isEasyGuess(g: AnyGuess): g is EasyGuess {
 }
 
 function isHardGuess(g: AnyGuess): g is HardGuess {
-    return "electronegativity" in g;
+    return "atomicRadius" in g;
 }
 
 export default function CarbleGame({ yellowRange, guessFormat, carbleLesson, carbleArticle }: Props): React.JSX.Element {
@@ -78,10 +78,10 @@ export default function CarbleGame({ yellowRange, guessFormat, carbleLesson, car
             newGuess = {
                 element_name: element.element_name,
                 symbol: element.symbol,
-                electronegativity: element.electronegativity,
-                electronAffinity: element.electron_affinity,
-                ionizationEnergy: element.first_ionization_energy,
                 atomicRadius: element.atomic_radius,
+                //electronAffinity: element.electron_affinity,
+                ionizationEnergy: element.first_ionization_energy,
+                electronegativity: element.electronegativity,
             } satisfies HardGuess;
         } else {
             newGuess = {
@@ -123,10 +123,10 @@ export default function CarbleGame({ yellowRange, guessFormat, carbleLesson, car
                 : {
                     element_name: targetElement.element_name,
                     symbol: targetElement.symbol,
-                    electronegativity: targetElement.electronegativity,
-                    electronAffinity: targetElement.electron_affinity,
+                    atomicRadius: targetElement.atomic_radius, 
+                    //electronAffinity: targetElement.electron_affinity,
                     ionizationEnergy: targetElement.first_ionization_energy,
-                    atomicRadius: targetElement.atomic_radius,
+                    electronegativity: targetElement.electronegativity,
                 } satisfies HardGuess
         ]
         : guesses;
@@ -217,10 +217,10 @@ export default function CarbleGame({ yellowRange, guessFormat, carbleLesson, car
                                 <tr className="bg-gray-200 text-center">
                                     <th className="px-4 py-2 border">Element</th>
                                     <th className="px-4 py-2 border">Symbol</th>
-                                    <th className="px-4 py-2 border">Electronegativity (+/-2)</th>
-                                    <th className="px-4 py-2 border">Electron Affinity (+/-25)</th>
-                                    <th className="px-4 py-2 border">1st Ionization Energy (+/-50)</th>
                                     <th className="px-4 py-2 border">Atomic Radius (+/-25)</th>
+                                    {/*<th className="px-4 py-2 border">Electron Affinity (+/-25)</th>*/}
+                                    <th className="px-4 py-2 border">Ionization Energy (+/-50)</th>
+                                    <th className="px-4 py-2 border">Electronegativity (+/-2)</th>
                                     <th className="px-4 py-2 border">Info</th>
                                 </tr>)
                             }
@@ -258,10 +258,10 @@ export default function CarbleGame({ yellowRange, guessFormat, carbleLesson, car
                                         <tr key={i} className="text-center">
                                             <td className={`border px-4 py-2 ${getColorString(g.element_name, actual.element_name)}`}>{g.element_name}</td>
                                             <td className={`border px-4 py-2 ${getColorString(g.symbol, actual.symbol)}`}>{g.symbol}</td>
-                                            <td className={`border px-4 py-2 ${getColorNumeric(g.electronegativity, actual.electronegativity, yellowRange.electronegativity)}`}>{g.electronegativity}</td>
-                                            <td className={`border px-4 py-2 ${getColorNumeric(g.electronAffinity, actual.electron_affinity, yellowRange.electronAffinity)}`}>{g.electronAffinity}</td>
-                                            <td className={`border px-4 py-2 ${getColorNumeric(g.ionizationEnergy, actual.first_ionization_energy, yellowRange.ionizationEnergy)}`}>{g.ionizationEnergy}</td>
                                             <td className={`border px-4 py-2 ${getColorNumeric(g.atomicRadius, actual.atomic_radius, yellowRange.atomicRadius)}`}>{g.atomicRadius}</td>
+                                            {/*<td className={`border px-4 py-2 ${getColorNumeric(g.electronAffinity, actual.electron_affinity, yellowRange.electronAffinity)}`}>{g.electronAffinity}</td>*/}
+                                            <td className={`border px-4 py-2 ${getColorNumeric(g.ionizationEnergy, actual.first_ionization_energy, yellowRange.ionizationEnergy)}`}>{g.ionizationEnergy}</td>
+                                            <td className={`border px-4 py-2 ${getColorNumeric(g.electronegativity, actual.electronegativity, yellowRange.electronegativity)}`}>{g.electronegativity}</td>
                                             <td className="border px-4 py-2">
                                                 <strong>
                                                     <a
