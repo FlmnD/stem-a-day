@@ -8,6 +8,7 @@ import { CarbleEasyArticle, CarbleEasyLesson, CarbleHardArticle, CarbleHardLesso
 import PeriodicTable from "@/components/sections/games/PeriodicTable";
 
 import React from "react";
+import StemLink from "@/components/ui/StemLink";
 
 interface Props {
     yellowRange: ElementRange;
@@ -123,7 +124,7 @@ export default function CarbleGame({ yellowRange, guessFormat, carbleLesson, car
                 : {
                     element_name: targetElement.element_name,
                     symbol: targetElement.symbol,
-                    atomicRadius: targetElement.atomic_radius, 
+                    atomicRadius: targetElement.atomic_radius,
                     //electronAffinity: targetElement.electron_affinity,
                     ionizationEnergy: targetElement.first_ionization_energy,
                     electronegativity: targetElement.electronegativity,
@@ -263,15 +264,7 @@ export default function CarbleGame({ yellowRange, guessFormat, carbleLesson, car
                                             <td className={`border px-4 py-2 ${getColorNumeric(g.ionizationEnergy, actual.first_ionization_energy, yellowRange.ionizationEnergy)}`}>{g.ionizationEnergy}</td>
                                             <td className={`border px-4 py-2 ${getColorNumeric(g.electronegativity, actual.electronegativity, yellowRange.electronegativity)}`}>{g.electronegativity}</td>
                                             <td className="border px-4 py-2">
-                                                <strong>
-                                                    <a
-                                                        href={"https://www.webelements.com/" + g.element_name.toLowerCase()}
-                                                        target="_blank"
-                                                        className="text-blue-500"
-                                                    >
-                                                        <center><Info /></center>
-                                                    </a>
-                                                </strong>
+                                                <StemLink url={"https://www.webelements.com/" + g.element_name.toLowerCase()} children={<center><Info /></center>}></StemLink>
                                             </td>
                                         </tr>
                                     );

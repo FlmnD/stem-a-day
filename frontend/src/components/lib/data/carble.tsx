@@ -1,3 +1,4 @@
+import CarbleLink from "@/components/ui/StemLink";
 import { Article, Lesson } from "@/structures/GameStructures";
 
 export function CarbleEasyArticle(): Article {
@@ -30,12 +31,10 @@ export function CarbleEasyArticle(): Article {
                     <li>Negative <strong>electrons</strong></li>
                     <li>Neutral <strong>neutrons</strong></li>
                 </ul>
-                {/* "Learn more about elements and atoms at *external hyperlink for resource website*." */}
 
                 <p className="italic text-gray-600 mb-4">
                     <img src="/atomic and mass number.jpg" alt="atomic and mass number example" height="300" width="200" />
                 </p>
-                {/* "Learn more about atomic mass and mass number at *external hyperlink for resource website*." */}
 
                 <h3 className="font-semibold">Atomic Number</h3>
                 <p className="mb-2">
@@ -52,7 +51,7 @@ export function CarbleEasyArticle(): Article {
                 </ul>
                 <p className="mb-4">
                     It <strong>increases by one</strong> as you move left → right <strong>across a period</strong>
-                     and <strong>increases dramatically</strong> as you move top → bottom <strong>down a group</strong>.
+                    and <strong> increases dramatically</strong> as you move top → bottom <strong> down a group</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
                     <img src="/4 protons diagram.png" alt="atom diagram example" height="300" width="200" />
@@ -79,12 +78,15 @@ export function CarbleEasyArticle(): Article {
                 </ul>
                 <p className="mb-4">
                     It <strong>increases</strong> as you move left → right <strong>across a period</strong>
-                     and <strong>increases dramatically</strong> as you move top → bottom <strong>down a group</strong>.
+                    and <strong>increases dramatically</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
                     <img src="/the structure of atom.jpg" alt="the structure of atom diagram" height="300" width="200" />
                 </p>
-                {/* "Learn more about atomic mass at *external hyperlink for resource website*." */}
+
+                <div className="mb-7">
+                    <CarbleLink url="https://chem.libretexts.org/Courses/Furman_University/CHM101%3A_Chemistry_and_Global_Awareness_(Gordon)/03%3A_Atoms_and_the_Periodic_Table/3.04%3A_Atomic_Mass_and_Atomic_Number" text="Learn more about atomic mass and atomic number!"></CarbleLink>
+                </div>
 
                 <h3 className="font-semibold">Ionic Charge</h3>
                 <p className="mb-2">
@@ -136,7 +138,7 @@ export function CarbleHardArticle(): Article {
         { term: "1st Ionization Energy", definition: "Energy required to remove the first electron from a neutral atom." },
         { term: "Atomic Radius", definition: "Approximate size of an atom." },
     ];*/
-    
+
     return (
         <>
             {/*<h1 className="text-3xl font-bold mb-6">Carble: Periodic Trends</h1>
@@ -197,7 +199,7 @@ export function CarbleHardArticle(): Article {
                 </ul>
                 <p className="mb-4">
                     It <strong>decreases</strong> as you move left → right <strong>across a period</strong>
-                     and <strong>increases</strong> as you move top → bottom <strong>down a group</strong>.
+                    and <strong>increases</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
                     {/* atomic radius example diagrams picture */}
@@ -222,7 +224,7 @@ export function CarbleHardArticle(): Article {
                 </ul>
                 <p className="mb-4">
                     It <strong>increases dramatically</strong> as you move left → right <strong>across a period</strong>
-                     and <strong>decreases</strong> as you move top → bottom <strong>down a group</strong>.
+                    and <strong>decreases</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
                 <p className="italic text-gray-600">
                     {/* first ionization energy example diagrams picture */}
@@ -247,7 +249,7 @@ export function CarbleHardArticle(): Article {
                 </ul>
                 <p className="mb-4">
                     It <strong>increases dramatically</strong> as you move left → right <strong>across a period</strong>
-                     and <strong>decreases</strong> as you move top → bottom <strong>down a group</strong>.
+                    and <strong>decreases</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
                     {/* electronegativity example diagrams picture */}
