@@ -56,7 +56,6 @@ export function CarbleEasyArticle(): Article {
                 <p className="italic text-gray-600 mb-4">
                     <img src="/4 protons diagram.png" alt="atom diagram example" height="300" width="200" />
                 </p>
-                {/* "Learn more about atomic number at *external hyperlink for resource website*." */}
 
                 <h3 className="font-semibold">Atomic Mass</h3>
                 <p className="mb-2">
@@ -124,7 +123,9 @@ export function CarbleEasyArticle(): Article {
                 <p className="italic text-gray-600">
                     <img src="/4 diagrams ionic charge.gif" alt="4 atom diagrams" height="400" width="300" />
                 </p>
-                {/* "Learn more about ionic charge at *external hyperlink for resource website*." */}
+                <div className="mb-7 mt-5">
+                    <CarbleLink url="https://chem.libretexts.org/Courses/Portland_Community_College/CH151%3A_Preparatory_Chemistry/06%3A_Ions_Ionic_Bonding_and_the_Nomenclature_of_Ionic_Compounds/6.01%3A_Ions" text="Learn more about ions and ionic charge!"></CarbleLink>
+                </div>
             </div>
         </>
     );
@@ -132,23 +133,8 @@ export function CarbleEasyArticle(): Article {
 
 export function CarbleHardArticle(): Article {
 
-    /*const learnDefinitions = [
-        { term: "Electronegativity", definition: "Measure of how strongly an atom attracts electrons in a bond." },
-        { term: "Electron Affinity", definition: "Energy released when an atom gains an electron." },
-        { term: "1st Ionization Energy", definition: "Energy required to remove the first electron from a neutral atom." },
-        { term: "Atomic Radius", definition: "Approximate size of an atom." },
-    ];*/
-
     return (
         <>
-            {/*<h1 className="text-3xl font-bold mb-6">Carble: Periodic Trends</h1>
-
-            <div className="w-full max-w-5xl mb-6 p-4 bg-white rounded shadow">
-                <h2 className="text-xl font-semibold mb-2">Learn:</h2>
-                <ul className="list-disc list-inside">
-                    {learnDefinitions.map(ld => <li key={ld.term}><strong>{ld.term}:</strong> {ld.definition}</li>)}
-                </ul>
-            </div>*/}
 
             <h1 className="text-3xl font-bold mb-6">Carble: Periodic Trends</h1>
 
@@ -172,18 +158,14 @@ export function CarbleHardArticle(): Article {
                 <p className="mb-1">
                     An <strong>atom</strong> is the smallest chemical particle of an element. It includes:
                 </p>
-                <ul className="list-disc ml-6 mb-3">
+                <ul className="list-disc ml-6">
                     <li>Positive <strong>protons</strong></li>
                     <li>Negative <strong>electrons</strong></li>
                     <li>Neutral <strong>neutrons</strong></li>
                 </ul>
-                {/* "Learn more about elements and atoms at *external hyperlink for resource website*." */}
-
-                <p className="italic text-gray-600 mb-4">
-                    {/* periodic trends picture with patterns (arrows across periodic table) for atomic radius, ionization energy, and electronegativity (with null group 18 column for electronegativity) */}
-                    {/*<img src="/atomic and mass number.jpg" alt="atomic and mass number example" height="300" width="200" />*/}
-                </p>
-                {/* "Learn more about periodic trends at *external hyperlink for resource website*." */}
+                <div className="mb-7 mt-3">
+                    <CarbleLink url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Atomic_Theory/The_Atom" text="Learn more about atoms and elements!"></CarbleLink>
+                </div>
 
                 <h3 className="font-semibold">Atomic Radius</h3>
                 <p className="mb-2">
@@ -202,10 +184,8 @@ export function CarbleHardArticle(): Article {
                     and <strong>increases</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
-                    {/* atomic radius example diagrams picture */}
-                    {/*<img src="/the structure of atom.jpg" alt="the structure of atom diagram" height="300" width="200" />*/}
+                    <img src="https://general.chemistrysteps.com/wp-content/uploads/2023/11/Atomic-Radius-and-periodic-table.png" alt="Atomic Radius Diagram" height="500" width="300" />
                 </p>
-                {/* "Learn more about atomic radius at *external hyperlink for resource website*." */}
 
                 <h3 className="font-semibold">(1st) Ionization Energy</h3>
                 <p className="mb-2">
@@ -223,16 +203,14 @@ export function CarbleHardArticle(): Article {
                     <li>Neon: 2080.7</li>
                 </ul>
                 <p className="mb-4">
-                    It <strong>increases dramatically</strong> as you move left → right <strong>across a period</strong>
-                    and <strong>decreases</strong> as you move top → bottom <strong>down a group</strong>.
+                    It <strong>increases dramatically</strong> as you move left → right <strong> across a period </strong>
+                    and <strong>decreases</strong> as you move top → bottom <strong> down a group</strong>.
                 </p>
                 <p className="italic text-gray-600">
-                    {/* first ionization energy example diagrams picture */}
-                    {/*<img src="/4 diagrams ionic charge.gif" alt="4 atom diagrams" height="400" width="300" />*/}
+                    <img src="https://media.geeksforgeeks.org/wp-content/uploads/20230310125901/ionization-energy-trend.png" alt="First Ionization Energy Diagram" height="500" width="350" />
                 </p>
-                {/* "Learn more about ionization energy at *external hyperlink for resource website*." */}
 
-                <h3 className="font-semibold">Electronegativity</h3>
+                <h3 className="font-semibold mt-5">Electronegativity</h3>
                 <p className="mb-2">
                     The <strong>electronegativity</strong> is a measure of how well an atom attracts electrons. It is the strength of attraction forces between external electrons and an atom's nucleus.
                     As more protons are added to the nucleus to create new elements, forces between the nucleus and electrons are strengthened due to opposite charge attractions, more easily attracting electrons to join the atom and increasing electronegativity.
@@ -248,14 +226,15 @@ export function CarbleHardArticle(): Article {
                     <li>Flourine: 3.98</li>
                 </ul>
                 <p className="mb-4">
-                    It <strong>increases dramatically</strong> as you move left → right <strong>across a period</strong>
+                    It <strong>increases dramatically</strong> as you move left → right <strong>across a period </strong>
                     and <strong>decreases</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
-                    {/* electronegativity example diagrams picture */}
-                    {/*<img src="/4 protons diagram.png" alt="atom diagram example" height="300" width="200" />*/}
+                    <img src="https://media.geeksforgeeks.org/wp-content/uploads/20231207124854/Periodic-Table-Electronegativity-1.png" alt="Electronegativity Diagram" height="500" width="300" />
                 </p>
-                {/* "Learn more about electronegativity at *external hyperlink for resource website*." */}
+                <div className="mb-7 mt-3">
+                    <CarbleLink url="https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Supplemental_Modules_and_Websites_(Inorganic_Chemistry)/Descriptive_Chemistry/Periodic_Trends_of_Elemental_Properties/Periodic_Trends" text="Learn more about atomic radius, electronegativity, 1st ionization energy, and other periodic trends!"></CarbleLink>
+                </div>
             </div>
         </>
     );
