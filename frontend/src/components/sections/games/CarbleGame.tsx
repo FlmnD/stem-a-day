@@ -110,27 +110,28 @@ export default function CarbleGame({ yellowRange, guessFormat, carbleLesson, car
     };
     const getColorString = (guessValue: string, actualValue: string) => guessValue === actualValue ? "bg-green-300" : "";
 
-    const displayRows = gameOver && targetElement
-        ? [
-            ...guesses,
-            guessFormat === Guess.EasyGuess
-                ? {
-                    element_name: targetElement.element_name,
-                    symbol: targetElement.symbol,
-                    atomicNumber: targetElement.atomic_number,
-                    atomicMass: targetElement.atomic_mass,
-                    ionCharge: targetElement.ion_charge,
-                } satisfies EasyGuess
-                : {
-                    element_name: targetElement.element_name,
-                    symbol: targetElement.symbol,
-                    atomicRadius: targetElement.atomic_radius,
-                    //electronAffinity: targetElement.electron_affinity,
-                    ionizationEnergy: targetElement.first_ionization_energy,
-                    electronegativity: targetElement.electronegativity,
-                } satisfies HardGuess
-        ]
-        : guesses;
+    const displayRows =
+        gameOver && targetElement && !won
+            ? [
+                ...guesses,
+                guessFormat === Guess.EasyGuess
+                    ? {
+                        element_name: targetElement.element_name,
+                        symbol: targetElement.symbol,
+                        atomicNumber: targetElement.atomic_number,
+                        atomicMass: targetElement.atomic_mass,
+                        ionCharge: targetElement.ion_charge,
+                    } satisfies EasyGuess
+                    : {
+                        element_name: targetElement.element_name,
+                        symbol: targetElement.symbol,
+                        atomicRadius: targetElement.atomic_radius,
+                        //electronAffinity: targetElement.electron_affinity,
+                        ionizationEnergy: targetElement.first_ionization_energy,
+                        electronegativity: targetElement.electronegativity,
+                    } satisfies HardGuess,
+            ]
+            : guesses;
 
 
     const guessedSymbols = guesses.map(g => g.symbol);

@@ -31,6 +31,9 @@ export function CarbleEasyArticle(): Article {
                     <li>Negative <strong>electrons</strong></li>
                     <li>Neutral <strong>neutrons</strong></li>
                 </ul>
+                <div className="mb-7 mt-3">
+                    <CarbleLink url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Atomic_Theory/The_Atom" text="Learn more about atoms and elements!"></CarbleLink>
+                </div>
 
                 <p className="italic text-gray-600 mb-4">
                     <img src="/atomic and mass number.jpg" alt="atomic and mass number example" height="300" width="200" />
