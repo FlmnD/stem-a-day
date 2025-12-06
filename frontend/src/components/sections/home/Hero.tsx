@@ -91,8 +91,8 @@ export default function Hero() {
                          border-sky-200 bg-linear-to-br from-sky-50 to-emerald-50
                          dark:border-gray-800 dark:from-gray-900 dark:to-gray-900"
                         >
-                            <div className="grid h-full w-full place-items-center text-sky-500 dark:text-teal-300">
-                                Demo Screenshot
+                            <div className="grid w-full place-items-center text-sky-500 dark:text-teal-300">
+                                <img src="/carble_demo.png" alt="Carble Demo Image"/>
                             </div>
                         </div>
                     </div>

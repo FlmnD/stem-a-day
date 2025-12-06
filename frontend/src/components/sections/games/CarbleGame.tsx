@@ -8,6 +8,7 @@ import { CarbleEasyArticle, CarbleEasyLesson, CarbleHardArticle, CarbleHardLesso
 import PeriodicTable from "@/components/sections/games/PeriodicTable";
 
 import React from "react";
+import StemLink from "@/components/ui/StemLink";
 
 interface Props {
     yellowRange: ElementRange;
@@ -109,27 +110,28 @@ export default function CarbleGame({ yellowRange, guessFormat, carbleLesson, car
     };
     const getColorString = (guessValue: string, actualValue: string) => guessValue === actualValue ? "bg-green-300" : "";
 
-    const displayRows = gameOver && targetElement
-        ? [
-            ...guesses,
-            guessFormat === Guess.EasyGuess
-                ? {
-                    element_name: targetElement.element_name,
-                    symbol: targetElement.symbol,
-                    atomicNumber: targetElement.atomic_number,
-                    atomicMass: targetElement.atomic_mass,
-                    ionCharge: targetElement.ion_charge,
-                } satisfies EasyGuess
-                : {
-                    element_name: targetElement.element_name,
-                    symbol: targetElement.symbol,
-                    atomicRadius: targetElement.atomic_radius, 
-                    //electronAffinity: targetElement.electron_affinity,
-                    ionizationEnergy: targetElement.first_ionization_energy,
-                    electronegativity: targetElement.electronegativity,
-                } satisfies HardGuess
-        ]
-        : guesses;
+    const displayRows =
+        gameOver && targetElement && !won
+            ? [
+                ...guesses,
+                guessFormat === Guess.EasyGuess
+                    ? {
+                        element_name: targetElement.element_name,
+                        symbol: targetElement.symbol,
+                        atomicNumber: targetElement.atomic_number,
+                        atomicMass: targetElement.atomic_mass,
+                        ionCharge: targetElement.ion_charge,
+                    } satisfies EasyGuess
+                    : {
+                        element_name: targetElement.element_name,
+                        symbol: targetElement.symbol,
+                        atomicRadius: targetElement.atomic_radius,
+                        //electronAffinity: targetElement.electron_affinity,
+                        ionizationEnergy: targetElement.first_ionization_energy,
+                        electronegativity: targetElement.electronegativity,
+                    } satisfies HardGuess,
+            ]
+            : guesses;
 
 
     const guessedSymbols = guesses.map(g => g.symbol);
@@ -263,15 +265,7 @@ export default function CarbleGame({ yellowRange, guessFormat, carbleLesson, car
                                             <td className={`border px-4 py-2 ${getColorNumeric(g.ionizationEnergy, actual.first_ionization_energy, yellowRange.ionizationEnergy)}`}>{g.ionizationEnergy}</td>
                                             <td className={`border px-4 py-2 ${getColorNumeric(g.electronegativity, actual.electronegativity, yellowRange.electronegativity)}`}>{g.electronegativity}</td>
                                             <td className="border px-4 py-2">
-                                                <strong>
-                                                    <a
-                                                        href={"https://www.webelements.com/" + g.element_name.toLowerCase()}
-                                                        target="_blank"
-                                                        className="text-blue-500"
-                                                    >
-                                                        <center><Info /></center>
-                                                    </a>
-                                                </strong>
+                                                <StemLink url={"https://www.webelements.com/" + g.element_name.toLowerCase()} children={<center><Info /></center>}></StemLink>
                                             </td>
                                         </tr>
                                     );
