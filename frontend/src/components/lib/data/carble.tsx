@@ -6,7 +6,7 @@ export function CarbleEasyArticle(): Article {
         <>
             <h1 className="text-3xl font-bold mb-6">Carble: Common Characteristics</h1>
 
-            <div className="max-w-3xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
+            <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
                 <h2 className="text-xl font-bold mb-3">Learn About the Essentials!</h2>
 
                 <p className="mb-4">
@@ -141,7 +141,7 @@ export function CarbleHardArticle(): Article {
 
             <h1 className="text-3xl font-bold mb-6">Carble: Periodic Trends</h1>
 
-            <div className="max-w-3xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
+            <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
                 <h2 className="text-xl font-bold mb-3">Learn About the Essentials!</h2>
 
                 <p className="mb-4">
@@ -248,7 +248,7 @@ export function CarbleEasyLesson(): Lesson {
 
     return (
         <>
-            <div className="w-full max-w-4xl mt-6 mb-6 p-4 bg-white rounded shadow">
+            <div className="w-full max-w-5xl mt-6 mb-6 p-4 bg-white rounded shadow">
                 <h2 className="text-2xl font-semibold mb-3">Play our original game!</h2>
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
                     <li>
@@ -288,7 +288,7 @@ export function CarbleHardLesson(): Lesson {
 
     return (
         <>
-            <div className="w-full max-w-4xl mt-6 mb-6 p-4 bg-white rounded shadow">
+            <div className="w-full max-w-5xl mt-6 mb-6 p-4 bg-white rounded shadow">
                 <h2 className="text-2xl font-semibold mb-3">Play our original game!</h2>
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
                     <li>

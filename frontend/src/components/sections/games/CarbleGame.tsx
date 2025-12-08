@@ -146,6 +146,8 @@ export default function CarbleGame({ yellowRange, guessFormat, carbleLesson, car
                     ${isPink && !guessed && !isAnswer ? "bg-pink-300" : ""}`;
     }
 
+    const guessLength = (guessFormat == Guess.EasyGuess) ? 8 : 16;
+
 
     return (
         <>
@@ -185,7 +187,7 @@ export default function CarbleGame({ yellowRange, guessFormat, carbleLesson, car
                 </div>
 
                 <div className="mb-4 text-gray-700">
-                    <p className="m-auto text-lg inline mr-10"><strong>Guesses: {guesses.length}/8</strong></p>
+                    <p className="m-auto text-lg inline mr-10"><strong>Guesses: {guesses.length}/{guessLength}</strong></p>
                     <p className="italic text-sm inline">When in doubt, choose Carbon, the center of life!</p>
                 </div>
 
