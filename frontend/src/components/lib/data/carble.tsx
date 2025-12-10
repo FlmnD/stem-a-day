@@ -1,10 +1,9 @@
 import CarbleLink from "@/components/ui/StemLink";
 import { Article, Lesson } from "@/structures/GameStructures";
 
-export function CarbleEasyArticle(): Article {
+export const CarbleEasyArticle: Article = () => {
     return (
         <>
-            <h1 className="text-3xl font-bold mb-6">Carble: Common Characteristics</h1>
 
             <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
                 <h2 className="text-xl font-bold mb-3">Learn About the Essentials!</h2>
@@ -134,12 +133,10 @@ export function CarbleEasyArticle(): Article {
     );
 }
 
-export function CarbleHardArticle(): Article {
+export const CarbleHardArticle: Article = () => {
 
     return (
         <>
-
-            <h1 className="text-3xl font-bold mb-6">Carble: Periodic Trends</h1>
 
             <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
                 <h2 className="text-xl font-bold mb-3">Learn About the Essentials!</h2>
@@ -244,7 +241,7 @@ export function CarbleHardArticle(): Article {
 }
 
 
-export function CarbleEasyLesson(): Lesson {
+export const CarbleEasyLesson: Lesson = () => {
 
     return (
         <>
@@ -284,7 +281,7 @@ export function CarbleEasyLesson(): Lesson {
 }
 
 
-export function CarbleHardLesson(): Lesson {
+export const CarbleHardLesson: Lesson = () => {
 
     return (
         <>

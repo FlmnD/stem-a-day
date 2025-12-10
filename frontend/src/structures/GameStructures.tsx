@@ -1,2 +1,4 @@
-export type Article = React.JSX.Element;
-export type Lesson = React.JSX.Element;
+import type { ComponentType } from "react";
+
+export type Lesson = ComponentType;
+export type Article = ComponentType;

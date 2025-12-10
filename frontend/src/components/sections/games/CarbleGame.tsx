@@ -4,17 +4,16 @@ import { ElementRange, ElementData, Guess, HardGuess, EasyGuess, elementsData, A
 import { Lesson, Article } from "@/structures/GameStructures";
 import { useState, useMemo, useEffect } from "react";
 import { Info } from "lucide-react";
-import { CarbleEasyArticle, CarbleEasyLesson, CarbleHardArticle, CarbleHardLesson } from "@/components/lib/data/carble";
 import PeriodicTable from "@/components/sections/games/PeriodicTable";
-
 import React from "react";
 import StemLink from "@/components/ui/StemLink";
+import Collapsible from "@/components/ui/Collapsible";
 
 interface Props {
     yellowRange: ElementRange;
     guessFormat: Guess
-    carbleLesson: Lesson
-    carbleArticle: Article
+    CarbleLesson: Lesson
+    CarbleArticle: Article
 }
 
 function isEasyGuess(g: AnyGuess): g is EasyGuess {
@@ -25,7 +24,7 @@ function isHardGuess(g: AnyGuess): g is HardGuess {
     return "atomicRadius" in g;
 }
 
-export default function CarbleGame({ yellowRange, guessFormat, carbleLesson, carbleArticle }: Props): React.JSX.Element {
+export default function CarbleGame({ yellowRange, guessFormat, CarbleLesson, CarbleArticle }: Props): React.JSX.Element {
 
     const [guesses, setGuesses] = useState<AnyGuess[]>([]);
     const [input, setInput] = useState("");
@@ -153,11 +152,18 @@ export default function CarbleGame({ yellowRange, guessFormat, carbleLesson, car
         <>
             <div className="min-h-screen flex flex-col items-center justify-start py-10 bg-gray-100">
 
-                {guessFormat == Guess.EasyGuess && (<CarbleEasyArticle></CarbleEasyArticle>)}
+                {/* {guessFormat == Guess.EasyGuess && (<CarbleEasyArticle></CarbleEasyArticle>)}
                 {guessFormat == Guess.HardGuess && (<CarbleHardArticle></CarbleHardArticle>)}
                 {guessFormat == Guess.HardGuess && (<CarbleHardLesson></CarbleHardLesson>)}
-                {guessFormat == Guess.EasyGuess && (<CarbleEasyLesson></CarbleEasyLesson>)}
+                {guessFormat == Guess.EasyGuess && (<CarbleEasyLesson></CarbleEasyLesson>)} */}
 
+                {guessFormat == Guess.EasyGuess && (<h1 className="text-3xl font-bold mb-6">Carble: Common Characteristics</h1>)}
+                {guessFormat == Guess.HardGuess && (<h1 className="text-3xl font-bold mb-6">Carble: Periodic Trends</h1>)}
+
+                
+                <Collapsible title="Learn More!" className="max-w-7xl" defaultOpen={true}><CarbleArticle /></Collapsible>
+                <CarbleLesson />
+                
                 <PeriodicTable onElementClick={addGuess} guessFormat={guessFormat} classNameArgs={getTableArgs}></PeriodicTable>
 
                 <div className="relative w-96 mt-6 mb-4">
