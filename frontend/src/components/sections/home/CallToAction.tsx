@@ -2,9 +2,9 @@ export default function CallToAction() {
     return (
         <section className="bg-white">
             <div className="mx-auto max-w-6xl px-4 pb-24">
-                <div className="rounded-2xl border border-sky-200 bg-gradient-to-r from-sky-600 to-emerald-600 p-8 text-white shadow-lg sm:p-12">
+                <div className="rounded-2xl border border-sky-200 bg-linear-to-r from-sky-600 to-emerald-600 p-8 text-white shadow-lg sm:p-12">
                     <h2 className="text-balance text-3xl font-extrabold sm:text-4xl leading-tight">
-                        Turn 5 minutes a day into mastery.
+                        Turn 6-7 minutes a day into mastery.
                     </h2>
 
                     <p className="mt-3 max-w-2xl text-white/85 text-lg">

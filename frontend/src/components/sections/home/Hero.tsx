@@ -1,4 +1,5 @@
 import Button from "@/components/ui/Button";
+import { SparklesIcon } from "@/components/ui/Icons";
 
 export default function Hero() {
     return (
@@ -103,18 +104,5 @@ export default function Hero() {
                 </p>
             </div>
         </section>
-    );
-}
-
-function SparklesIcon(props: React.SVGProps<SVGSVGElement>) {
-    return (
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden {...props}>
-            <path
-                d="M12 3l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4Zm6 10l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2ZM6 13l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2Z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinejoin="round"
-            />
-        </svg>
     );
 }
