@@ -6,7 +6,6 @@ export default function ThemeToggle() {
     const [mounted, setMounted] = useState(false);
     const [isDark, setIsDark] = useState(false);
 
-    // On mount: read the current theme from <html> and sync local state
     useEffect(() => {
         const root = document.documentElement;
         setIsDark(root.classList.contains("dark"));
@@ -21,7 +20,6 @@ export default function ThemeToggle() {
         setIsDark(next);
     };
 
-    // Avoid flicker before we know the initial theme
     if (!mounted) {
         return (
             <button
