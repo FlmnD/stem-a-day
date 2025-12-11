@@ -49,7 +49,7 @@ export default function CarbleGame({ yellowRange, guessFormat, CarbleLesson, Car
     useEffect(() => { startNewGame(); }, []);
 
     const filteredOptions = useMemo(() => {
-        if (!input) return elementsData.sort((a, b) => a.atomic_number - b.atomic_number);
+        if (!input) return [...elementsData].sort((a, b) => a.atomic_number - b.atomic_number);
         const lowerInput = input.toLowerCase();
         const matches = elementsData.filter(
             (e) =>
@@ -183,7 +183,10 @@ export default function CarbleGame({ yellowRange, guessFormat, CarbleLesson, Car
                                 <div
                                     key={e.symbol}
                                     className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
-                                    onClick={() => addGuess(e)}
+                                    onMouseDown={(event) => {
+                                        event.preventDefault();
+                                        addGuess(e);
+                                    }}
                                 >
                                     {e.element_name} ({e.symbol})
                                 </div>
