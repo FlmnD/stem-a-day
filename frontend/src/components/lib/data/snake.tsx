@@ -1,7 +1,7 @@
 import CarbleLink from "@/components/ui/StemLink";
 import { Article, Lesson } from "@/structures/GameStructures";
 
-export const CarbleEasyArticle: Article = () => {
+export const SnakeEasyArticle: Article = () => {
     return (
         <>
 
@@ -133,7 +133,7 @@ export const CarbleEasyArticle: Article = () => {
     );
 }
 
-export const CarbleHardArticle: Article = () => {
+export const SnakeHardArticle: Article = () => {
 
     return (
         <>
@@ -241,7 +241,7 @@ export const CarbleHardArticle: Article = () => {
 }
 
 
-export const CarbleEasyLesson: Lesson = () => {
+export const SnakeEasyLesson: Lesson = () => {
 
     return (
         <>
@@ -281,7 +281,7 @@ export const CarbleEasyLesson: Lesson = () => {
 }
 
 
-export const CarbleHardLesson: Lesson = () => {
+export const SnakeHardLesson: Lesson = () => {
 
     return (
         <>

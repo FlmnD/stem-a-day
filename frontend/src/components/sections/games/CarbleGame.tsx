@@ -31,6 +31,7 @@ export default function CarbleGame({ yellowRange, guessFormat, CarbleLesson, Car
     const [showDropdown, setShowDropdown] = useState(false);
     const [targetElement, setTargetElement] = useState<ElementData | null>(null);
     const [gameOver, setGameOver] = useState(false);
+    const [alert, setAlert] = useState(false);
     const [won, setWon] = useState(false);
     const [pinkElements, setPinkElements] = useState<string[]>([]);
 
@@ -42,6 +43,7 @@ export default function CarbleGame({ yellowRange, guessFormat, CarbleLesson, Car
         setInput("");
         setShowDropdown(false);
         setGameOver(false);
+        setAlert(false);
         setWon(false);
         setPinkElements(elementsData.filter(e => e.block === "s" || e.block === "p").map(e => e.symbol));
     };
@@ -68,8 +70,9 @@ export default function CarbleGame({ yellowRange, guessFormat, CarbleLesson, Car
     const addGuess = (element: ElementData) => {
         if (!targetElement || gameOver) return;
         if (guesses.some(g => g.symbol === element.symbol)) {
-            alert("Already guessed!");
-            return;
+            //alert("Already guessed!");
+            setAlert(true);
+            return ` ${alert ? "Already guessed!" : ""}`;
         }
 
         let newGuess: AnyGuess;
@@ -99,7 +102,7 @@ export default function CarbleGame({ yellowRange, guessFormat, CarbleLesson, Car
         if (element.symbol === targetElement.symbol) {
             setWon(true);
             setGameOver(true);
-        } else if (guesses.length + 1 >= 8) setGameOver(true);
+        } else if (guesses.length + 1 >= guessLength) setGameOver(true);
     };
 
     const getColorNumeric = (guessValue: number, actualValue: number, range: number) => {
