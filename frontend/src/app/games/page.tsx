@@ -12,7 +12,7 @@ export default function Games() {
                 Test your periodic table skills with our Carble and Snake challenges!
             </p>
 
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-2 gap-9 mb-16">
                 <div className="bg-white rounded-2xl shadow-md border border-sky-100 p-6 hover:shadow-lg transition-all duration-200">
                     <div className="flex items-center gap-3 mb-2">
                         <FlaskConical className="text-sky-500" size={24} />
@@ -69,26 +69,24 @@ export default function Games() {
             </div>
 
 
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-2 gap-9 mb-16">
                 <div className="bg-white rounded-2xl shadow-md border border-sky-100 p-6 hover:shadow-lg transition-all duration-200">
                     <div className="flex items-center gap-3 mb-2">
                         <FlaskConical className="text-sky-500" size={24} />
                         <h2 className="text-xl font-semibold text-gray-800">
-                            Snake: easy game name
+                            Snake: Nomenclature
                         </h2>
                     </div>
                     <p className="text-sm text-gray-500 mb-4">Difficulty: <span className="font-medium text-green-600">Easy</span></p>
                     <p className="text-gray-700 mb-6">
-                        Guess the element based on its <strong>basic characteristics</strong> like
-                        element name, symbol, atomic number, atomic mass, and ion charge.
-                        You get 8 guesses and hints show how close you are!
+                        little preview text about the easy version of snake game
                     </p>
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+                    {/*<div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
                         <Star className="text-yellow-400" size={14} />
                         <span>Yellow = near correct (within range)</span>
                         <Star className="text-green-500" size={14} />
                         <span>Green = exact match</span>
-                    </div>
+                    </div>*/}
                     <Link
                         href="/games/snake-easy"
                         className="inline-block bg-sky-500 hover:bg-sky-600 text-white font-medium py-2 px-4 rounded-lg transition-all"
@@ -101,21 +99,19 @@ export default function Games() {
                     <div className="flex items-center gap-3 mb-2">
                         <Atom className="text-red-500" size={24} />
                         <h2 className="text-xl font-semibold text-gray-800">
-                            Snake: hard game name
+                            Snake: Intermolecular Forces (IMF)
                         </h2>
                     </div>
                     <p className="text-sm text-gray-500 mb-4">Difficulty: <span className="font-medium text-red-600">Hard</span></p>
                     <p className="text-gray-700 mb-6">
-                        Test your mastery of <strong>periodic trends</strong>: atomic radius,
-                         ionization energy, and electronegativity.  
-                        Use logic to guess the element in 16 tries!
+                        little preview text about the hard version of snake game
                     </p>
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+                    {/*<div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
                         <Star className="text-yellow-400" size={14} />
                         <span>Yellow = near correct (within range)</span>
                         <Star className="text-green-500" size={14} />
                         <span>Green = exact match</span>
-                    </div>
+                    </div>*/}
                     <Link
                         href="/games/snake-hard"
                         className="inline-block bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-all"
