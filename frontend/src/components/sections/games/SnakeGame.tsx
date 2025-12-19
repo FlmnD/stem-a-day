@@ -8,217 +8,213 @@ const COMPOUNDS = [
   { formula: "CaCl₂", name: "calcium chloride" },
   { formula: "Al₂O₃", name: "aluminum oxide" },
   { formula: "FeO", name: "iron(II) oxide" },
-  { formula: "Fe₂O₃", name: "iron(III) oxide (also ferric oxide)" },
+  { formula: "Fe₂O₃", name: "iron(III) oxide" },
   { formula: "CuCl", name: "copper(I) chloride" },
   { formula: "CuCl₂", name: "copper(II) chloride" },
   { formula: "Ca(OH)₂", name: "calcium hydroxide" },
   { formula: "(NH₄)₂SO₄", name: "ammonium sulfate" },
-  { formula: "NaHCO₃", name: "sodium hydrogen carbonate (or sodium bicarbonate)" },
-  { formula: "K₂Cr₂O₇", name: "potassium dichromate" },
-  { formula: "CO", name: "carbon monoxide" },
   { formula: "CO₂", name: "carbon dioxide" },
-  { formula: "N₂O", name: "dinitrogen monoxide" },
-  { formula: "N₂O₃", name: "dinitrogen trioxide" },
-  { formula: "PCl₅", name: "phosphorus pentachloride" },
-  { formula: "SF₆", name: "sulfur hexafluoride" },
-  { formula: "Cl₂O₇", name: "dichlorine heptoxide" },
-  { formula: "P₄O₆", name: "tetraphosphorus hexoxide" },
-  { formula: "CCl₄", name: "carbon tetrachloride" },
-  { formula: "HCl(aq)", name: "hydrochloric acid" },
-  { formula: "HBr(aq)", name: "hydrobromic acid" },
-  { formula: "HI(aq)", name: "hydroiodic acid" },
-  { formula: "H₂S(aq)", name: "hydrosulfuric acid" },
   { formula: "H₂SO₄", name: "sulfuric acid" },
-  { formula: "H₂SO₃", name: "sulfurous acid" },
-  { formula: "HNO₃", name: "nitric acid" },
-  { formula: "HNO₂", name: "nitrous acid" },
-  { formula: "H₃PO₄", name: "phosphoric acid" },
-  { formula: "HC₂H₃O₂", name: "acetic acid" },
-  { formula: "CH₄", name: "methane" },
-  { formula: "C₂H₆", name: "ethane" },
-  { formula: "C₃H₈", name: "propane" },
-  { formula: "C₄H₁₀", name: "butane" },
   { formula: "C₆H₁₂O₆", name: "glucose" },
-  { formula: "C₂H₅OH", name: "ethanol (ethyl alcohol)" },
+  { formula: "C₂H₅OH", name: "ethanol" },
 ];
 
 const GRID_SIZE = 20;
 const CELL_SIZE = 25;
-const INITIAL_SNAKE_LENGTH = 5;
+const INITIAL_LENGTH = 5;
 const WIN_LENGTH = 15;
+const MIN_LENGTH = 3;
 const MIN_APPLES = 5;
 
 interface Apple {
   x: number;
   y: number;
-  compound: typeof COMPOUNDS[0];
   size: number;
+  compound: typeof COMPOUNDS[0];
 }
 
 export default function SnakeGame() {
   const [snake, setSnake] = useState<{ x: number; y: number }[]>([]);
-  const [dir, setDir] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [dir, setDir] = useState({ x: 0, y: 0 });
   const [apples, setApples] = useState<Apple[]>([]);
-  const [usedCompounds, setUsedCompounds] = useState<Set<string>>(new Set());
+  const [used, setUsed] = useState<Set<string>>(new Set());
   const [prompt, setPrompt] = useState<typeof COMPOUNDS[0] | null>(null);
   const [running, setRunning] = useState(false);
-  const [speed, setSpeed] = useState(300);
-  const [snakeLength, setSnakeLength] = useState(INITIAL_SNAKE_LENGTH);
-  const [msg, setMsg] = useState<{ text: string; color: string } | null>(null);
-  const [gameOver, setGameOver] = useState(false);
-
+  const [snakeLength, setSnakeLength] = useState(INITIAL_LENGTH);
+  const [msg, setMsg] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const startGame = () => {
-    const initialSnake = Array.from({ length: INITIAL_SNAKE_LENGTH }, (_, i) => ({ x: 5 - i, y: 5 }));
-    setSnake(initialSnake);
-    setDir({ x: 1, y: 0 });
-    setSpeed(300);
-    setSnakeLength(INITIAL_SNAKE_LENGTH);
-    setUsedCompounds(new Set());
-    setGameOver(false);
-    setMsg(null);
-    setRunning(true);
-    setApples([]);
-    spawnApples(MIN_APPLES);
-  };
-
-  const getRandomPosition = (size: number) => ({
+  const randPos = (size = 2) => ({
     x: Math.floor(Math.random() * (GRID_SIZE - size)),
     y: Math.floor(Math.random() * (GRID_SIZE - size)),
   });
 
-  const spawnApples = (count: number) => {
-    let newApples: Apple[] = [...apples];
-    const available = COMPOUNDS.filter(c => !usedCompounds.has(c.formula));
+  const unusedCompound = () => {
+    const left = COMPOUNDS.filter(c => !used.has(c.formula));
+    return left.length ? left[Math.floor(Math.random() * left.length)] : null;
+  };
 
-    while (newApples.length < MIN_APPLES && available.length > 0) {
-      const compound = available[Math.floor(Math.random() * available.length)];
-      const pos = getRandomPosition(2);
-      newApples.push({ x: pos.x, y: pos.y, compound, size: 2 });
-      setUsedCompounds(prev => new Set(prev).add(compound.formula));
-    }
+  const ensurePromptApple = (compound: typeof COMPOUNDS[0]) => {
+    setApples(prev => {
+      if (prev.some(a => a.compound.formula === compound.formula)) return prev;
+      return [...prev, { ...randPos(), size: 2, compound }];
+    });
+  };
 
-    setApples(newApples);
+  const pickNewPrompt = () => {
+    const compound = unusedCompound();
+    if (!compound) return; // do nothing, game continues
 
-    // Ensure prompt apple exists on screen
-    if (!prompt && newApples.length > 0) {
-      setPrompt(newApples[0].compound);
-    }
+    setPrompt(compound);
+    setUsed(u => new Set(u).add(compound.formula));
+    ensurePromptApple(compound);
+  };
+
+
+  const spawnApples = () => {
+    setApples(prev => {
+        let next = [...prev];
+        while (next.length < MIN_APPLES) {
+        const c = unusedCompound();
+        if (!c) break;
+        next.push({ ...randPos(), size: 2, compound: c });
+        }
+        return next;
+    });
+  };
+
+
+  const startGame = () => {
+    setSnake(Array.from({ length: INITIAL_LENGTH }, (_, i) => ({ x: 5 - i, y: 5 })));
+    setDir({ x: 1, y: 0 });
+    setApples([]);
+    setUsed(new Set());
+    setPrompt(null);
+    setSnakeLength(INITIAL_LENGTH);
+    setMsg(null);
+    setRunning(true);
   };
 
   const handleKey = (e: KeyboardEvent) => {
-    e.preventDefault(); // prevent scrolling
-    if (!running && e.code === "Space") startGame();
+    e.preventDefault();
+
+    if (e.code === "Space") {
+      startGame();
+      return;
+    }
 
     if (!running) return;
 
-    switch (e.code) {
-      case "ArrowUp": if (dir.y === 0) setDir({ x: 0, y: -1 }); break;
-      case "ArrowDown": if (dir.y === 0) setDir({ x: 0, y: 1 }); break;
-      case "ArrowLeft": if (dir.x === 0) setDir({ x: -1, y: 0 }); break;
-      case "ArrowRight": if (dir.x === 0) setDir({ x: 1, y: 0 }); break;
-      case "Space": startGame(); break;
-    }
+    if (e.code === "ArrowUp" && dir.y === 0) setDir({ x: 0, y: -1 });
+    if (e.code === "ArrowDown" && dir.y === 0) setDir({ x: 0, y: 1 });
+    if (e.code === "ArrowLeft" && dir.x === 0) setDir({ x: -1, y: 0 });
+    if (e.code === "ArrowRight" && dir.x === 0) setDir({ x: 1, y: 0 });
   };
 
   useEffect(() => {
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
-  }, [dir, running, prompt]);
+  }, [dir, running]);
 
   useEffect(() => {
     if (!running) return;
+    spawnApples();
+    pickNewPrompt();
+  }, [running]);
+
+  useEffect(() => {
+    if (!running) return;
+
     const interval = setInterval(() => {
       setSnake(prev => {
         const head = { x: prev[0].x + dir.x, y: prev[0].y + dir.y };
 
-        if (head.x < 0 || head.y < 0 || head.x >= GRID_SIZE || head.y >= GRID_SIZE) {
-          setRunning(false); setGameOver(true); setMsg({ text: "You hit the wall!", color: "red" }); return prev;
-        }
-        if (prev.some(seg => seg.x === head.x && seg.y === head.y)) {
-          setRunning(false); setGameOver(true); setMsg({ text: "You ran into yourself!", color: "red" }); return prev;
+        if (
+          head.x < 0 || head.y < 0 ||
+          head.x >= GRID_SIZE || head.y >= GRID_SIZE ||
+          prev.some(s => s.x === head.x && s.y === head.y)
+        ) {
+          setRunning(false);
+          setMsg("Game Over");
+          setPrompt(null);
+          return prev;
         }
 
-        let ateApple = false;
-        let newMsg: typeof msg | null = null;
+        let ate = false;
 
-        setApples(prevApples => {
-          let updated = [...prevApples];
-          updated.forEach((apple, idx) => {
-            if (head.x >= apple.x && head.x < apple.x + apple.size &&
-                head.y >= apple.y && head.y < apple.y + apple.size) {
-              ateApple = true;
-              if (apple.compound.formula === prompt?.formula) {
-                setSnakeLength(len => len + 2);
-                newMsg = { text: "Correct!", color: "green" };
+        setApples(a =>
+          a.filter(ap => {
+            const hit =
+              head.x >= ap.x && head.x < ap.x + ap.size &&
+              head.y >= ap.y && head.y < ap.y + ap.size;
+
+            if (hit) {
+              ate = true;
+              //spawnApples();
+              //pickNewPrompt();
+              if (ap.compound.formula === prompt?.formula) {
+                setSnakeLength(l => l + 1);
+                setMsg("Correct!");
+                spawnApples();
+                pickNewPrompt();
               } else {
-                setSnakeLength(len => Math.max(1, len - 1));
-                newMsg = { text: `Wrong! It was ${prompt?.formula}`, color: "red" };
+                setSnakeLength(l => l - 0.5);
+                setMsg(`Wrong! It was ${prompt?.formula}!`);
+                spawnApples();
+                pickNewPrompt();
               }
-              updated.splice(idx, 1);
             }
-          });
-          return updated;
-        });
+            return !hit;
+          })
+        );
 
-        if (ateApple) {
-          // Select new prompt from current apples
-          const availableApples = apples.filter(a => a.compound.formula !== prompt?.formula);
-          if (availableApples.length > 0) {
-            const nextApple = availableApples[Math.floor(Math.random() * availableApples.length)];
-            setPrompt(nextApple.compound);
-          } else {
-            setPrompt(null); // next spawn will create prompt apple
-          }
+        //if (ate) {
+        //  spawnApples();
+        //  pickNewPrompt();
+        //}
 
-          // Ensure MIN_APPLES after eating
-          spawnApples(MIN_APPLES);
-        }
-
-        setMsg(newMsg);
-
-        let newSnake = [head, ...prev];
-        if (!ateApple) newSnake = newSnake.slice(0, snakeLength);
-
-        if (snakeLength >= WIN_LENGTH) {
-          setRunning(false); setGameOver(true); setMsg({ text: "You Win!", color: "green" });
-        }
-
-        return newSnake;
+        return [head, ...prev].slice(0, Math.floor(snakeLength));
       });
-
-      setSpeed(prev => Math.max(50, prev - 1));
-    }, speed);
+    }, 200);
 
     return () => clearInterval(interval);
-  }, [running, dir, snakeLength, apples, prompt]);
+  }, [running, dir, snakeLength, prompt]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    if (snakeLength >= WIN_LENGTH) {
+      setRunning(false);
+      setMsg("You Win!");
+      setPrompt(null);
+    }
+    if (snakeLength < MIN_LENGTH) {
+      setRunning(false);
+      setMsg("You Lost!");
+      setPrompt(null);
+    }
+  }, [snakeLength]);
+
+  useEffect(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const ctx = c.getContext("2d");
     if (!ctx) return;
 
     ctx.clearRect(0, 0, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);
     ctx.fillStyle = "#d0f0f0";
     ctx.fillRect(0, 0, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);
 
-    snake.forEach((seg, i) => {
+    snake.forEach((s, i) => {
       ctx.fillStyle = i === 0 ? "#0a8" : "#0c6";
-      ctx.strokeStyle = "#000";
-      ctx.lineWidth = 1;
-      ctx.fillRect(seg.x * CELL_SIZE, seg.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-      ctx.strokeRect(seg.x * CELL_SIZE, seg.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      ctx.fillRect(s.x * CELL_SIZE, s.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
     });
 
-    apples.forEach(apple => {
+    apples.forEach(a => {
       ctx.fillStyle = "#ff4c4c";
       ctx.beginPath();
       ctx.arc(
-        (apple.x + apple.size / 2) * CELL_SIZE,
-        (apple.y + apple.size / 2) * CELL_SIZE,
-        (apple.size / 2) * CELL_SIZE,
+        (a.x + a.size / 2) * CELL_SIZE,
+        (a.y + a.size / 2) * CELL_SIZE,
+        (a.size / 2) * CELL_SIZE,
         0,
         Math.PI * 2
       );
@@ -228,34 +224,35 @@ export default function SnakeGame() {
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(
-        apple.compound.formula,
-        (apple.x + apple.size / 2) * CELL_SIZE,
-        (apple.y + apple.size / 2) * CELL_SIZE
+        a.compound.formula,
+        (a.x + a.size / 2) * CELL_SIZE,
+        (a.y + a.size / 2) * CELL_SIZE
       );
     });
-  }, [snake, apples]);
+
+    ctx.fillStyle = "#000";
+    ctx.font = "14px Arial";
+    ctx.textAlign = "right";
+    ctx.fillText(
+      `Snake Length: ${snakeLength}`,
+      GRID_SIZE * CELL_SIZE - 10,
+      GRID_SIZE * CELL_SIZE - 10
+    );
+  }, [snake, apples, snakeLength]);
 
   return (
-    <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
-      {msg && (
-        <div style={{ backgroundColor: msg.color }} className="w-full max-w-xl text-center text-white font-bold p-2 rounded mb-2">
-          {msg.text}
-        </div>
-      )}
-      <div className="relative">
-        <div className="absolute top-2 left-2 text-xl font-bold">Snake Length: {snakeLength}</div>
-        <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-2xl font-bold">
-          Find: {prompt?.name || ""}
-        </div>
-        <canvas ref={canvasRef} width={GRID_SIZE * CELL_SIZE} height={GRID_SIZE * CELL_SIZE} className="border-4 border-gray-600" onClick={startGame}/>
-        {gameOver && (
-          <div className="absolute inset-0 bg-white bg-opacity-75 flex flex-col items-center justify-center text-4xl font-bold text-red-600">
-            {msg?.text || "Game Over"}
-            <button className="mt-4 px-6 py-2 bg-blue-500 text-white rounded" onClick={startGame}>Try Again</button>
-          </div>
-        )}
+    <div className="flex flex-col items-center p-6">
+      <div className="text-2xl font-bold mb-2">
+        Find: {prompt?.name ?? "Press Space"}
       </div>
-      {!running && !gameOver && <p className="mt-4 text-lg text-gray-700">Click the game box or press Space to start!</p>}
+      <canvas
+        ref={canvasRef}
+        width={GRID_SIZE * CELL_SIZE}
+        height={GRID_SIZE * CELL_SIZE}
+        className="border-4 border-gray-600"
+        onClick={startGame}
+      />
+      {msg && <div className="mt-4 text-xl font-bold">{msg}</div>}
     </div>
   );
 }
