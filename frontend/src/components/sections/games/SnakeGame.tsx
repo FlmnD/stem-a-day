@@ -1,22 +1,45 @@
 'use client'
 import React, { useState, useEffect, useRef } from "react";
 
-const COMPOUNDS = [
-  { formula: "NaCl", name: "sodium chloride" },
-  { formula: "K₂O", name: "potassium oxide" },
-  { formula: "MgSe", name: "magnesium selenide" },
-  { formula: "CaCl₂", name: "calcium chloride" },
-  { formula: "Al₂O₃", name: "aluminum oxide" },
-  { formula: "FeO", name: "iron(II) oxide" },
-  { formula: "Fe₂O₃", name: "iron(III) oxide" },
-  { formula: "CuCl", name: "copper(I) chloride" },
-  { formula: "CuCl₂", name: "copper(II) chloride" },
-  { formula: "Ca(OH)₂", name: "calcium hydroxide" },
-  { formula: "(NH₄)₂SO₄", name: "ammonium sulfate" },
-  { formula: "CO₂", name: "carbon dioxide" },
-  { formula: "H₂SO₄", name: "sulfuric acid" },
-  { formula: "C₆H₁₂O₆", name: "glucose" },
-  { formula: "C₂H₅OH", name: "ethanol" },
+const COMPOUNDS = [ 
+    { formula: "NaCl", name: "sodium chloride" }, 
+    { formula: "K₂O", name: "potassium oxide" }, 
+    { formula: "MgSe", name: "magnesium selenide" }, 
+    { formula: "CaCl₂", name: "calcium chloride" }, 
+    { formula: "Al₂O₃", name: "aluminum oxide" }, 
+    { formula: "FeO", name: "iron(II) oxide" }, 
+    { formula: "Fe₂O₃", name: "iron(III) oxide (also ferric oxide)" }, 
+    { formula: "CuCl", name: "copper(I) chloride" }, 
+    { formula: "CuCl₂", name: "copper(II) chloride" }, 
+    { formula: "Ca(OH)₂", name: "calcium hydroxide" }, 
+    { formula: "(NH₄)₂SO₄", name: "ammonium sulfate" }, 
+    { formula: "NaHCO₃", name: "sodium hydrogen carbonate (or sodium bicarbonate)" }, 
+    { formula: "K₂Cr₂O₇", name: "potassium dichromate" }, 
+    { formula: "CO", name: "carbon monoxide" }, 
+    { formula: "CO₂", name: "carbon dioxide" }, 
+    { formula: "N₂O", name: "dinitrogen monoxide" }, 
+    { formula: "N₂O₃", name: "dinitrogen trioxide" }, 
+    { formula: "PCl₅", name: "phosphorus pentachloride" }, 
+    { formula: "SF₆", name: "sulfur hexafluoride" }, 
+    { formula: "Cl₂O₇", name: "dichlorine heptoxide" }, 
+    { formula: "P₄O₆", name: "tetraphosphorus hexoxide" }, 
+    { formula: "CCl₄", name: "carbon tetrachloride" },
+    { formula: "HCl(aq)", name: "hydrochloric acid" }, 
+    { formula: "HBr(aq)", name: "hydrobromic acid" }, 
+    { formula: "HI(aq)", name: "hydroiodic acid" }, 
+    { formula: "H₂S(aq)", name: "hydrosulfuric acid" }, 
+    { formula: "H₂SO₄", name: "sulfuric acid" }, 
+    { formula: "H₂SO₃", name: "sulfurous acid" }, 
+    { formula: "HNO₃", name: "nitric acid" }, 
+    { formula: "HNO₂", name: "nitrous acid" }, 
+    { formula: "H₃PO₄", name: "phosphoric acid" }, 
+    { formula: "HC₂H₃O₂", name: "acetic acid" }, 
+    { formula: "CH₄", name: "methane" }, 
+    { formula: "C₂H₆", name: "ethane" }, 
+    { formula: "C₃H₈", name: "propane" }, 
+    { formula: "C₄H₁₀", name: "butane" }, 
+    { formula: "C₆H₁₂O₆", name: "glucose" }, 
+    { formula: "C₂H₅OH", name: "ethanol (ethyl alcohol)" }, 
 ];
 
 const GRID_SIZE = 20;
@@ -63,10 +86,13 @@ export default function SnakeGame() {
 
   const pickNewPrompt = () => {
     const compound = unusedCompound();
-    if (!compound) return; // do nothing, game continues
-
+    if (!compound){
+        setRunning(false);
+        setMsg("You Lost! You took too many attempts!");
+        setPrompt(null);
+        return;
+    }
     setPrompt(compound);
-    setUsed(u => new Set(u).add(compound.formula));
     ensurePromptApple(compound);
   };
 
@@ -75,9 +101,13 @@ export default function SnakeGame() {
     setApples(prev => {
         let next = [...prev];
         while (next.length < MIN_APPLES) {
-        const c = unusedCompound();
-        if (!c) break;
-        next.push({ ...randPos(), size: 2, compound: c });
+            const c = unusedCompound();
+            if (!c) break;
+            let pos = randPos();
+            while (snake.some(s => s.x === pos.x && s.y === pos.y)){
+                pos = randPos();
+            }
+            next.push({ ...pos, size: 2, compound: c });
         }
         return next;
     });
@@ -85,15 +115,23 @@ export default function SnakeGame() {
 
 
   const startGame = () => {
+    const freshUsed = new Set<string>();
+
     setSnake(Array.from({ length: INITIAL_LENGTH }, (_, i) => ({ x: 5 - i, y: 5 })));
     setDir({ x: 1, y: 0 });
     setApples([]);
-    setUsed(new Set());
-    setPrompt(null);
+    setUsed(freshUsed);
     setSnakeLength(INITIAL_LENGTH);
     setMsg(null);
     setRunning(true);
+
+    // 🔑 Immediately initialize game state
+    setTimeout(() => {
+        spawnApples();
+        pickNewPrompt();
+    }, 0);
   };
+
 
   const handleKey = (e: KeyboardEvent) => {
     e.preventDefault();
@@ -118,12 +156,6 @@ export default function SnakeGame() {
 
   useEffect(() => {
     if (!running) return;
-    spawnApples();
-    pickNewPrompt();
-  }, [running]);
-
-  useEffect(() => {
-    if (!running) return;
 
     const interval = setInterval(() => {
       setSnake(prev => {
@@ -135,7 +167,7 @@ export default function SnakeGame() {
           prev.some(s => s.x === head.x && s.y === head.y)
         ) {
           setRunning(false);
-          setMsg("Game Over");
+          setMsg("You Lost! You hit yourself!");
           setPrompt(null);
           return prev;
         }
@@ -150,19 +182,18 @@ export default function SnakeGame() {
 
             if (hit) {
               ate = true;
+              setUsed(u => new Set(u).add(ap.compound.formula));
               //spawnApples();
               //pickNewPrompt();
               if (ap.compound.formula === prompt?.formula) {
                 setSnakeLength(l => l + 1);
                 setMsg("Correct!");
-                spawnApples();
-                pickNewPrompt();
               } else {
                 setSnakeLength(l => l - 0.5);
                 setMsg(`Wrong! It was ${prompt?.formula}!`);
-                spawnApples();
-                pickNewPrompt();
               }
+              spawnApples();
+              pickNewPrompt();
             }
             return !hit;
           })
@@ -183,12 +214,12 @@ export default function SnakeGame() {
   useEffect(() => {
     if (snakeLength >= WIN_LENGTH) {
       setRunning(false);
-      setMsg("You Win!");
+      setMsg("You Won! You reached the maximum snake length!");
       setPrompt(null);
     }
     if (snakeLength < MIN_LENGTH) {
       setRunning(false);
-      setMsg("You Lost!");
+      setMsg("You Lost! Your snake is too short!");
       setPrompt(null);
     }
   }, [snakeLength]);
