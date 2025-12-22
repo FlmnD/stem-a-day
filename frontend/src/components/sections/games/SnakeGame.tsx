@@ -145,7 +145,7 @@ export default function SnakeGame() {
 
   const spawnApples = () => {
     setApples(prev => {
-        let next = [...prev];
+        const next = [...prev];
         const existing = new Set(next.map(a => a.compound.formula));
 
         while (next.length < MIN_APPLES) {
@@ -336,7 +336,7 @@ export default function SnakeGame() {
 
     const interval = setInterval(() => {
         setApples(prev => {
-        let next = [...prev];
+        const next = [...prev];
 
         // 30% chance to remove a random apple (never drop below MIN_APPLES)
         if (next.length > MIN_APPLES && Math.random() < 0.3) {
