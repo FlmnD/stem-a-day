@@ -294,38 +294,51 @@ export const SnakeEasyLesson: Lesson = () => {
     );
 }
 
-
 export const SnakeHardLesson: Lesson = () => {
 
     return (
         <>
             <div className="w-full max-w-5xl mt-6 mb-6 p-4 bg-white rounded shadow">
-                <h2 className="text-2xl font-semibold mb-3">Play our original game!</h2>
+                <h2 className="text-2xl font-semibold mb-3">Play our original game: Snake Nomenclature!</h2>
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
                     <li>
-                        <strong>Goal</strong> — Find the correct element which is randomly picked as
-                        one of the pink elements in the periodic table.
+                        Start with a snake length of 5
                     </li>
                     <li>
-                        <strong>Guess an element</strong>
+                        <strong>To Win</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>16 guesses maximum</li>
-                            <li>Click on an element box in the periodic table</li>
-                            <li>Use the search bar by selecting an element from the dropdown or by typing an element name or symbol and clicking it</li>
+                            <li>Snake length of 15 or more</li>
                         </ul>
                     </li>
                     <li>
-                        <strong>Access element properties</strong>
+                        <strong>Goal</strong> — “Eat” the apple with the chemical formula that matches the substance in the prompt at the top of the game box.
+                    </li>
+                    <li>
+                        <strong>Eat the Correct Apple</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Hover your mouse over any element to view its name, symbol, electronegativity, ionization energy, and atomic radius</li>
-                            <li>After you guess an element, its properties will appear in the game table with color hints that help you win</li>
+                            <li>+2 snake length</li>
                         </ul>
                     </li>
                     <li>
-                        <strong>Reading the game table</strong>
+                        <strong>Eat the Wrong Apple</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li><span className="text-yellow-600 font-semibold">Yellow cell</span> = the value is close to the correct element’s value</li>
-                            <li><span className="text-green-600 font-semibold">Green cell</span> = the value matches the correct element exactly</li>
+                            <li>-1 snake length</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>To Lose</strong>
+                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                            <li>Snake length less than 3</li>
+                            <li>Snake hits wall</li>
+                            <li>Snake hits itself (its body)</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>To Start/Restart the Game</strong>
+                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                            <li>Press space</li>
+                            <li>Click the game box</li>
+                            <li>No pausing to prevent cheating</li>
                         </ul>
                     </li>
                 </ul>

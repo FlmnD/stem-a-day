@@ -79,7 +79,9 @@ export default function Games() {
                     </div>
                     <p className="text-sm text-gray-500 mb-4">Difficulty: <span className="font-medium text-green-600">Easy</span></p>
                     <p className="text-gray-700 mb-6">
-                        little preview text about the easy version of snake game
+                        Test your chemistry <strong>nomenclature</strong> knowledge in this educational Snake game.
+                         Guide the snake to the correct chemical formula while avoiding wrong answers.
+                         Grow your snake, think fast, and win by mastering compounds!
                     </p>
                     {/*<div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
                         <Star className="text-yellow-400" size={14} />

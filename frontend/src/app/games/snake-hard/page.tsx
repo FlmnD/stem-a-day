@@ -1,11 +1,11 @@
 import Collapsible from "@/components/ui/Collapsible";
-import SnakeGame from "@/components/sections/games/SnakeGameEasy";
+import SnakeGame from "@/components/sections/games/SnakeGameHard";
 import {
-  SnakeEasyArticle,
-  SnakeEasyLesson,
+  SnakeHardArticle,
+  SnakeHardLesson,
 } from "@/components/lib/data/snake";
 
-export default function SnakeEasyPage() {
+export default function SnakeHardPage() {
   return (
     <div className="min-h-screen flex flex-col items-center py-10 bg-gray-100">
 
@@ -18,10 +18,10 @@ export default function SnakeEasyPage() {
         className="max-w-7xl"
         defaultOpen={true}
       >
-        <SnakeEasyArticle />
+        <SnakeHardArticle />
       </Collapsible>
 
-      <SnakeEasyLesson />
+      <SnakeHardLesson />
 
       <SnakeGame />
 
