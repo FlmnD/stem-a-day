@@ -1,5 +1,5 @@
 import Collapsible from "@/components/ui/Collapsible";
-import SnakeGame from "@/components/sections/games/SnakeGameEasy";
+import SnakeGame from "@/components/sections/games/SnakeGame";
 import {
   SnakeEasyArticle,
   SnakeEasyLesson,

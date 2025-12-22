@@ -284,7 +284,6 @@ export const SnakeEasyLesson: Lesson = () => {
                         <strong>To Start/Restart the Game</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
                             <li>Press space</li>
-                            <li>Click the game box</li>
                             <li>No pausing to prevent cheating</li>
                         </ul>
                     </li>
@@ -337,7 +336,6 @@ export const SnakeHardLesson: Lesson = () => {
                         <strong>To Start/Restart the Game</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
                             <li>Press space</li>
-                            <li>Click the game box</li>
                             <li>No pausing to prevent cheating</li>
                         </ul>
                     </li>

@@ -92,6 +92,14 @@ export default function SnakeGame() {
     y: Math.floor(Math.random() * (GRID_SIZE - size)),
   });
 
+  const overlapsApple = (pos: { x: number; y: number }, apples: Apple[], size = 2) =>
+  apples.some(a =>
+    pos.x < a.x + a.size &&
+    pos.x + size > a.x &&
+    pos.y < a.y + a.size &&
+    pos.y + size > a.y
+  );
+
   const unusedCompound = () => {
     const left = COMPOUNDS.filter(c => !used.has(c.formula));
     return left.length ? left[Math.floor(Math.random() * left.length)] : null;
@@ -100,7 +108,15 @@ export default function SnakeGame() {
   const ensurePromptApple = (compound: typeof COMPOUNDS[0]) => {
     setApples(prev => {
       if (prev.some(a => a.compound.formula === compound.formula)) return prev;
-      return [...prev, { ...randPos(), size: 2, compound }];
+      let pos = randPos();
+      while (
+        snake.some(s => s.x === pos.x && s.y === pos.y) ||
+        overlapsApple(pos, prev)
+      ) {
+        pos = randPos();
+      }
+
+      return [...prev, { ...pos, size: 2, compound }];
     });
   };
 
@@ -142,8 +158,11 @@ export default function SnakeGame() {
         if (!c || existing.has(c.formula)) break;
 
         let pos = randPos();
-        while (snake.some(s => s.x === pos.x && s.y === pos.y)) {
-            pos = randPos();
+        while (
+          snake.some(s => s.x === pos.x && s.y === pos.y) ||
+          overlapsApple(pos, next)
+        ) {
+          pos = randPos();
         }
 
         existing.add(c.formula);
@@ -164,6 +183,7 @@ export default function SnakeGame() {
     setSnakeLength(INITIAL_LENGTH);
     setMsg(null);
     setRunning(true);
+    setFeedback(null);
 
     // 🔑 Immediately initialize game state
     setTimeout(() => {
@@ -331,7 +351,15 @@ export default function SnakeGame() {
         if (Math.random() < 0.5) {
             const c = unusedCompound();
             if (c) {
-            next.push({ ...randPos(), size: 2, compound: c });
+              let pos = randPos();
+              while (
+                snake.some(s => s.x === pos.x && s.y === pos.y) ||
+                overlapsApple(pos, next)
+              ) {
+                pos = randPos();
+              }
+
+              next.push({ ...pos, size: 2, compound: c });
             }
         }
 
@@ -370,7 +398,15 @@ export default function SnakeGame() {
       ) {
         const c = unusedCompound();
         if (c && !existing.has(c.formula)) {
-          next.push({ ...randPos(), size: 2, compound: c });
+          let pos = randPos();
+          while (
+            snake.some(s => s.x === pos.x && s.y === pos.y) ||
+            overlapsApple(pos, next)
+          ) {
+            pos = randPos();
+          }
+
+          next.push({ ...pos, size: 2, compound: c });
         }
       }
 
@@ -424,10 +460,6 @@ export default function SnakeGame() {
             height: GRID_SIZE * CELL_SIZE,
         }}
         >
-          <div className="mt-4 text-xl font-bold text-center text-black">
-            {feedback}
-          </div>
-
         <canvas
             ref={canvasRef}
             width={GRID_SIZE * CELL_SIZE}
@@ -435,9 +467,10 @@ export default function SnakeGame() {
             className={`border-4 border-gray-600 ${
             !running && msg ? "opacity-40" : ""
             }`}
-            onClick={startGame}
         />
-
+        <div className="mt-4 text-xl font-bold text-center text-black">
+          {feedback}
+        </div>
         {!running && msg && (
             <div className="absolute inset-0 flex flex-col items-center justify-center">
             <div className="bg-black/70 text-white px-8 py-6 rounded-xl text-center">

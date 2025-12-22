@@ -1,54 +1,46 @@
 'use client'
 import React, { useState, useEffect, useRef } from "react";
 
-const COMPOUNDS = [
-  { formula: "NaCl", name: "sodium chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "K₂O", name: "potassium oxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "MgSe", name: "magnesium selenide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "CaCl₂", name: "calcium chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "Al₂O₃", name: "aluminum oxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "FeO", name: "iron(II) oxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "Fe₂O₃", name: "iron(III) oxide (also ferric oxide)", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "CuCl", name: "copper(I) chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "CuCl₂", name: "copper(II) chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-
-  { formula: "Ca(OH)₂", name: "calcium hydroxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "(NH₄)₂SO₄", name: "ammonium sulfate", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "NaHCO₃", name: "sodium hydrogen carbonate (or sodium bicarbonate)", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "K₂Cr₂O₇", name: "potassium dichromate", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-
-  { formula: "CO", name: "carbon monoxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-  { formula: "CO₂", name: "carbon dioxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-  { formula: "N₂O", name: "dinitrogen monoxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-  { formula: "N₂O₃", name: "dinitrogen trioxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-
-  { formula: "PCl₅", name: "phosphorus pentachloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-  { formula: "SF₆", name: "sulfur hexafluoride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-  { formula: "Cl₂O₇", name: "dichlorine heptoxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-  { formula: "P₄O₆", name: "tetraphosphorus hexoxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-  { formula: "CCl₄", name: "carbon tetrachloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-
-  { formula: "HCl(aq)", name: "hydrochloric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-  { formula: "HBr(aq)", name: "hydrobromic acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-  { formula: "HI(aq)", name: "hydroiodic acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-  { formula: "H₂S(aq)", name: "hydrosulfuric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-
-  { formula: "H₂SO₄", name: "sulfuric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
-  { formula: "H₂SO₃", name: "sulfurous acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
-  { formula: "HNO₃", name: "nitric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
-  { formula: "HNO₂", name: "nitrous acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
-  { formula: "H₃PO₄", name: "phosphoric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
-  { formula: "HC₂H₃O₂", name: "acetic acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
-
-  { formula: "CH₄", name: "methane", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-  { formula: "C₂H₆", name: "ethane", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-  { formula: "C₃H₈", name: "propane", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-  { formula: "C₄H₁₀", name: "butane", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-
-  { formula: "C₆H₁₂O₆", name: "glucose", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
-  { formula: "C₂H₅OH", name: "ethanol (ethyl alcohol)", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
+const COMPOUNDS = [ 
+    { formula: "NaCl", name: "sodium chloride" }, 
+    { formula: "K₂O", name: "potassium oxide" }, 
+    { formula: "MgSe", name: "magnesium selenide" }, 
+    { formula: "CaCl₂", name: "calcium chloride" }, 
+    { formula: "Al₂O₃", name: "aluminum oxide" }, 
+    { formula: "FeO", name: "iron(II) oxide" }, 
+    { formula: "Fe₂O₃", name: "iron(III) oxide (also ferric oxide)" }, 
+    { formula: "CuCl", name: "copper(I) chloride" }, 
+    { formula: "CuCl₂", name: "copper(II) chloride" }, 
+    { formula: "Ca(OH)₂", name: "calcium hydroxide" }, 
+    { formula: "(NH₄)₂SO₄", name: "ammonium sulfate" }, 
+    { formula: "NaHCO₃", name: "sodium hydrogen carbonate (or sodium bicarbonate)" }, 
+    { formula: "K₂Cr₂O₇", name: "potassium dichromate" }, 
+    { formula: "CO", name: "carbon monoxide" }, 
+    { formula: "CO₂", name: "carbon dioxide" }, 
+    { formula: "N₂O", name: "dinitrogen monoxide" }, 
+    { formula: "N₂O₃", name: "dinitrogen trioxide" }, 
+    { formula: "PCl₅", name: "phosphorus pentachloride" }, 
+    { formula: "SF₆", name: "sulfur hexafluoride" }, 
+    { formula: "Cl₂O₇", name: "dichlorine heptoxide" }, 
+    { formula: "P₄O₆", name: "tetraphosphorus hexoxide" }, 
+    { formula: "CCl₄", name: "carbon tetrachloride" },
+    { formula: "HCl(aq)", name: "hydrochloric acid" }, 
+    { formula: "HBr(aq)", name: "hydrobromic acid" }, 
+    { formula: "HI(aq)", name: "hydroiodic acid" }, 
+    { formula: "H₂S(aq)", name: "hydrosulfuric acid" }, 
+    { formula: "H₂SO₄", name: "sulfuric acid" }, 
+    { formula: "H₂SO₃", name: "sulfurous acid" }, 
+    { formula: "HNO₃", name: "nitric acid" }, 
+    { formula: "HNO₂", name: "nitrous acid" }, 
+    { formula: "H₃PO₄", name: "phosphoric acid" }, 
+    { formula: "HC₂H₃O₂", name: "acetic acid" }, 
+    { formula: "CH₄", name: "methane" }, 
+    { formula: "C₂H₆", name: "ethane" }, 
+    { formula: "C₃H₈", name: "propane" }, 
+    { formula: "C₄H₁₀", name: "butane" }, 
+    { formula: "C₆H₁₂O₆", name: "glucose" }, 
+    { formula: "C₂H₅OH", name: "ethanol (ethyl alcohol)" }, 
 ];
-
 
 const GRID_SIZE = 20;
 const CELL_SIZE = 25;
@@ -75,11 +67,20 @@ export default function SnakeGame() {
   const [snakeLength, setSnakeLength] = useState(INITIAL_LENGTH);
   const [msg, setMsg] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
 
   const randPos = (size = 2) => ({
     x: Math.floor(Math.random() * (GRID_SIZE - size)),
     y: Math.floor(Math.random() * (GRID_SIZE - size)),
   });
+
+  const overlapsApple = (pos: { x: number; y: number }, apples: Apple[], size = 2) =>
+  apples.some(a =>
+    pos.x < a.x + a.size &&
+    pos.x + size > a.x &&
+    pos.y < a.y + a.size &&
+    pos.y + size > a.y
+  );
 
   const unusedCompound = () => {
     const left = COMPOUNDS.filter(c => !used.has(c.formula));
@@ -89,7 +90,15 @@ export default function SnakeGame() {
   const ensurePromptApple = (compound: typeof COMPOUNDS[0]) => {
     setApples(prev => {
       if (prev.some(a => a.compound.formula === compound.formula)) return prev;
-      return [...prev, { ...randPos(), size: 2, compound }];
+      let pos = randPos();
+      while (
+        snake.some(s => s.x === pos.x && s.y === pos.y) ||
+        overlapsApple(pos, prev)
+      ) {
+        pos = randPos();
+      }
+
+      return [...prev, { ...pos, size: 2, compound }];
     });
   };
 
@@ -144,8 +153,11 @@ export default function SnakeGame() {
         if (!c || existing.has(c.formula)) break;
 
         let pos = randPos();
-        while (snake.some(s => s.x === pos.x && s.y === pos.y)) {
-            pos = randPos();
+        while (
+          snake.some(s => s.x === pos.x && s.y === pos.y) ||
+          overlapsApple(pos, next)
+        ) {
+          pos = randPos();
         }
 
         existing.add(c.formula);
@@ -166,6 +178,7 @@ export default function SnakeGame() {
     setSnakeLength(INITIAL_LENGTH);
     setMsg(null);
     setRunning(true);
+    setFeedback(null);
 
     // 🔑 Immediately initialize game state
     setTimeout(() => {
@@ -233,10 +246,10 @@ export default function SnakeGame() {
 
                 if (ap.compound.formula === prompt?.formula) {
                     setSnakeLength(l => l + 1);
-                    setMsg("Correct!");
+                    setFeedback("Correct!");
                 } else {
                     setSnakeLength(l => l - 0.5);
-                    setMsg(`Wrong! It was ${prompt?.formula}`);
+                    setFeedback(`Wrong! It was ${prompt?.formula}`);
                 }
 
                 pickNewPrompt();
@@ -334,7 +347,14 @@ export default function SnakeGame() {
         if (Math.random() < 0.5) {
             const c = unusedCompound();
             if (c) {
-            next.push({ ...randPos(), size: 2, compound: c });
+              let pos = randPos();
+              while (
+                snake.some(s => s.x === pos.x && s.y === pos.y) ||
+                overlapsApple(pos, next)
+              ) {
+                pos = randPos();
+              }
+              next.push({ ...pos, size: 2, compound: c });
             }
         }
 
@@ -376,7 +396,15 @@ export default function SnakeGame() {
       ) {
         const c = unusedCompound();
         if (c && !existing.has(c.formula)) {
-          next.push({ ...randPos(), size: 2, compound: c });
+          let pos = randPos();
+          while (
+            snake.some(s => s.x === pos.x && s.y === pos.y) ||
+            overlapsApple(pos, next)
+          ) {
+            pos = randPos();
+          }
+
+          next.push({ ...pos, size: 2, compound: c });
         }
       }
 
@@ -436,9 +464,10 @@ export default function SnakeGame() {
             className={`border-4 border-gray-600 ${
             !running && msg ? "opacity-40" : ""
             }`}
-            onClick={startGame}
         />
-
+        <div className="mt-4 text-xl font-bold text-center text-black">
+          {feedback}
+        </div>
         {!running && msg && (
             <div className="absolute inset-0 flex flex-col items-center justify-center">
             <div className="bg-black/70 text-white px-8 py-6 rounded-xl text-center">
