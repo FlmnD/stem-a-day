@@ -2,51 +2,50 @@
 import React, { useState, useEffect, useRef } from "react";
 
 const COMPOUNDS = [
-  { formula: "NaCl", name: "sodium chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "K₂O", name: "potassium oxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "MgSe", name: "magnesium selenide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "CaCl₂", name: "calcium chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "Al₂O₃", name: "aluminum oxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "FeO", name: "iron(II) oxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "Fe₂O₃", name: "iron(III) oxide (also ferric oxide)", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "CuCl", name: "copper(I) chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "CuCl₂", name: "copper(II) chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
+  { formula: "NaCl", name: "sodium chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "K₂O", name: "potassium oxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "MgSe", name: "magnesium selenide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "CaCl₂", name: "calcium chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "Al₂O₃", name: "aluminum oxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "FeO", name: "iron(II) oxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "Fe₂O₃", name: "iron(III) oxide (also ferric oxide)", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "CuCl", name: "copper(I) chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "CuCl₂", name: "copper(II) chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
 
-  { formula: "Ca(OH)₂", name: "calcium hydroxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "(NH₄)₂SO₄", name: "ammonium sulfate", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "NaHCO₃", name: "sodium hydrogen carbonate (or sodium bicarbonate)", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
-  { formula: "K₂Cr₂O₇", name: "potassium dichromate", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: true } },
+  { formula: "Ca(OH)₂", name: "calcium hydroxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "(NH₄)₂SO₄", name: "ammonium sulfate", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "NaHCO₃", name: "sodium hydrogen carbonate (or sodium bicarbonate)", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "K₂Cr₂O₇", name: "potassium dichromate", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
 
-  { formula: "CO", name: "carbon monoxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-  { formula: "CO₂", name: "carbon dioxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-  { formula: "N₂O", name: "dinitrogen monoxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-  { formula: "N₂O₃", name: "dinitrogen trioxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
+  { formula: "CO", name: "carbon monoxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false } },
+  { formula: "CO₂", name: "carbon dioxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "N₂O", name: "dinitrogen monoxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false } },
+  { formula: "N₂O₃", name: "dinitrogen trioxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false } },
 
-  { formula: "PCl₅", name: "phosphorus pentachloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-  { formula: "SF₆", name: "sulfur hexafluoride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-  { formula: "Cl₂O₇", name: "dichlorine heptoxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-  { formula: "P₄O₆", name: "tetraphosphorus hexoxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-  { formula: "CCl₄", name: "carbon tetrachloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
+  { formula: "PCl₅", name: "phosphorus pentachloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "SF₆", name: "sulfur hexafluoride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "Cl₂O₇", name: "dichlorine heptoxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false } },
+  { formula: "P₄O₆", name: "tetraphosphorus hexoxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false } },
+  { formula: "CCl₄", name: "carbon tetrachloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "HCl(aq)", name: "hydrochloric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false } },
+  { formula: "HBr(aq)", name: "hydrobromic acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false } },
+  { formula: "HI(aq)", name: "hydroiodic acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false } },
+  { formula: "H₂S(aq)", name: "hydrosulfuric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false } },
 
-  { formula: "HCl(aq)", name: "hydrochloric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-  { formula: "HBr(aq)", name: "hydrobromic acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-  { formula: "HI(aq)", name: "hydroiodic acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
-  { formula: "H₂S(aq)", name: "hydrosulfuric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false, ionDipole: false } },
+  { formula: "H₂SO₄", name: "sulfuric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true } },
+  { formula: "H₂SO₃", name: "sulfurous acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true } },
+  { formula: "HNO₃", name: "nitric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true } },
+  { formula: "HNO₂", name: "nitrous acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true } },
+  { formula: "H₃PO₄", name: "phosphoric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true } },
+  { formula: "HC₂H₃O₂", name: "acetic acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true } },
 
-  { formula: "H₂SO₄", name: "sulfuric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
-  { formula: "H₂SO₃", name: "sulfurous acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
-  { formula: "HNO₃", name: "nitric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
-  { formula: "HNO₂", name: "nitrous acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
-  { formula: "H₃PO₄", name: "phosphoric acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
-  { formula: "HC₂H₃O₂", name: "acetic acid", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
+  { formula: "CH₄", name: "methane", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "C₂H₆", name: "ethane", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "C₃H₈", name: "propane", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "C₄H₁₀", name: "butane", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
 
-  { formula: "CH₄", name: "methane", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-  { formula: "C₂H₆", name: "ethane", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-  { formula: "C₃H₈", name: "propane", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-  { formula: "C₄H₁₀", name: "butane", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false, ionDipole: false } },
-
-  { formula: "C₆H₁₂O₆", name: "glucose", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
-  { formula: "C₂H₅OH", name: "ethanol (ethyl alcohol)", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true, ionDipole: false } },
+  { formula: "C₆H₁₂O₆", name: "glucose", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true } },
+  { formula: "C₂H₅OH", name: "ethanol (ethyl alcohol)", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true } },
 ];
 
 
@@ -250,10 +249,10 @@ export default function SnakeGame() {
                 });
 
                 if (prompt && ap.compound.imf[prompt.key]) {
-                  setSnakeLength(l => l + 1);
+                  setSnakeLength(l => l + 0.5);
                   setFeedback("Correct!");
                 } else {
-                  setSnakeLength(l => l - 0.5);
+                  setSnakeLength(l => l - 1);
                   setFeedback("Wrong!");
                 }
                 if (running) pickNewPrompt();

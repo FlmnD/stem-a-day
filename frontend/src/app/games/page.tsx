@@ -106,7 +106,8 @@ export default function Games() {
                     </div>
                     <p className="text-sm text-gray-500 mb-4">Difficulty: <span className="font-medium text-red-600">Hard</span></p>
                     <p className="text-gray-700 mb-6">
-                        little preview text about the hard version of snake game
+                        Put your chemistry skills to the test with <strong>intermolecular forces</strong>.
+                         Chase the correct interaction, dodge the wrong ones, and survive as the challenge gets harder.
                     </p>
                     {/*<div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
                         <Star className="text-yellow-400" size={14} />

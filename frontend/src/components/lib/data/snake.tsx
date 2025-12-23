@@ -310,18 +310,19 @@ export const SnakeHardLesson: Lesson = () => {
                         </ul>
                     </li>
                     <li>
-                        <strong>Goal</strong> — “Eat” the apple with the chemical formula that matches the substance in the prompt at the top of the game box.
+                        <strong>Goal</strong> — “Eat” an apple that matches the IMF (Intermolecular Force) in the prompt at the top of the game box.
+                         Consider the IMF to be between a substance and itself, not between 2 different substances.
                     </li>
                     <li>
                         <strong>Eat the Correct Apple</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>+2 snake length</li>
+                            <li>+1 snake length</li>
                         </ul>
                     </li>
                     <li>
                         <strong>Eat the Wrong Apple</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>-1 snake length</li>
+                            <li>-2 snake length</li>
                         </ul>
                     </li>
                     <li>
