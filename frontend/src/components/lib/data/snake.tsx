@@ -4,129 +4,206 @@ import { Article, Lesson } from "@/structures/GameStructures";
 export const SnakeEasyArticle: Article = () => {
     return (
         <>
-
             <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
-                <h2 className="text-xl font-bold mb-3">Learn About the Essentials!</h2>
+                <h2 className="text-xl font-bold mb-3">Learn About Chemical Bonding & Compounds!</h2>
 
                 <p className="mb-4">
-                    Learn about elements, atoms, atomic number, atomic mass, and ionic charge here!
-                    These hints will help you play the game successfully, so don’t skip them.
-                    You should spend at least <strong>6–7 minutes</strong> learning before starting the game.
-                    If you need more help, feel free to explore the external links.
-                    <strong> Enjoy learning and playing!</strong>
+                    Learn about molecules, ions, ionic compounds, acids, bases, and hydrocarbons here!
+                    These concepts are essential for understanding how substances form and react.
+                    You should spend at least <strong>6–7 minutes</strong> reviewing this information before playing.
+                    <strong> Take your time — it will help you succeed!</strong>
                 </p>
 
-                <h3 className="font-semibold">Element</h3>
+                <h3 className="font-semibold">Molecule</h3>
                 <p className="mb-3">
-                    An <strong>element</strong> is a pure substance that cannot be broken down or transformed
-                    into another substance.
-                </p>
-                <h3 className="font-semibold">Atom</h3>
-                <p className="mb-1">
-                    An <strong>atom</strong> is the smallest chemical particle of an element. It includes:
-                </p>
-                <ul className="list-disc ml-6 mb-3">
-                    <li>Positive <strong>protons</strong></li>
-                    <li>Negative <strong>electrons</strong></li>
-                    <li>Neutral <strong>neutrons</strong></li>
-                </ul>
-                <div className="mb-7 mt-3">
-                    <CarbleLink url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Atomic_Theory/The_Atom" text="Learn more about atoms and elements!"></CarbleLink>
-                </div>
-
-                <p className="italic text-gray-600 mb-4">
-                    <img src="/atomic and mass number.jpg" alt="atomic and mass number example" height="300" width="200" />
-                </p>
-
-                <h3 className="font-semibold">Atomic Number</h3>
-                <p className="mb-2">
-                    The <strong>atomic number</strong> is the number of protons in an atom.
-                    On the periodic table, assume protons ≈ electrons ≈ neutrons (simplified model).
-                    The atomic number increases by one as one proton is added to create the next element on the periodic table.
-                    An element is defined by there number of protons it has. One proton is always a Hydrogen atom. Two protons is always a Helium atom and so on.
-                </p>
-                <p className="mb-2">Examples:</p>
-                <ul className="list-disc ml-6 mb-3">
-                    <li>Hydrogen: 1</li>
-                    <li>Helium: 2</li>
-                    <li>Carbon: 6</li>
-                </ul>
-                <p className="mb-4">
-                    It <strong>increases by one</strong> as you move left → right <strong>across a period</strong>
-                    and <strong> increases dramatically</strong> as you move top → bottom <strong> down a group</strong>.
+                    A <strong>molecule</strong> is made of multiple <strong>nonmetal atoms</strong> that are
+                    <strong> covalently bonded</strong> together and have a <strong>neutral (zero) overall charge</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
-                    <img src="/4 protons diagram.png" alt="atom diagram example" height="300" width="200" />
+                    <img src="/molecule.jpg" alt="molecule example" height="300" width="200" />
                 </p>
-
-                <h3 className="font-semibold">Atomic Mass</h3>
-                <p className="mb-2">
-                    Atomic mass (or mass number) is the mass of an atom.
-                    Mass number should increase by about 1-3 amu for each proceeding element to account for an additional proton and neutron (and practically weightless electron).
-                    (Be aware that the periodic table is an average based on the probability of atoms for each element, so <strong>values will vary from theoretical</strong> and experimental values.)
-                    Approximate values:
-                </p>
-                <ul className="list-disc ml-6 mb-3">
-                    <li>1 proton (p⁺) ≈ 1 amu</li>
-                    <li>1 neutron ≈ 1 amu</li>
-                    <li>1 electron (e⁻) ≈ 0 amu (so electrons barely affect mass)</li>
-                </ul>
-                <p className="mb-2">Examples:</p>
-                <ul className="list-disc ml-6 mb-3">
-                    <li>Hydrogen: 1 p + 1 e⁻ → ~1 amu</li>
-                    <li>Helium: 2 p + 2 n + 2 e⁻ → ~4 amu</li>
-                    <li>Carbon: 6 p + 6 n + 6 e⁻ → ~12 amu</li>
-                </ul>
-                <p className="mb-4">
-                    It <strong>increases</strong> as you move left → right <strong>across a period</strong>
-                    and <strong>increases dramatically</strong> as you move top → bottom <strong>down a group</strong>.
-                </p>
-                <p className="italic text-gray-600 mb-4">
-                    <img src="/the structure of atom.jpg" alt="the structure of atom diagram" height="300" width="200" />
-                </p>
-
                 <div className="mb-7">
-                    <CarbleLink url="https://chem.libretexts.org/Courses/Furman_University/CHM101%3A_Chemistry_and_Global_Awareness_(Gordon)/03%3A_Atoms_and_the_Periodic_Table/3.04%3A_Atomic_Mass_and_Atomic_Number" text="Learn more about atomic mass and atomic number!"></CarbleLink>
+                    <CarbleLink
+                        url="https://byjus.com/chemistry/atoms-and-molecules/"
+                        text="Learn more about atoms and molecules!"
+                    />
                 </div>
 
-                <h3 className="font-semibold">Ionic Charge</h3>
+                <h3 className="font-semibold">Ion</h3>
                 <p className="mb-2">
-                    The <strong>ionic charge</strong> is the charge an atom gets when it loses or gains electrons.
-                    Charge is only depends on how many valence (outermost) electrons an atom originally has.
-                    It can then lose all those electrons or gain more electrons in order to have a full valence shell (typically of 8 electrons but 2 for H and He).
+                    An <strong>ion</strong> is an atom or molecule with an <strong>overall positive or negative charge</strong>
+                    due to <strong>losing or gaining electron(s)</strong>.
                 </p>
-                <p className="mb-3 italic text-gray-700">Reminder: electrons have a negative charge!</p>
                 <p className="mb-2">Examples:</p>
                 <ul className="list-disc ml-6 mb-3">
-                    <li>Hydrogen: +</li>
-                    <li>Carbon: 0</li>
-                    <li>Fluorine: –</li>
-                    <li>Neon: 0</li>
+                    <li>Na⁺</li>
+                    <li>Cl⁻</li>
+                    <li>Ba²⁺</li>
                 </ul>
-                <p className="font-semibold mb-2">General Patterns:</p>
-                <ul className="list-disc ml-6 mb-4">
-                    <li>Metals: positive charge</li>
-                    <li>Nonmetals: negative charge</li>
-                    <li>Transition metals: variable charges</li>
-                    <li>Noble gases: 0 charge</li>
-                </ul>
-                <p className="font-semibold mb-2">Charge by Group:</p>
-                <ul className="list-disc ml-6 mb-3">
-                    <li>Group 1: +</li>
-                    <li>Group 2: 2+</li>
-                    <li>Groups 3–12: varies</li>
-                    <li>Group 13: 3+</li>
-                    <li>Group 14: 4+ or 0</li>
-                    <li>Group 15: 3–</li>
-                    <li>Group 16: 2–</li>
-                    <li>Group 17: –</li>
-                    <li>Group 18: 0</li>
-                </ul>
-                <p className="italic text-gray-600">
-                    <img src="/4 diagrams ionic charge.gif" alt="4 atom diagrams" height="400" width="300" />
+                <p className="italic text-gray-600 mb-6">
+                    <img src="/ion.png" alt="ion examples" height="300" width="200" />
                 </p>
-                <div className="mb-7 mt-5">
-                    <CarbleLink url="https://chem.libretexts.org/Courses/Portland_Community_College/CH151%3A_Preparatory_Chemistry/06%3A_Ions_Ionic_Bonding_and_the_Nomenclature_of_Ionic_Compounds/6.01%3A_Ions" text="Learn more about ions and ionic charge!"></CarbleLink>
+
+                <h3 className="font-semibold">Cation</h3>
+                <p className="mb-2">
+                    A <strong>cation</strong> is an ion with an <strong>overall positive charge</strong>
+                    caused by <strong>losing electron(s)</strong>.
+                </p>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-4">
+                    <li>K⁺</li>
+                    <li>Al³⁺</li>
+                    <li>NH₄⁺</li>
+                </ul>
+
+                <h3 className="font-semibold">Anion</h3>
+                <p className="mb-2">
+                    An <strong>anion</strong> is an ion with an <strong>overall negative charge</strong>
+                    caused by <strong>gaining electron(s)</strong>.
+                </p>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-4">
+                    <li>F⁻</li>
+                    <li>O²⁻</li>
+                    <li>SO₄²⁻</li>
+                </ul>
+                <p className="italic text-gray-600 mb-6">
+                    <img src="/cat and an ion.jpg" alt="cation and anion comparison" height="300" width="200" />
+                </p>
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://www.geeksforgeeks.org/chemistry/cations-vs-anions/"
+                        text="Learn more about cations and anions!"
+                    />
+                </div>
+
+                <h3 className="font-semibold">Polyatomic Ion</h3>
+                <p className="mb-2">
+                    A <strong>polyatomic ion</strong> is a charged group of <strong>multiple covalently bonded atoms</strong>.
+                    The overall charge can be <strong>positive or negative</strong>.
+                </p>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-3">
+                    <li>SO₄²⁻ : sulfate</li>
+                    <li>OH⁻ : hydroxide</li>
+                    <li>NH₄⁺ : ammonium</li>
+                </ul>
+                <p className="font-semibold mb-2">Nomenclature Patterns:</p>
+                <ul className="list-disc ml-6 mb-4">
+                    <li><strong>-ate</strong>: most common form (e.g., nitrate NO₃⁻)</li>
+                    <li><strong>-ite</strong>: one less oxygen than -ate (e.g., nitrite NO₂⁻)</li>
+                    <li><strong>Per-___-ate</strong>: one more oxygen than -ate (e.g., perchlorate ClO₄⁻)</li>
+                    <li><strong>Hypo-___-ite</strong>: one less oxygen than -ite (e.g., hypochlorite ClO⁻)</li>
+                </ul>
+                <p className="italic text-gray-600 mb-6">
+                    <img src="/polyion.png" alt="polyatomic ion examples" height="300" width="200" />
+                </p>
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://www.khanacademy.org/science/hs-chemistry/x2613d8165d88df5e:chemical-bonding/x2613d8165d88df5e:ionic-nomenclature/a/polyatomic-ions-article"
+                        text="Learn more about polyatomic ions!"
+                    />
+                </div>
+
+                <h3 className="font-semibold">Ionic Compound</h3>
+                <p className="mb-2">
+                    An <strong>ionic compound</strong> forms between a <strong>cation</strong> and an <strong>anion</strong>.
+                    Electrons are transferred, but the compound has a <strong>neutral overall charge</strong>.
+                </p>
+                <p className="mb-2 font-mono">
+                    | anion subscript × anion charge | = cation subscript × cation charge
+                </p>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-3">
+                    <li>NaCl : sodium chloride</li>
+                    <li>LiF : lithium fluoride</li>
+                    <li>CaCO₃ : calcium carbonate</li>
+                </ul>
+                <p className="font-semibold mb-2">Nomenclature Rules:</p>
+                <ul className="list-disc ml-6 mb-4">
+                    <li>Write the cation name first (unchanged)</li>
+                    <li>Transition metal charges are shown using Roman numerals</li>
+                    <li>Polyatomic anions keep their name</li>
+                    <li>Single-element anions end in <strong>-ide</strong></li>
+                </ul>
+                <p className="italic text-gray-600 mb-6">
+                    <img src="/ionic comp.png" alt="ionic compound diagram" height="300" width="200" />
+                </p>
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://www.britannica.com/science/ionic-compound"
+                        text="Learn more about ionic compounds!"
+                    />
+                </div>
+
+                <h3 className="font-semibold">Acid</h3>
+                <p className="mb-2">
+                    An <strong>acid</strong> usually contains at least one <strong>hydrogen ion (H⁺)</strong>,
+                    donates protons, and has a <strong>pH below 7</strong>.
+                </p>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-3">
+                    <li>HCl : hydrochloric acid</li>
+                    <li>HNO₃ : nitric acid</li>
+                    <li>H₂SO₄ : sulfuric acid</li>
+                </ul>
+                <p className="font-semibold mb-2">Nomenclature:</p>
+                <ul className="list-disc ml-6 mb-4">
+                    <li><strong>Hydro-___ acid</strong>: single-element acids</li>
+                    <li><strong>-ic acid</strong>: polyatomic ions ending in -ate</li>
+                    <li><strong>-ous acid</strong>: polyatomic ions ending in -ite</li>
+                </ul>
+                <p className="italic mb-6">
+                    “I <strong>ATE</strong> it and it was <strong>IC</strong>ky. I took a b<strong>ITE</strong> and it was delici<strong>OUS</strong>.”
+                </p>
+
+                <h3 className="font-semibold">Base</h3>
+                <p className="mb-2">
+                    A <strong>base</strong> often contains a <strong>hydroxide ion (OH⁻)</strong>,
+                    accepts protons, and has a <strong>pH above 7</strong>.
+                </p>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-4">
+                    <li>NaOH : sodium hydroxide</li>
+                    <li>CaCO₃ : calcium carbonate</li>
+                    <li>Mg(OH)₂ : magnesium hydroxide</li>
+                </ul>
+                <p className="italic text-gray-600 mb-6">
+                    <img src="/acid base.png" alt="acid and base diagram" height="300" width="200" />
+                </p>
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://www.pasco.com/resources/articles/acid-base-chemistry"
+                        text="Learn more about acids and bases!"
+                    />
+                </div>
+
+                <h3 className="font-semibold">Hydrocarbon</h3>
+                <p className="mb-2">
+                    A <strong>hydrocarbon</strong> is an organic compound made only of
+                    <strong> carbon (C)</strong> and <strong>hydrogen (H)</strong> atoms.
+                </p>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-3">
+                    <li>CH₄ : methane</li>
+                    <li>C₄H₁₀ : butane</li>
+                    <li>C₃H₈ : propane</li>
+                </ul>
+                <p className="mb-3">
+                    Nomenclature is complex, but hydrocarbons usually end in <strong>-ane</strong> or <strong>-ene</strong>.
+                </p>
+                <p className="italic text-gray-600 mb-4">
+                    <img src="/hydrocarb.png" alt="hydrocarbon examples" height="300" width="200" />
+                </p>
+                <p className="font-semibold mb-4">
+                    There are also organic compounds similar to hydrocarbons with more complex nomenclature,
+                    such as alcohols (C₂H₅OH) and ethanol (CH₃CH₂OH).
+                </p>
+                <div className="mb-3">
+                    <CarbleLink
+                        url="https://chem.libretexts.org/Bookshelves/General_Chemistry/ChemPRIME_(Moore_et_al.)/08%3A_Properties_of_Organic_Compounds/8.05%3A_Organic_Compounds-_Hydrocarbons"
+                        text="Learn more about hydrocarbons and organic compounds!"
+                    />
                 </div>
             </div>
         </>
@@ -137,103 +214,206 @@ export const SnakeHardArticle: Article = () => {
 
     return (
         <>
-
             <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
-                <h2 className="text-xl font-bold mb-3">Learn About the Essentials!</h2>
+                <h2 className="text-xl font-bold mb-3">Learn About Chemical Bonding & Compounds!</h2>
 
                 <p className="mb-4">
-                    Learn about elements, atoms, electronegativity, ionization energy, and atomic radius here!
-                    These hints will help you play the game successfully, so don’t skip them.
-                    You should spend at least <strong>6–7 minutes</strong> learning before starting the game.
-                    If you need more help, feel free to explore the external links.
-                    <strong> Enjoy learning and playing!</strong>
+                    Learn about molecules, ions, ionic compounds, acids, bases, and hydrocarbons here!
+                    These concepts are essential for understanding how substances form and react.
+                    You should spend at least <strong>6–7 minutes</strong> reviewing this information before playing.
+                    <strong> Take your time — it will help you succeed!</strong>
                 </p>
 
-                <h3 className="font-semibold">Element</h3>
+                <h3 className="font-semibold">Molecule</h3>
                 <p className="mb-3">
-                    An <strong>element</strong> is a pure substance that cannot be broken down or transformed
-                    into another substance.
+                    A <strong>molecule</strong> is made of multiple <strong>nonmetal atoms</strong> that are
+                    <strong> covalently bonded</strong> together and have a <strong>neutral (zero) overall charge</strong>.
                 </p>
-                <h3 className="font-semibold">Atom</h3>
-                <p className="mb-1">
-                    An <strong>atom</strong> is the smallest chemical particle of an element. It includes:
+                <p className="italic text-gray-600 mb-4">
+                    <img src="/molecule.jpg" alt="molecule example" height="300" width="200" />
                 </p>
-                <ul className="list-disc ml-6">
-                    <li>Positive <strong>protons</strong></li>
-                    <li>Negative <strong>electrons</strong></li>
-                    <li>Neutral <strong>neutrons</strong></li>
-                </ul>
-                <div className="mb-7 mt-3">
-                    <CarbleLink url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Atomic_Theory/The_Atom" text="Learn more about atoms and elements!"></CarbleLink>
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://byjus.com/chemistry/atoms-and-molecules/"
+                        text="Learn more about atoms and molecules!"
+                    />
                 </div>
 
-                <h3 className="font-semibold">Atomic Radius</h3>
+                <h3 className="font-semibold">Ion</h3>
                 <p className="mb-2">
-                    Atomic radius (similar to ionic radius) is the distance between the nucleus and valence (outermost) shell of an atom. It is the approximate size of an atom.
-                    As more protons are added to the nucleus to create new elements, forces between the nucleus and electrons are strengthened due to opposite charge attractions, pulling electrons closer into the atom and reducing the atomic radius.
-                    But atoms with more electron shells have larger atomic radii because the outermost shell is farther from the nucleus.
+                    An <strong>ion</strong> is an atom or molecule with an <strong>overall positive or negative charge</strong>
+                    due to <strong>losing or gaining electron(s)</strong>.
                 </p>
                 <p className="mb-2">Examples:</p>
                 <ul className="list-disc ml-6 mb-3">
-                    <li>Hydrogen: 53</li>
-                    <li>Sodium: 190</li>
-                    <li>Carbon: 67</li>
+                    <li>Na⁺</li>
+                    <li>Cl⁻</li>
+                    <li>Ba²⁺</li>
                 </ul>
-                <p className="mb-4">
-                    It <strong>decreases</strong> as you move left → right <strong>across a period</strong>
-                    and <strong>increases</strong> as you move top → bottom <strong>down a group</strong>.
-                </p>
-                <p className="italic text-gray-600 mb-4">
-                    <img src="https://general.chemistrysteps.com/wp-content/uploads/2023/11/Atomic-Radius-and-periodic-table.png" alt="Atomic Radius Diagram" height="500" width="300" />
+                <p className="italic text-gray-600 mb-6">
+                    <img src="/ion.png" alt="ion examples" height="300" width="200" />
                 </p>
 
-                <h3 className="font-semibold">(1st) Ionization Energy</h3>
+                <h3 className="font-semibold">Cation</h3>
                 <p className="mb-2">
-                    The <strong>ionization energy</strong> is the energy is takes to <strong>remove an electron</strong> from a neutral atom.
-                    There are multiple ionization energies for each atom, but we will only focus on the first ionization energy. This is the energy it takes to remove the FIRST electron. Second refers to the next electron removed and so on.
-                    As more protons are added to the nucleus to create new elements, forces between increased electrons and the nucleus strengthen due to opposite charge attractions, increasing ionization energy, the energy needed to break these forces.
-                    But atoms with more electron shells have lower ionization energies because the outermost shell is farther from the nucleus, weakening these forces.
-                    Examples:
+                    A <strong>cation</strong> is an ion with an <strong>overall positive charge</strong>
+                    caused by <strong>losing electron(s)</strong>.
                 </p>
-                <p className="mb-3 italic text-gray-700">Note: Noble gases (group 18) have super high ionization energies because they want to keep and not lose ANY electrons from their full valence shell! </p>
-                <ul className="list-disc ml-6 mb-3">
-                    <li>Hydrogen: 1312</li>
-                    <li>Helium: 2372.3</li>
-                    <li>Carbon: 1086.5</li>
-                    <li>Neon: 2080.7</li>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-4">
+                    <li>K⁺</li>
+                    <li>Al³⁺</li>
+                    <li>NH₄⁺</li>
                 </ul>
-                <p className="mb-4">
-                    It <strong>increases dramatically</strong> as you move left → right <strong> across a period </strong>
-                    and <strong>decreases</strong> as you move top → bottom <strong> down a group</strong>.
-                </p>
-                <p className="italic text-gray-600">
-                    <img src="https://media.geeksforgeeks.org/wp-content/uploads/20230310125901/ionization-energy-trend.png" alt="First Ionization Energy Diagram" height="500" width="350" />
-                </p>
 
-                <h3 className="font-semibold mt-5">Electronegativity</h3>
+                <h3 className="font-semibold">Anion</h3>
                 <p className="mb-2">
-                    The <strong>electronegativity</strong> is a measure of how well an atom attracts electrons. It is the strength of attraction forces between external electrons and an atom's nucleus.
-                    As more protons are added to the nucleus to create new elements, forces between the nucleus and electrons are strengthened due to opposite charge attractions, more easily attracting electrons to join the atom and increasing electronegativity.
-                    But atoms with more electron shells have less electronegativity because the nucleus's force of attraction is less effective on electrons farther away, outside the atom's many electron shells.
-                    (Fun and common fact: Flourine is the most electronegative element!)
+                    An <strong>anion</strong> is an ion with an <strong>overall negative charge</strong>
+                    caused by <strong>gaining electron(s)</strong>.
                 </p>
-                <p className="mb-3 italic text-gray-700">Note: Noble gases (group 18) do not have electronegativities! They want to keep their full valence shell, not attract new electrons. </p>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-4">
+                    <li>F⁻</li>
+                    <li>O²⁻</li>
+                    <li>SO₄²⁻</li>
+                </ul>
+                <p className="italic text-gray-600 mb-6">
+                    <img src="/cat and an ion.jpg" alt="cation and anion comparison" height="300" width="200" />
+                </p>
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://www.geeksforgeeks.org/chemistry/cations-vs-anions/"
+                        text="Learn more about cations and anions!"
+                    />
+                </div>
+
+                <h3 className="font-semibold">Polyatomic Ion</h3>
+                <p className="mb-2">
+                    A <strong>polyatomic ion</strong> is a charged group of <strong>multiple covalently bonded atoms</strong>.
+                    The overall charge can be <strong>positive or negative</strong>.
+                </p>
                 <p className="mb-2">Examples:</p>
                 <ul className="list-disc ml-6 mb-3">
-                    <li>Hydrogen: 2.2</li>
-                    <li>Helium: null</li>
-                    <li>Carbon: 2.55</li>
-                    <li>Flourine: 3.98</li>
+                    <li>SO₄²⁻ : sulfate</li>
+                    <li>OH⁻ : hydroxide</li>
+                    <li>NH₄⁺ : ammonium</li>
                 </ul>
-                <p className="mb-4">
-                    It <strong>increases dramatically</strong> as you move left → right <strong>across a period </strong>
-                    and <strong>decreases</strong> as you move top → bottom <strong>down a group</strong>.
+                <p className="font-semibold mb-2">Nomenclature Patterns:</p>
+                <ul className="list-disc ml-6 mb-4">
+                    <li><strong>-ate</strong>: most common form (e.g., nitrate NO₃⁻)</li>
+                    <li><strong>-ite</strong>: one less oxygen than -ate (e.g., nitrite NO₂⁻)</li>
+                    <li><strong>Per-___-ate</strong>: one more oxygen than -ate (e.g., perchlorate ClO₄⁻)</li>
+                    <li><strong>Hypo-___-ite</strong>: one less oxygen than -ite (e.g., hypochlorite ClO⁻)</li>
+                </ul>
+                <p className="italic text-gray-600 mb-6">
+                    <img src="/polyion.png" alt="polyatomic ion examples" height="300" width="200" />
+                </p>
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://www.khanacademy.org/science/hs-chemistry/x2613d8165d88df5e:chemical-bonding/x2613d8165d88df5e:ionic-nomenclature/a/polyatomic-ions-article"
+                        text="Learn more about polyatomic ions!"
+                    />
+                </div>
+
+                <h3 className="font-semibold">Ionic Compound</h3>
+                <p className="mb-2">
+                    An <strong>ionic compound</strong> forms between a <strong>cation</strong> and an <strong>anion</strong>.
+                    Electrons are transferred, but the compound has a <strong>neutral overall charge</strong>.
+                </p>
+                <p className="mb-2 font-mono">
+                    | anion subscript × anion charge | = cation subscript × cation charge
+                </p>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-3">
+                    <li>NaCl : sodium chloride</li>
+                    <li>LiF : lithium fluoride</li>
+                    <li>CaCO₃ : calcium carbonate</li>
+                </ul>
+                <p className="font-semibold mb-2">Nomenclature Rules:</p>
+                <ul className="list-disc ml-6 mb-4">
+                    <li>Write the cation name first (unchanged)</li>
+                    <li>Transition metal charges are shown using Roman numerals</li>
+                    <li>Polyatomic anions keep their name</li>
+                    <li>Single-element anions end in <strong>-ide</strong></li>
+                </ul>
+                <p className="italic text-gray-600 mb-6">
+                    <img src="/ionic comp.png" alt="ionic compound diagram" height="300" width="200" />
+                </p>
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://www.britannica.com/science/ionic-compound"
+                        text="Learn more about ionic compounds!"
+                    />
+                </div>
+
+                <h3 className="font-semibold">Acid</h3>
+                <p className="mb-2">
+                    An <strong>acid</strong> usually contains at least one <strong>hydrogen ion (H⁺)</strong>,
+                    donates protons, and has a <strong>pH below 7</strong>.
+                </p>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-3">
+                    <li>HCl : hydrochloric acid</li>
+                    <li>HNO₃ : nitric acid</li>
+                    <li>H₂SO₄ : sulfuric acid</li>
+                </ul>
+                <p className="font-semibold mb-2">Nomenclature:</p>
+                <ul className="list-disc ml-6 mb-4">
+                    <li><strong>Hydro-___ acid</strong>: single-element acids</li>
+                    <li><strong>-ic acid</strong>: polyatomic ions ending in -ate</li>
+                    <li><strong>-ous acid</strong>: polyatomic ions ending in -ite</li>
+                </ul>
+                <p className="italic mb-6">
+                    “I <strong>ATE</strong> it and it was <strong>IC</strong>ky. I took a b<strong>ITE</strong> and it was delici<strong>OUS</strong>.”
+                </p>
+
+                <h3 className="font-semibold">Base</h3>
+                <p className="mb-2">
+                    A <strong>base</strong> often contains a <strong>hydroxide ion (OH⁻)</strong>,
+                    accepts protons, and has a <strong>pH above 7</strong>.
+                </p>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-4">
+                    <li>NaOH : sodium hydroxide</li>
+                    <li>CaCO₃ : calcium carbonate</li>
+                    <li>Mg(OH)₂ : magnesium hydroxide</li>
+                </ul>
+                <p className="italic text-gray-600 mb-6">
+                    <img src="/acid base.png" alt="acid and base diagram" height="300" width="200" />
+                </p>
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://www.pasco.com/resources/articles/acid-base-chemistry"
+                        text="Learn more about acids and bases!"
+                    />
+                </div>
+
+                <h3 className="font-semibold">Hydrocarbon</h3>
+                <p className="mb-2">
+                    A <strong>hydrocarbon</strong> is an organic compound made only of
+                    <strong> carbon (C)</strong> and <strong>hydrogen (H)</strong> atoms.
+                </p>
+                <p className="mb-2">Examples:</p>
+                <ul className="list-disc ml-6 mb-3">
+                    <li>CH₄ : methane</li>
+                    <li>C₄H₁₀ : butane</li>
+                    <li>C₃H₈ : propane</li>
+                </ul>
+                <p className="mb-3">
+                    Nomenclature is complex, but hydrocarbons usually end in <strong>-ane</strong> or <strong>-ene</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
-                    <img src="https://media.geeksforgeeks.org/wp-content/uploads/20231207124854/Periodic-Table-Electronegativity-1.png" alt="Electronegativity Diagram" height="500" width="300" />
+                    <img src="/hydrocarb.png" alt="hydrocarbon examples" height="300" width="200" />
                 </p>
-                <div className="mb-7 mt-3">
-                    <CarbleLink url="https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Supplemental_Modules_and_Websites_(Inorganic_Chemistry)/Descriptive_Chemistry/Periodic_Trends_of_Elemental_Properties/Periodic_Trends" text="Learn more about atomic radius, electronegativity, 1st ionization energy, and other periodic trends!"></CarbleLink>
+                <p className="font-semibold mb-4">
+                    There are also organic compounds similar to hydrocarbons with more complex nomenclature,
+                    such as alcohols (C₂H₅OH) and ethanol (CH₃CH₂OH).
+                </p>
+                <div className="mb-3">
+                    <CarbleLink
+                        url="https://chem.libretexts.org/Bookshelves/General_Chemistry/ChemPRIME_(Moore_et_al.)/08%3A_Properties_of_Organic_Compounds/8.05%3A_Organic_Compounds-_Hydrocarbons"
+                        text="Learn more about hydrocarbons and organic compounds!"
+                    />
                 </div>
             </div>
         </>

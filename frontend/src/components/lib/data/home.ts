@@ -5,10 +5,30 @@ export const featureItems = [
 ];
 
 export const dailyLessons = [
-    { tag: "Chemistry", title: "Common Characteristics", time: "6 min" },
-    { tag: "Chemistry", title: "Periodic Trends", time: "7 min" },
-    { tag: "Chemistry", title: "Nomenclature", time: "6 min" },
-    {tag: "Chemistry", title: "Intermolecular Forces", time: "7 min"}
+  {
+    tag: "Chemistry",
+    title: "Carble: Common Characteristics",
+    time: "6 min",
+    href: "/games/carble-easy",
+  },
+  {
+    tag: "Chemistry",
+    title: "Carble: Periodic Trends",
+    time: "7 min",
+    href: "/games/carble-hard",
+  },
+  {
+    tag: "Chemistry",
+    title: "Snake: Chemical Nomenclature",
+    time: "6 min",
+    href: "/games/snake-easy",
+  },
+  {
+    tag: "Chemistry",
+    title: "Snake: Intermolecular Forces (IMF)",
+    time: "7 min",
+    href: "/games/snake-hard",
+  },
 ];
 
 export const statsData = [
