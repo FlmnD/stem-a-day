@@ -123,6 +123,46 @@ export default function Games() {
                     </Link>
                 </div>
             </div>
+
+            <div className="grid md:grid-cols-2 gap-9 mb-16">
+                <div className="bg-white rounded-2xl shadow-md border border-sky-100 p-6 hover:shadow-lg transition-all duration-200">
+                    <div className="flex items-center gap-3 mb-2">
+                        <FlaskConical className="text-sky-500" size={24} />
+                        <h2 className="text-xl font-semibold text-gray-800">
+                            2048: Molarity
+                        </h2>
+                    </div>
+                    <p className="text-sm text-gray-500 mb-4">Difficulty: <span className="font-medium text-green-600">Easy</span></p>
+                    <p className="text-gray-700 mb-6">
+                        little preview text
+                    </p>
+                    <Link
+                        href="/games/2048-easy"
+                        className="inline-block bg-sky-500 hover:bg-sky-600 text-white font-medium py-2 px-4 rounded-lg transition-all"
+                    >
+                        Play Easy Version
+                    </Link>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-md border border-red-100 p-6 hover:shadow-lg transition-all duration-200">
+                    <div className="flex items-center gap-3 mb-2">
+                        <Atom className="text-red-500" size={24} />
+                        <h2 className="text-xl font-semibold text-gray-800">
+                            2048: Gas Laws
+                        </h2>
+                    </div>
+                    <p className="text-sm text-gray-500 mb-4">Difficulty: <span className="font-medium text-red-600">Hard</span></p>
+                    <p className="text-gray-700 mb-6">
+                        little preview text
+                    </p>
+                    <Link
+                        href="/games/2048-hard"
+                        className="inline-block bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-all"
+                    >
+                        Play Hard Version
+                    </Link>
+                </div>
+            </div>
         </section>
 
         
