@@ -2,7 +2,7 @@ import Collapsible from "@/components/ui/Collapsible";
 import Game2048 from "@/components/sections/games/2048GameHard";
 import {
   HardArticle2048,
-  EasyArticle2048,
+  HardLesson2048,
 } from "@/components/lib/data/2048";
 
 export default function HardPage2048() {
@@ -21,7 +21,7 @@ export default function HardPage2048() {
         <HardArticle2048 />
       </Collapsible>
 
-      <EasyArticle2048 />
+      <HardLesson2048 />
 
       <Game2048 />
 

@@ -14,8 +14,6 @@ export const SnakeEasyArticle: Article = () => {
                     <strong> Take your time — it will help you succeed!</strong>
                 </p>
 
-                {/* ================= IONS ================= */}
-
                 <h3 className="font-semibold">Ion</h3>
                 <p className="mb-2">
                     An <strong>ion</strong> is an atom or molecule with an <strong>overall net positive or negative charge</strong>
@@ -65,8 +63,6 @@ export const SnakeEasyArticle: Article = () => {
                     />
                 </div>
 
-                {/* ================= POLYATOMIC IONS ================= */}
-
                 <h3 className="font-semibold">Polyatomic Ion</h3>
                 <p className="mb-2">
                     A <strong>polyatomic ion</strong> is made of <strong>multiple atoms</strong> that are
@@ -96,8 +92,6 @@ export const SnakeEasyArticle: Article = () => {
                         text="Learn more about polyatomic ions!"
                     />
                 </div>
-
-                {/* ================= MOLECULES ================= */}
 
                 <h3 className="font-semibold">Molecule</h3>
                 <p className="mb-2">
@@ -136,8 +130,6 @@ export const SnakeEasyArticle: Article = () => {
                     />
                 </div>
 
-                {/* ================= IONIC COMPOUNDS ================= */}
-
                 <h3 className="font-semibold">Ionic Compound</h3>
                 <p className="mb-2">
                     An <strong>ionic compound</strong> forms between a <strong>cation</strong> and an
@@ -170,8 +162,6 @@ export const SnakeEasyArticle: Article = () => {
                         text="Learn more about ionic compounds!"
                     />
                 </div>
-
-                {/* ================= ACIDS & BASES ================= */}
 
                 <h3 className="font-semibold">Acid</h3>
                 <p className="mb-2">
@@ -222,8 +212,6 @@ export const SnakeEasyArticle: Article = () => {
                     />
                 </div>
 
-                {/* ================= HYDROCARBONS ================= */}
-
                 <h3 className="font-semibold">Hydrocarbon</h3>
                 <p className="mb-2">
                     A <strong>hydrocarbon</strong> is an organic compound made up of only
@@ -271,8 +259,6 @@ export const SnakeHardArticle: Article = () => {
                     strongly influence physical properties such as boiling point, solubility, and state of matter.
                     Spend <strong>6-7 minutes</strong> studying this section before starting Hard mode.
                 </p>
-
-                {/* ================= INTERMOLECULAR FORCES ================= */}
 
                 <h3 className="font-semibold">Intermolecular Forces (IMFs)</h3>
                 <p className="mb-2">
@@ -364,8 +350,6 @@ export const SnakeHardArticle: Article = () => {
                     />
                 </div>
 
-                {/* ================= IONS ================= */}
-
                 <h3 className="font-semibold">Ion</h3>
                 <p className="mb-2">
                     An <strong>ion</strong> is an atom or molecule with an
@@ -413,8 +397,6 @@ export const SnakeHardArticle: Article = () => {
                     />
                 </div>
 
-                {/* ================= MOLECULES ================= */}
-
                 <h3 className="font-semibold">Molecule</h3>
                 <p className="mb-2">
                     A <strong>molecule</strong> consists of multiple
@@ -446,8 +428,6 @@ export const SnakeHardArticle: Article = () => {
                     />
                 </div>
 
-                {/* ================= IONIC COMPOUNDS ================= */}
-
                 <h3 className="font-semibold">Ionic Compound</h3>
                 <p className="mb-2">
                     An <strong>ionic compound</strong> forms between a
@@ -472,8 +452,6 @@ export const SnakeHardArticle: Article = () => {
                         text="Learn more about ionic compounds!"
                     />
                 </div>
-
-                {/* ================= ACIDS & BASES ================= */}
 
                 <h3 className="font-semibold">Acid</h3>
                 <p className="mb-2">
@@ -506,8 +484,6 @@ export const SnakeHardArticle: Article = () => {
                         text="Learn more about acids and bases!"
                     />
                 </div>
-
-                {/* ================= HYDROCARBONS ================= */}
 
                 <h3 className="font-semibold">Hydrocarbon</h3>
                 <p className="mb-2">

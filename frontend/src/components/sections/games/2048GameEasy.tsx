@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 
 type TileKind =
   | "M1"
-  | "M2"
   | "V1"
-  | "V2"
   | "M1V1"
+  | "M2"
+  | "V2"
   | "M2V2"
   | "EQUAL";
 
@@ -17,6 +17,8 @@ interface Tile {
   leftValue?: number;
   rightValue?: number;
 }
+
+type Direction = "left" | "right" | "up" | "down";
 
 const SIZE = 4;
 let idCounter = 0;
@@ -31,73 +33,71 @@ const COLORS: Record<TileKind, string> = {
   EQUAL: "bg-red-500",
 };
 
-const SPAWNABLE: TileKind[] = ["M1", "M2", "V1", "V2"];
-const VALUES = [0.5, 1, 1.5, 2];
+const SPAWNABLE: TileKind[] = ["M1", "V1", "M2", "V2"];
+const VALUES = [1, 2, 3, 4];
 
 const emptyGrid = () =>
   Array.from({ length: SIZE }, () => Array(SIZE).fill(null));
 
 export default function Game2048Easy() {
   const [grid, setGrid] = useState<(Tile | null)[][]>(emptyGrid);
+  const [started, setStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [win, setWin] = useState(false);
-  const [started, setStarted] = useState(false);
-  const [pendingResult, setPendingResult] = useState<{
-    left: number;
-    right: number;
-  } | null>(null);
+  const [inputLocked, setInputLocked] = useState(false);
 
-  function startGame() {
+  function resetGame() {
     let g = emptyGrid();
     g = spawnTile(g, "right");
     g = spawnTile(g, "right");
-
     setGrid(g);
+    setStarted(true);
     setGameOver(false);
     setWin(false);
-    setStarted(true);
+    setInputLocked(false);
   }
 
   useEffect(() => {
-    let g = emptyGrid();
-    g = spawnTile(g, "right");
-    g = spawnTile(g, "right");
-    setGrid(g);
-  }, []);
+    function handleKeyDown(e: KeyboardEvent) {
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) {
+        e.preventDefault();
+      }
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
       if (e.code === "Space") {
-        if (!started || gameOver || win) {
-          startGame();
-        }
+        resetGame();
         return;
       }
 
-      if (!started || gameOver || win) return;
+      if (!started || gameOver || win || inputLocked) return;
 
-      if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key))
-        return;
+      let dir: Direction | null = null;
+      if (e.code === "ArrowLeft") dir = "left";
+      if (e.code === "ArrowRight") dir = "right";
+      if (e.code === "ArrowUp") dir = "up";
+      if (e.code === "ArrowDown") dir = "down";
+      if (!dir) return;
 
-      const dir = e.key.replace("Arrow", "").toLowerCase() as Direction;
       const moved = moveGrid(grid, dir);
-
       if (moved.changed) {
         const next = spawnTile(moved.grid, dir);
         setGrid(next);
+        setInputLocked(true);
       }
+    }
+
+    function handleKeyUp() {
+      setInputLocked(false);
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
     };
+  }, [grid, started, gameOver, win, inputLocked]);
 
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [grid, started, gameOver, win]);
-
-  type Direction = "left" | "right" | "up" | "down";
-
-  function moveGrid(
-    g: (Tile | null)[][],
-    dir: Direction
-  ): { grid: (Tile | null)[][]; changed: boolean } {
+  function moveGrid(g: (Tile | null)[][], dir: Direction) {
     let changed = false;
     let newGrid = emptyGrid();
 
@@ -114,113 +114,101 @@ export default function Game2048Easy() {
       for (let j = 0; j < SIZE; j++) {
         const [r, c] = traverse(i, j);
         const tile = g[r][c];
-        if (tile) buffer.push({ ...tile });
+        if (tile) buffer.push(tile);
       }
 
       let merged: Tile[] = [];
       for (let k = 0; k < buffer.length; k++) {
-        const curr = buffer[k];
-        const next = buffer[k + 1];
+        const a = buffer[k];
+        const b = buffer[k + 1];
 
-        if (next && canMerge(curr, next)) {
-          const result = mergeTiles(curr, next);
-          if (result === "LOSE" || result === "WIN") {
-            merged.push(curr);
+        if (b && canMerge(a, b)) {
+          const result = mergeTiles(a, b);
+          if (result) {
+            merged.push(result);
+            k++;
+            changed = true;
             continue;
           }
-          merged.push(result);
-          k++;
-          changed = true;
-        } else {
-          merged.push(curr);
         }
+        merged.push(a);
       }
 
       for (let j = 0; j < SIZE; j++) {
         const [r, c] = traverse(i, j);
         newGrid[r][c] = merged[j] || null;
-        if (g[r][c] !== newGrid[r][c]) changed = true;
+        if (newGrid[r][c] !== g[r][c]) changed = true;
       }
     }
 
     return { grid: newGrid, changed };
   }
 
-  function canMerge(a: Tile, b: Tile): boolean {
+  function canMerge(a: Tile, b: Tile) {
     if (a.kind === b.kind) return true;
-
     if (a.kind === "M1" && b.kind === "V1") return true;
     if (a.kind === "V1" && b.kind === "M1") return true;
     if (a.kind === "M2" && b.kind === "V2") return true;
     if (a.kind === "V2" && b.kind === "M2") return true;
-
     if (a.kind === "M1V1" && (b.kind === "M1" || b.kind === "V1")) return true;
     if (b.kind === "M1V1" && (a.kind === "M1" || a.kind === "V1")) return true;
-
     if (a.kind === "M2V2" && (b.kind === "M2" || b.kind === "V2")) return true;
     if (b.kind === "M2V2" && (a.kind === "M2" || a.kind === "V2")) return true;
-
-    if (
-      (a.kind === "M1V1" && b.kind === "M2V2") ||
-      (a.kind === "M2V2" && b.kind === "M1V1")
-    )
-      return true;
-
+    if ((a.kind === "M1V1" && b.kind === "M2V2") || (a.kind === "M2V2" && b.kind === "M1V1")) return true;
     return false;
   }
 
-  function mergeTiles(a: Tile, b: Tile): Tile | "LOSE" | "WIN" {
+  function mergeTiles(a: Tile, b: Tile): Tile | null {
     if (a.kind === b.kind) {
-      return {
-        id: idCounter++,
-        kind: a.kind,
-        value: a.value * b.value,
-      };
+      return { id: idCounter++, kind: a.kind, value: a.value * b.value };
     }
 
-    if (
-      (a.kind === "M1" && b.kind === "V1") ||
-      (a.kind === "V1" && b.kind === "M1")
-    )
+    if ((a.kind === "M1" && b.kind === "V1") || (a.kind === "V1" && b.kind === "M1")) {
       return { id: idCounter++, kind: "M1V1", value: a.value * b.value };
+    }
 
-    if (
-      (a.kind === "M2" && b.kind === "V2") ||
-      (a.kind === "V2" && b.kind === "M2")
-    )
+    if ((a.kind === "M2" && b.kind === "V2") || (a.kind === "V2" && b.kind === "M2")) {
       return { id: idCounter++, kind: "M2V2", value: a.value * b.value };
+    }
 
-    if (a.kind === "M1V1" && (b.kind === "M1" || b.kind === "V1"))
+    if (a.kind === "M1V1" && (b.kind === "M1" || b.kind === "V1")) {
       return { id: idCounter++, kind: "M1V1", value: a.value * b.value };
+    }
 
-    if (b.kind === "M1V1" && (a.kind === "M1" || a.kind === "V1"))
+    if (b.kind === "M1V1" && (a.kind === "M1" || a.kind === "V1")) {
       return { id: idCounter++, kind: "M1V1", value: a.value * b.value };
+    }
 
-    if (a.kind === "M2V2" && (b.kind === "M2" || b.kind === "V2"))
+    if (a.kind === "M2V2" && (b.kind === "M2" || b.kind === "V2")) {
       return { id: idCounter++, kind: "M2V2", value: a.value * b.value };
+    }
 
-    if (b.kind === "M2V2" && (a.kind === "M2" || a.kind === "V2"))
+    if (b.kind === "M2V2" && (a.kind === "M2" || a.kind === "V2")) {
       return { id: idCounter++, kind: "M2V2", value: a.value * b.value };
+    }
 
-    if (
-      (a.kind === "M1V1" && b.kind === "M2V2") ||
-      (a.kind === "M2V2" && b.kind === "M1V1")
-    ) {
-      setPendingResult({ left: a.value, right: b.value });
+    if ((a.kind === "M1V1" && b.kind === "M2V2") || (a.kind === "M2V2" && b.kind === "M1V1")) {
+      const left = a.kind === "M1V1" ? a.value : b.value;
+      const right = a.kind === "M2V2" ? a.value : b.value;
+
+      if (left === right) setWin(true);
+      else setGameOver(true);
 
       return {
         id: idCounter++,
         kind: "EQUAL",
-        value: a.value,
+        value: left,
+        leftValue: left,
+        rightValue: right,
       };
     }
 
-    return a;
+    return null;
   }
 
   function spawnTile(g: (Tile | null)[][], dir: Direction) {
     const copy = g.map(r => r.slice());
-    const positions: { r: number; c: number }[] = [];
+    const spots: { r: number; c: number }[] = [];
 
     for (let i = 0; i < SIZE; i++) {
       for (let j = 0; j < SIZE; j++) {
@@ -230,12 +218,12 @@ export default function Game2048Easy() {
           (dir === "up" && i === SIZE - 1) ||
           (dir === "down" && i === 0);
 
-        if (edge && !copy[i][j]) positions.push({ r: i, c: j });
+        if (edge && !copy[i][j]) spots.push({ r: i, c: j });
       }
     }
 
-    if (!positions.length) return copy;
-    const { r, c } = positions[Math.floor(Math.random() * positions.length)];
+    if (!spots.length) return copy;
+    const { r, c } = spots[Math.floor(Math.random() * spots.length)];
 
     copy[r][c] = {
       id: idCounter++,
@@ -246,39 +234,16 @@ export default function Game2048Easy() {
     return copy;
   }
 
-  useEffect(() => {
-    if (!pendingResult) return;
-
-    const timeout = setTimeout(() => {
-      if (pendingResult.left === pendingResult.right) {
-        setWin(true);
-      } else {
-        setGameOver(true);
-      }
-      setPendingResult(null);
-    }, 700);
-
-    return () => clearTimeout(timeout);
-  }, [pendingResult]);
-
   return (
     <div className="flex flex-col items-center gap-4">
-      <h1 className="text-2xl font-bold">2048 Molarity (Easy)</h1>
+      <h1 className="text-2xl font-bold">2048 Molarity</h1>
 
-      {!started && (
-        <p className="text-gray-600 font-semibold">
-          Press <span className="font-bold">SPACE</span> to start
-        </p>
-      )}
-
-      {(gameOver || win) && (
-        <p className="text-gray-600 font-semibold">
-          Press <span className="font-bold">SPACE</span> to restart
-        </p>
-      )}
+      <p className="text-gray-600 font-semibold">
+        Press <span className="font-bold">SPACE</span> to restart
+      </p>
 
       {gameOver && <p className="text-red-600 font-bold">Game Over</p>}
-      {win && <p className="text-green-600 font-bold">You Win!</p>}
+      {win && <p className="text-green-600 font-bold">You Win</p>}
 
       <div className="grid grid-cols-4 gap-2 bg-gray-300 p-2 rounded">
         {grid.flat().map((cell, i) => (
@@ -291,8 +256,8 @@ export default function Game2048Easy() {
             {cell && (
               <div className="text-center text-sm">
                 {cell.kind === "EQUAL" ? (
-                  <div className="text-center text-xs leading-tight">
-                    {pendingResult?.left} M1V1 {pendingResult?.left === pendingResult?.right ? "=" : "!="} {pendingResult?.right} M2V2
+                  <div className="text-xs leading-tight">
+                    {cell.leftValue} M1V1 {cell.leftValue === cell.rightValue ? "=" : "!="} {cell.rightValue} M2V2
                   </div>
                 ) : (
                   <>

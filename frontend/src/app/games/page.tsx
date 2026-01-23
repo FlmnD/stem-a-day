@@ -134,7 +134,8 @@ export default function Games() {
                     </div>
                     <p className="text-sm text-gray-500 mb-4">Difficulty: <span className="font-medium text-green-600">Easy</span></p>
                     <p className="text-gray-700 mb-6">
-                        little preview text
+                        Put your chemistry skills to the test with <strong>molarity</strong>.
+                         Guide the snake to the correct concentration, avoid incorrect values, and grow as you master solution calculations.
                     </p>
                     <Link
                         href="/games/2048-easy"
@@ -153,7 +154,8 @@ export default function Games() {
                     </div>
                     <p className="text-sm text-gray-500 mb-4">Difficulty: <span className="font-medium text-red-600">Hard</span></p>
                     <p className="text-gray-700 mb-6">
-                        little preview text
+                        Take on the challenge of <strong>gas laws</strong>.
+                         Combine variables, balance equations, and think strategically as you work toward satisfying the ideal gas law.
                     </p>
                     <Link
                         href="/games/2048-hard"

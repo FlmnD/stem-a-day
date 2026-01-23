@@ -14,8 +14,6 @@ export const EasyArticle2048: Article = () => {
                     <strong> Take your time — it will help you succeed!</strong>
                 </p>
 
-                {/* ================= IONS ================= */}
-
                 <h3 className="font-semibold">Ion</h3>
                 <p className="mb-2">
                     An <strong>ion</strong> is an atom or molecule with an <strong>overall net positive or negative charge</strong>
@@ -65,8 +63,6 @@ export const EasyArticle2048: Article = () => {
                     />
                 </div>
 
-                {/* ================= POLYATOMIC IONS ================= */}
-
                 <h3 className="font-semibold">Polyatomic Ion</h3>
                 <p className="mb-2">
                     A <strong>polyatomic ion</strong> is made of <strong>multiple atoms</strong> that are
@@ -96,8 +92,6 @@ export const EasyArticle2048: Article = () => {
                         text="Learn more about polyatomic ions!"
                     />
                 </div>
-
-                {/* ================= MOLECULES ================= */}
 
                 <h3 className="font-semibold">Molecule</h3>
                 <p className="mb-2">
@@ -136,8 +130,6 @@ export const EasyArticle2048: Article = () => {
                     />
                 </div>
 
-                {/* ================= IONIC COMPOUNDS ================= */}
-
                 <h3 className="font-semibold">Ionic Compound</h3>
                 <p className="mb-2">
                     An <strong>ionic compound</strong> forms between a <strong>cation</strong> and an
@@ -170,8 +162,6 @@ export const EasyArticle2048: Article = () => {
                         text="Learn more about ionic compounds!"
                     />
                 </div>
-
-                {/* ================= ACIDS & BASES ================= */}
 
                 <h3 className="font-semibold">Acid</h3>
                 <p className="mb-2">
@@ -222,8 +212,6 @@ export const EasyArticle2048: Article = () => {
                     />
                 </div>
 
-                {/* ================= HYDROCARBONS ================= */}
-
                 <h3 className="font-semibold">Hydrocarbon</h3>
                 <p className="mb-2">
                     A <strong>hydrocarbon</strong> is an organic compound made up of only
@@ -271,8 +259,6 @@ export const HardArticle2048: Article = () => {
                     strongly influence physical properties such as boiling point, solubility, and state of matter.
                     Spend <strong>6-7 minutes</strong> studying this section before starting Hard mode.
                 </p>
-
-                {/* ================= INTERMOLECULAR FORCES ================= */}
 
                 <h3 className="font-semibold">Intermolecular Forces (IMFs)</h3>
                 <p className="mb-2">
@@ -364,8 +350,6 @@ export const HardArticle2048: Article = () => {
                     />
                 </div>
 
-                {/* ================= IONS ================= */}
-
                 <h3 className="font-semibold">Ion</h3>
                 <p className="mb-2">
                     An <strong>ion</strong> is an atom or molecule with an
@@ -413,8 +397,6 @@ export const HardArticle2048: Article = () => {
                     />
                 </div>
 
-                {/* ================= MOLECULES ================= */}
-
                 <h3 className="font-semibold">Molecule</h3>
                 <p className="mb-2">
                     A <strong>molecule</strong> consists of multiple
@@ -446,8 +428,6 @@ export const HardArticle2048: Article = () => {
                     />
                 </div>
 
-                {/* ================= IONIC COMPOUNDS ================= */}
-
                 <h3 className="font-semibold">Ionic Compound</h3>
                 <p className="mb-2">
                     An <strong>ionic compound</strong> forms between a
@@ -472,8 +452,6 @@ export const HardArticle2048: Article = () => {
                         text="Learn more about ionic compounds!"
                     />
                 </div>
-
-                {/* ================= ACIDS & BASES ================= */}
 
                 <h3 className="font-semibold">Acid</h3>
                 <p className="mb-2">
@@ -506,8 +484,6 @@ export const HardArticle2048: Article = () => {
                         text="Learn more about acids and bases!"
                     />
                 </div>
-
-                {/* ================= HYDROCARBONS ================= */}
 
                 <h3 className="font-semibold">Hydrocarbon</h3>
                 <p className="mb-2">
@@ -546,108 +522,147 @@ export const HardArticle2048: Article = () => {
     );
 }
 
-
 export const EasyLesson2048: Lesson = () => {
-
     return (
         <>
             <div className="w-full max-w-5xl mt-6 mb-6 p-4 bg-white rounded shadow">
-                <h2 className="text-2xl font-semibold mb-3">Play our original game: 2048 Molarity!</h2>
+                <h2 className="text-2xl font-semibold mb-3">
+                    Play our original game: 2048 Molarity!
+                </h2>
+
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
                     <li>
-                        Start with a snake length of 5
+                        The game is played on a 4×4 grid using arrow keys
                     </li>
+
+                    <li>
+                        <strong>Goal</strong> — Strategically combine variables to satisfy the
+                        Solution Dilutions relationship: <strong>M1V1 = M2V2</strong>
+                    </li>
+
+                    <li>
+                        <strong>How to Play</strong>
+                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                            <li>Use arrow keys to slide tiles across the grid</li>
+                            <li>Compatible variable tiles merge into compound expressions</li>
+                            <li>Each move spawns a new variable tile</li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <strong>Variable Rules</strong>
+                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                            <li>M1, V1, M2, and V2 tiles can combine into multi-variable tiles</li>
+                            <li>Merges occur between tiles of the same variable and corresponding initial/final variable tiles</li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <strong>Equation Check</strong>
+                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                            <li>When <strong>M1V1</strong> collides with <strong>M2V2</strong>, the game checks the equation</li>
+                            <li>If the values are equal, you win</li>
+                            <li>If the values are not equal, the game ends</li>
+                        </ul>
+                    </li>
+
                     <li>
                         <strong>To Win</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Snake length of 15 or more</li>
+                            <li>Correctly balance the dilution equation</li>
                         </ul>
                     </li>
-                    <li>
-                        <strong>Goal</strong> — “Eat” the apple with the chemical formula that matches the substance in the prompt at the top of the game box.
-                    </li>
-                    <li>
-                        <strong>Eat the Correct Apple</strong>
-                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>+2 snake length</li>
-                        </ul>
-                    </li>
-                    <li>
-                        <strong>Eat the Wrong Apple</strong>
-                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>-1 snake length</li>
-                        </ul>
-                    </li>
+
                     <li>
                         <strong>To Lose</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Snake length less than 3</li>
-                            <li>Snake hits wall</li>
-                            <li>Snake hits itself (its body)</li>
+                            <li>M1V1 and M2V2 collide but the equation is incorrect</li>
+                            <li>No valid moves remain on the grid</li>
                         </ul>
                     </li>
+
                     <li>
-                        <strong>To Start/Restart the Game</strong>
+                        <strong>To Start / Restart the Game</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Press space</li>
-                            <li>No pausing to prevent cheating</li>
+                            <li>Press the space bar</li>
+                            <li>No pausing or undoing moves</li>
                         </ul>
                     </li>
                 </ul>
             </div>
         </>
     );
-}
+};
 
 export const HardLesson2048: Lesson = () => {
-
     return (
         <>
             <div className="w-full max-w-5xl mt-6 mb-6 p-4 bg-white rounded shadow">
-                <h2 className="text-2xl font-semibold mb-3">Play our original game: 2048 Gas Laws!</h2>
+                <h2 className="text-2xl font-semibold mb-3">
+                    Play our original game: 2048 Gas Laws!
+                </h2>
+
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
                     <li>
-                        Start with a snake length of 5
+                        The game is played on a 4×4 grid using arrow keys
                     </li>
+
+                    <li>
+                        <strong>Goal</strong> — Strategically combine variables to satisfy the
+                        Ideal Gas Law relationship: <strong>PV = nRT</strong>
+                    </li>
+
+                    <li>
+                        <strong>How to Play</strong>
+                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                            <li>Use arrow keys to slide tiles across the grid</li>
+                            <li>Compatible variable tiles merge into compound expressions</li>
+                            <li>Each move spawns a new variable tile</li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <strong>Variable Rules</strong>
+                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                            <li>P, V, n, and T tiles can combine into multi-variable tiles</li>
+                            <li>R is a constant and always has a fixed value</li>
+                            <li>Repeated merges may be required to build full expressions</li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <strong>Equation Check</strong>
+                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                            <li>When <strong>PV</strong> collides with <strong>nRT</strong>, the game checks the equation</li>
+                            <li>If the values are equal, you win</li>
+                            <li>If the values are not equal, the game ends</li>
+                        </ul>
+                    </li>
+
                     <li>
                         <strong>To Win</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Snake length of 15 or more</li>
+                            <li>Correctly balance the gas law equation</li>
                         </ul>
                     </li>
-                    <li>
-                        <strong>Goal</strong> — “Eat” an apple that matches the IMF (Intermolecular Force) in the prompt at the top of the game box.
-                         <strong>  Consider the IMF to be between a substance and itself</strong>, not between 2 different substances.
-                    </li>
-                    <li>
-                        <strong>Eat the Correct Apple</strong>
-                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>+1 snake length</li>
-                        </ul>
-                    </li>
-                    <li>
-                        <strong>Eat the Wrong Apple</strong>
-                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>-2 snake length</li>
-                        </ul>
-                    </li>
+
                     <li>
                         <strong>To Lose</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Snake length less than 3</li>
-                            <li>Snake hits wall</li>
-                            <li>Snake hits itself (its body)</li>
+                            <li>PV and nRT collide but the equation is incorrect</li>
+                            <li>No valid moves remain on the grid</li>
                         </ul>
                     </li>
+
                     <li>
-                        <strong>To Start/Restart the Game</strong>
+                        <strong>To Start / Restart the Game</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Press space</li>
-                            <li>No pausing to prevent cheating</li>
+                            <li>Press the space bar</li>
+                            <li>No pausing or undoing moves</li>
                         </ul>
                     </li>
                 </ul>
             </div>
         </>
     );
-}
+};
