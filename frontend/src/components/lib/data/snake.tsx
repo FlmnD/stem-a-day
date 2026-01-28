@@ -1,5 +1,6 @@
 import CarbleLink from "@/components/ui/StemLink";
 import { Article, Lesson } from "@/structures/GameStructures";
+import Image from "next/image";
 
 export const SnakeEasyArticle: Article = () => {
     return (
@@ -26,7 +27,7 @@ export const SnakeEasyArticle: Article = () => {
                     <li>Ba²⁺</li>
                 </ul>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/ion.png" alt="ion examples" height="300" width="200" />
+                    <Image src="/ion.png" alt="ion examples" height={300} width={200} />
                 </p>
 
                 <h3 className="font-semibold">Cation</h3>
@@ -53,7 +54,7 @@ export const SnakeEasyArticle: Article = () => {
                     <li>SO₄²⁻</li>
                 </ul>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/cat and an ion.jpg" alt="cation and anion comparison" height="300" width="200" />
+                    <Image src="/cat and an ion.jpg" alt="cation and anion comparison" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
@@ -83,7 +84,7 @@ export const SnakeEasyArticle: Article = () => {
                     <li><strong>Hypo-___-ite</strong>: one less oxygen than -ite (e.g., hypochlorite ClO⁻)</li>
                 </ul>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/polyion.png" alt="polyatomic ion examples" height="300" width="200" />
+                    <Image src="/polyion.png" alt="polyatomic ion examples" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
@@ -120,7 +121,7 @@ export const SnakeEasyArticle: Article = () => {
                     </li>
                 </ul>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/molecule.jpg" alt="molecule examples" height="300" width="200" />
+                    <Image src="/molecule.jpg" alt="molecule examples" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
@@ -153,7 +154,7 @@ export const SnakeEasyArticle: Article = () => {
                     <li>Single-element anions end in <strong>-ide</strong></li>
                 </ul>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/ionic comp.png" alt="ionic compound diagram" height="300" width="200" />
+                    <Image src="/ionic comp.png" alt="ionic compound diagram" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
@@ -202,7 +203,7 @@ export const SnakeEasyArticle: Article = () => {
                     <strong> (cation name) + Hydroxide</strong>
                 </p>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/acid base.png" alt="acid and base diagram" height="300" width="200" />
+                    <Image src="/acid base.png" alt="acid and base diagram" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
@@ -228,7 +229,7 @@ export const SnakeEasyArticle: Article = () => {
                     <strong> -ane</strong> or <strong>-ene</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
-                    <img src="/hydrocarb.png" alt="hydrocarbon examples" height="300" width="200" />
+                    <Image src="/hydrocarb.png" alt="hydrocarbon examples" height={300} width={200} />
                 </p>
                 <p className="font-semibold mb-4">
                     There are also organic compounds similar to hydrocarbons that have more complex nomenclature,
@@ -279,7 +280,7 @@ export const SnakeHardArticle: Article = () => {
                     <strong>Present in all substances</strong> (anything with a chemical formula).
                 </p>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/ldf.jpg" alt="London dispersion forces diagram" height="300" width="200" />
+                    <Image src="/ldf.jpg" alt="London dispersion forces diagram" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
@@ -303,7 +304,7 @@ export const SnakeHardArticle: Article = () => {
                     <strong>Can occur in molecules, acids, and bases.</strong>
                 </p>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/d-d.jpg" alt="dipole dipole forces diagram" height="300" width="200" />
+                    <Image src="/d-d.jpg" alt="dipole dipole forces diagram" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
@@ -333,7 +334,7 @@ export const SnakeHardArticle: Article = () => {
                     <strong>Can occur in molecules, acids, and bases.</strong>
                 </p>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/hb.png" alt="hydrogen bonding diagram" height="300" width="200" />
+                    <Image src="/hb.png" alt="hydrogen bonding diagram" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
@@ -362,7 +363,7 @@ export const SnakeHardArticle: Article = () => {
                     <li>Ba²⁺</li>
                 </ul>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/ion.png" alt="ion examples" height="300" width="200" />
+                    <Image src="/ion.png" alt="ion examples" height={300} width={200} />
                 </p>
 
                 <h3 className="font-semibold">Cation</h3>
@@ -387,7 +388,7 @@ export const SnakeHardArticle: Article = () => {
                     <li>SO₄²⁻</li>
                 </ul>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/cat and an ion.jpg" alt="cation and anion diagram" height="300" width="200" />
+                    <Image src="/cat and an ion.jpg" alt="cation and anion diagram" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
@@ -418,7 +419,7 @@ export const SnakeHardArticle: Article = () => {
                     and are represented using <strong>Lewis diagrams</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/lewis.png" alt="lewis structure example" height="300" width="200" />
+                    <Image src="/lewis.png" alt="lewis structure example" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
@@ -443,7 +444,7 @@ export const SnakeHardArticle: Article = () => {
                     and are typically <strong>solid and rigid</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/lattice.png" alt="ionic lattice structure" height="300" width="200" />
+                    <Image src="/lattice.png" alt="ionic lattice structure" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
@@ -475,7 +476,7 @@ export const SnakeHardArticle: Article = () => {
                     Always LDF, sometimes dipole–dipole or hydrogen bonding.
                 </p>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/acid imf.jpg" alt="acid base intermolecular forces" height="300" width="200" />
+                    <Image src="/acid imf.jpg" alt="acid base intermolecular forces" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
@@ -503,7 +504,7 @@ export const SnakeHardArticle: Article = () => {
                     No polarity and no hydrogen bonding.
                 </p>
                 <p className="italic text-gray-600 mb-4">
-                    <img src="/hydrocarb.png" alt="hydrocarbon IMF diagram" height="300" width="200" />
+                    <Image src="/hydrocarb.png" alt="hydrocarbon IMF diagram" height={300} width={200} />
                 </p>
 
                 <p className="font-semibold mb-4">

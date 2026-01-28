@@ -129,13 +129,13 @@ export default function Games() {
                     <div className="flex items-center gap-3 mb-2">
                         <FlaskConical className="text-sky-500" size={24} />
                         <h2 className="text-xl font-semibold text-gray-800">
-                            2048: Molarity
+                            2048: Dilution
                         </h2>
                     </div>
                     <p className="text-sm text-gray-500 mb-4">Difficulty: <span className="font-medium text-green-600">Easy</span></p>
                     <p className="text-gray-700 mb-6">
-                        Put your chemistry skills to the test with <strong>molarity</strong>.
-                         Guide the snake to the correct concentration, avoid incorrect values, and grow as you master solution calculations.
+                        Put your chemistry skills to the test with <strong>dilutions</strong>.
+                         Combine concentrations and volumes to solve dilution problems.
                     </p>
                     <Link
                         href="/games/2048-easy"

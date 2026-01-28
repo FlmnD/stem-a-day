@@ -5,12 +5,12 @@ import {
   EasyLesson2048,
 } from "@/components/lib/data/2048";
 
-export default function SnakeEasyPage() {
+export default function EasyPage2048() {
   return (
     <div className="min-h-screen flex flex-col items-center py-10 bg-gray-100">
 
       <h1 className="text-3xl font-bold mb-6">
-        2048: Molarity
+        2048: Dilution
       </h1>
 
       <Collapsible

@@ -236,7 +236,7 @@ export default function Game2048Easy() {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <h1 className="text-2xl font-bold">2048 Molarity</h1>
+      <h1 className="text-2xl font-bold">2048 Dilution</h1>
 
       <p className="text-gray-600 font-semibold">
         Press <span className="font-bold">SPACE</span> to restart

@@ -1,520 +1,313 @@
 import CarbleLink from "@/components/ui/StemLink";
 import { Article, Lesson } from "@/structures/GameStructures";
+import Image from "next/image";
 
 export const EasyArticle2048: Article = () => {
     return (
         <>
             <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
-                <h2 className="text-xl font-bold mb-3">Learn About Chemical Bonding & Compounds!</h2>
+                <h2 className="text-xl font-bold mb-3">Learn About Molarity & Dilutions!</h2>
 
                 <p className="mb-4">
-                    Learn about ions, molecules, ionic compounds, acids, bases, and hydrocarbons here!
-                    These concepts are essential for understanding how substances form and react.
-                    You should spend at least <strong>6–7 minutes</strong> reviewing this information before playing.
-                    <strong> Take your time — it will help you succeed!</strong>
+                    This section covers the core ideas behind <strong>moles, molar mass, volume,
+                    molarity, and dilution</strong>. These relationships are essential for solving
+                    solution chemistry problems and for succeeding in the 2048 Dilution game.
+                    You should spend at least <strong>6–7 minutes</strong> reviewing this material
+                    before playing.
                 </p>
 
-                <h3 className="font-semibold">Ion</h3>
+                <h3 className="font-semibold">The Mole (mol)</h3>
                 <p className="mb-2">
-                    An <strong>ion</strong> is an atom or molecule with an <strong>overall net positive or negative charge</strong>
-                    caused by <strong>losing or gaining electron(s)</strong>.
+                    A <strong>mole</strong> is a counting unit used in chemistry, similar to how
+                    a dozen means 12. One mole contains
+                    <strong> 6.022 × 10²³ particles</strong> (Avogadro’s number).
                 </p>
                 <p className="mb-2">Examples:</p>
                 <ul className="list-disc ml-6 mb-4">
-                    <li>Na⁺</li>
-                    <li>Cl⁻</li>
-                    <li>Ba²⁺</li>
+                    <li>1 mol of NaCl = 6.022 × 10²³ formula units</li>
+                    <li>0.5 mol of H₂O = half that many molecules</li>
                 </ul>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/ion.png" alt="ion examples" height="300" width="200" />
-                </p>
-
-                <h3 className="font-semibold">Cation</h3>
-                <p className="mb-2">
-                    A <strong>cation</strong> is an ion with a <strong>positive overall charge</strong>
-                    caused by <strong>losing electron(s)</strong>.
-                </p>
-                <p className="mb-2">Examples:</p>
-                <ul className="list-disc ml-6 mb-4">
-                    <li>K⁺</li>
-                    <li>Al³⁺</li>
-                    <li>NH₄⁺</li>
-                </ul>
-
-                <h3 className="font-semibold">Anion</h3>
-                <p className="mb-2">
-                    An <strong>anion</strong> is an ion with a <strong>negative overall charge</strong>
-                    caused by <strong>gaining electron(s)</strong>.
-                </p>
-                <p className="mb-2">Examples:</p>
-                <ul className="list-disc ml-6 mb-4">
-                    <li>F⁻</li>
-                    <li>O²⁻</li>
-                    <li>SO₄²⁻</li>
-                </ul>
-                <p className="italic text-gray-600 mb-6">
-                    <img src="/cat and an ion.jpg" alt="cation and anion comparison" height="300" width="200" />
+                    <Image src="/mole.jpg" alt="mole concept diagram" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.geeksforgeeks.org/chemistry/cations-vs-anions/"
-                        text="Learn more about cations and anions!"
+                        url="https://www.khanacademy.org/science/hs-chemistry/x2613d8165d88df5e:stoichiometry/x2613d8165d88df5e:the-mole/a/the-mole"
+                        text="Learn more about the mole!"
                     />
                 </div>
 
-                <h3 className="font-semibold">Polyatomic Ion</h3>
+                <h3 className="font-semibold">Molar Mass</h3>
                 <p className="mb-2">
-                    A <strong>polyatomic ion</strong> is made of <strong>multiple atoms</strong> that are
-                    <strong> covalently bonded</strong> together and carry an overall
-                    <strong> positive or negative charge</strong>.
-                </p>
-                <p className="mb-2">Examples:</p>
-                <ul className="list-disc ml-6 mb-3">
-                    <li>SO₄²⁻ : sulfate</li>
-                    <li>OH⁻ : hydroxide</li>
-                    <li>NH₄⁺ : ammonium</li>
-                </ul>
-                <p className="font-semibold mb-2">Nomenclature Patterns:</p>
-                <ul className="list-disc ml-6 mb-4">
-                    <li><strong>-ate</strong>: most common form (e.g., nitrate NO₃⁻)</li>
-                    <li><strong>-ite</strong>: one less oxygen than -ate (e.g., nitrite NO₂⁻)</li>
-                    <li><strong>Per-___-ate</strong>: one more oxygen than -ate (e.g., perchlorate ClO₄⁻)</li>
-                    <li><strong>Hypo-___-ite</strong>: one less oxygen than -ite (e.g., hypochlorite ClO⁻)</li>
-                </ul>
-                <p className="italic text-gray-600 mb-6">
-                    <img src="/polyion.png" alt="polyatomic ion examples" height="300" width="200" />
-                </p>
-
-                <div className="mb-7">
-                    <CarbleLink
-                        url="https://www.khanacademy.org/science/hs-chemistry/x2613d8165d88df5e:chemical-bonding/x2613d8165d88df5e:ionic-nomenclature/a/polyatomic-ions-article"
-                        text="Learn more about polyatomic ions!"
-                    />
-                </div>
-
-                <h3 className="font-semibold">Molecule</h3>
-                <p className="mb-2">
-                    A <strong>molecule</strong> consists of multiple <strong>nonmetal atoms or anions</strong>
-                    that are <strong>covalently bonded</strong> and have a
-                    <strong> neutral (zero) overall charge</strong>.
-                </p>
-                <p className="mb-2">Examples:</p>
-                <ul className="list-disc ml-6 mb-3">
-                    <li>CCl₄ : carbon tetrachloride</li>
-                    <li>N₂O₃ : dinitrogen trioxide</li>
-                    <li>CO₂ : carbon dioxide</li>
-                </ul>
-                <p className="font-semibold mb-2">Nomenclature Rules:</p>
-                <ul className="list-disc ml-6 mb-4">
-                    <li>
-                        Write the first nonmetal name. If it has a subscript greater than 1,
-                        add a prefix (<strong>di-, tri-, tetra-, penta-, hexa-</strong>, etc.).
-                    </li>
-                    <li>
-                        Write the second nonmetal name with a prefix
-                        (<strong>mono-, di-, tri-, tetra-, penta-, hexa-</strong>, etc.) no matter what.
-                    </li>
-                    <li>
-                        Repeat prefix usage for any additional nonmetals or anions in the molecule.
-                    </li>
-                </ul>
-                <p className="italic text-gray-600 mb-6">
-                    <img src="/molecule.jpg" alt="molecule examples" height="300" width="200" />
-                </p>
-
-                <div className="mb-7">
-                    <CarbleLink
-                        url="https://byjus.com/chemistry/atoms-and-molecules/"
-                        text="Learn more about atoms and molecules!"
-                    />
-                </div>
-
-                <h3 className="font-semibold">Ionic Compound</h3>
-                <p className="mb-2">
-                    An <strong>ionic compound</strong> forms between a <strong>cation</strong> and an
-                    <strong> anion</strong>. Electrons are transferred, but the compound has
-                    <strong> no overall charge</strong>.
+                    <strong>Molar mass</strong> is the mass of one mole of a substance,
+                    measured in <strong>grams per mole (g/mol)</strong>.
                 </p>
                 <p className="mb-2 font-mono">
-                    | anion subscript × anion charge | = cation subscript × cation charge
+                    molar mass = grams ÷ moles
                 </p>
                 <p className="mb-2">Examples:</p>
-                <ul className="list-disc ml-6 mb-3">
-                    <li>NaCl : sodium chloride</li>
-                    <li>LiF : lithium fluoride</li>
-                    <li>CaCO₃ : calcium carbonate</li>
-                </ul>
-                <p className="font-semibold mb-2">Nomenclature Rules:</p>
                 <ul className="list-disc ml-6 mb-4">
-                    <li>Write the cation name first (unchanged)</li>
-                    <li>Transition metal charges are shown using Roman numerals</li>
-                    <li>Polyatomic anions keep their name</li>
-                    <li>Single-element anions end in <strong>-ide</strong></li>
+                    <li>H₂O → 18 g/mol</li>
+                    <li>NaCl → 58.44 g/mol</li>
+                    <li>CO₂ → 44 g/mol</li>
                 </ul>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/ionic comp.png" alt="ionic compound diagram" height="300" width="200" />
+                    <Image src="/molar-mass.png" alt="molar mass example" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.britannica.com/science/ionic-compound"
-                        text="Learn more about ionic compounds!"
+                        url="https://chem.libretexts.org/Bookshelves/General_Chemistry/Introductory_Chemistry_(LibreTexts)/03%3A_Measurements/3.07%3A_Molar_Mass"
+                        text="Learn more about molar mass!"
                     />
                 </div>
 
-                <h3 className="font-semibold">Acid</h3>
+                <h3 className="font-semibold">Volume (L)</h3>
                 <p className="mb-2">
-                    An <strong>acid</strong> usually contains at least one
-                    <strong> hydrogen ion (H⁺)</strong>, donates protons,
-                    and has a <strong>pH below 7</strong>.
+                    <strong>Volume</strong> measures how much space a solution occupies.
+                    In solution chemistry, volume is almost always measured in
+                    <strong> liters (L)</strong>.
                 </p>
-                <p className="mb-2">Examples:</p>
-                <ul className="list-disc ml-6 mb-3">
-                    <li>HCl : hydrochloric acid</li>
-                    <li>HNO₃ : nitric acid</li>
-                    <li>H₂SO₄ : sulfuric acid</li>
-                </ul>
-                <p className="font-semibold mb-2">Nomenclature:</p>
+                <p className="mb-2">Key reminders:</p>
                 <ul className="list-disc ml-6 mb-4">
-                    <li><strong>Hydro-___ acid</strong>: single-element acids</li>
-                    <li><strong>-ic acid</strong>: polyatomic ions ending in -ate</li>
-                    <li><strong>-ous acid</strong>: polyatomic ions ending in -ite</li>
+                    <li>1000 mL = 1 L</li>
+                    <li>Volume refers to the total solution, not just the solute</li>
                 </ul>
-                <p className="italic mb-6">
-                    “I <strong>ATE</strong> it and it was <strong>IC</strong>ky. I took a b<strong>ITE</strong> and it was delici<strong>OUS</strong>.”
+                <p className="italic text-gray-600 mb-6">
+                    <Image src="/volume.png" alt="volume in liters diagram" height={300} width={200} />
                 </p>
 
-                <h3 className="font-semibold">Base</h3>
+                <h3 className="font-semibold">Molarity (M)</h3>
                 <p className="mb-2">
-                    A <strong>base</strong> sometimes contains at least one
-                    <strong> hydroxide ion (OH⁻)</strong>, accepts protons,
-                    and has a <strong>pH above 7</strong>.
+                    <strong>Molarity</strong> describes the concentration of a solution.
+                    It tells you how many moles of solute are dissolved per liter of solution.
+                </p>
+                <p className="mb-2 font-mono">
+                    M = moles ÷ liters
                 </p>
                 <p className="mb-2">Examples:</p>
                 <ul className="list-disc ml-6 mb-4">
-                    <li>NaOH : sodium hydroxide</li>
-                    <li>CaCO₃ : calcium carbonate</li>
-                    <li>Mg(OH)₂ : magnesium hydroxide</li>
+                    <li>2 mol NaCl in 1 L → 2 M</li>
+                    <li>0.5 mol glucose in 0.25 L → 2 M</li>
                 </ul>
-                <p className="mb-2">
-                    <strong>Nomenclature</strong> - 
-                    <strong> (cation name) + Hydroxide</strong>
-                </p>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/acid base.png" alt="acid and base diagram" height="300" width="200" />
+                    <Image src="/molarity.png" alt="molarity formula diagram" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.pasco.com/resources/articles/acid-base-chemistry"
-                        text="Learn more about acids and bases!"
+                        url="https://www.britannica.com/science/molarity"
+                        text="Learn more about molarity!"
                     />
                 </div>
 
-                <h3 className="font-semibold">Hydrocarbon</h3>
+                <h3 className="font-semibold">Dilution</h3>
                 <p className="mb-2">
-                    A <strong>hydrocarbon</strong> is an organic compound made up of only
-                    <strong> carbon (C)</strong> and <strong>hydrogen (H)</strong> atoms.
+                    <strong>Dilution</strong> occurs when solvent is added to a solution,
+                    decreasing its concentration while keeping the number of moles constant.
                 </p>
-                <p className="mb-2">Examples:</p>
-                <ul className="list-disc ml-6 mb-3">
-                    <li>CH₄ : methane</li>
-                    <li>C₄H₁₀ : butane</li>
-                    <li>C₃H₈ : propane</li>
+                <p className="mb-2 font-mono">
+                    M₁V₁ = M₂V₂
+                </p>
+                <p className="mb-2">What this means:</p>
+                <ul className="list-disc ml-6 mb-4">
+                    <li>M₁ and V₁ are the initial molarity and volume</li>
+                    <li>M₂ and V₂ are the final molarity and volume</li>
+                    <li>The amount of solute does not change</li>
                 </ul>
-                <p className="mb-3">
-                    Nomenclature is complex, but hydrocarbons usually end in
-                    <strong> -ane</strong> or <strong>-ene</strong>.
-                </p>
-                <p className="italic text-gray-600 mb-4">
-                    <img src="/hydrocarb.png" alt="hydrocarbon examples" height="300" width="200" />
-                </p>
-                <p className="font-semibold mb-4">
-                    There are also organic compounds similar to hydrocarbons that have more complex nomenclature,
-                    such as alcohols (C₂H₅OH) and ethanol (CH₃CH₂OH).
+                <p className="italic text-gray-600 mb-6">
+                    <Image src="/dilution.png" alt="dilution equation diagram" height={300} width={200} />
                 </p>
 
-                <div className="mb-3">
+                <div className="mb-7">
                     <CarbleLink
-                        url="https://chem.libretexts.org/Bookshelves/General_Chemistry/ChemPRIME_(Moore_et_al.)/08%3A_Properties_of_Organic_Compounds/8.05%3A_Organic_Compounds-_Hydrocarbons"
-                        text="Learn more about hydrocarbons and organic compounds!"
+                        url="https://www.khanacademy.org/science/hs-chemistry/x2613d8165d88df5e:solutions-and-molarity/x2613d8165d88df5e:dilution/a/dilution"
+                        text="Learn more about dilution!"
                     />
                 </div>
+
+                <h3 className="font-semibold">How These Variables Relate (Game Strategy)</h3>
+                <p className="mb-2">
+                    All molarity problems — and the 2048 Molarity game — rely on understanding
+                    how these variables interact.
+                </p>
+                <ul className="list-disc ml-6 mb-4">
+                    <li>Molarity depends on both <strong>moles</strong> and <strong>volume</strong></li>
+                    <li>Changing volume affects molarity even if moles stay the same</li>
+                    <li>Moles connect mass and molarity through molar mass</li>
+                    <li>Dilution keeps moles constant while volume changes</li>
+                </ul>
+
+                <p className="font-semibold">
+                    Master these relationships, and the tile combinations in the game will
+                    make intuitive sense.
+                </p>
             </div>
         </>
     );
-}
+};
 
 export const HardArticle2048: Article = () => {
-
     return (
         <>
             <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
-                <h2 className="text-xl font-bold mb-3">Hard Mode: Intermolecular Forces & Chemical Behavior</h2>
+                <h2 className="text-xl font-bold mb-3">Hard Mode: Gas Laws & Variable Relationships</h2>
 
                 <p className="mb-4">
-                    This section introduces <strong>Intermolecular Forces (IMFs)</strong>, which explain how particles
-                    attract each other in liquids and solids. These forces are weaker than chemical bonds but
-                    strongly influence physical properties such as boiling point, solubility, and state of matter.
-                    Spend <strong>6-7 minutes</strong> studying this section before starting Hard mode.
+                    This section introduces the <strong>Gas Laws</strong>, which describe how
+                    <strong> pressure (P)</strong>, <strong>volume (V)</strong>,
+                    <strong> temperature (T)</strong>, and <strong>amount of gas (n)</strong>
+                    interact. These laws explain the behavior of gases in real-life situations
+                    such as breathing, car tires heating up, and weather balloons.
+                    Spend <strong>7–9 minutes</strong> studying this section before starting Hard mode.
                 </p>
 
-                <h3 className="font-semibold">Intermolecular Forces (IMFs)</h3>
+                <h3 className="font-semibold">What Are Gas Laws?</h3>
+                <p className="mb-4">
+                    <strong>Gas laws</strong> are mathematical relationships that describe how gases
+                    respond when one variable changes while others are held constant.
+                    All temperature values <strong>must be in Kelvin (K)</strong>.
+                </p>
+
+                <h3 className="font-semibold">Boyle’s Law (Pressure–Volume)</h3>
                 <p className="mb-2">
-                    <strong>Intermolecular forces</strong> are attractions <strong>between</strong> molecules or particles.
-                    They are weaker than intramolecular (covalent or ionic) bonds.
+                    <strong>Boyle’s Law</strong> states that pressure and volume are
+                    <strong> inversely proportional</strong> when temperature and moles are constant.
+                </p>
+                <p className="mb-2">
+                    Formula: <strong>P₁V₁ = P₂V₂</strong>
+                </p>
+                <ul className="list-disc ml-6 mb-3">
+                    <li>If volume decreases, pressure increases</li>
+                    <li>If volume increases, pressure decreases</li>
+                </ul>
+                <p className="mb-2">
+                    <strong>Example:</strong> Pushing a syringe decreases volume and increases pressure.
+                </p>
+                <p className="italic text-gray-600 mb-6">
+                    <Image src="/boyles.jpg" alt="Boyle's Law pressure volume graph" height={300} width={200} />
+                </p>
+
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://www.khanacademy.org/science/ap-chemistry-beta/x2eef969c74e0d802:gases-and-kinetic-molecular-theory/x2eef969c74e0d802:boyles-law/v/boyle-s-law"
+                        text="Learn more about Boyle’s Law!"
+                    />
+                </div>
+
+                <h3 className="font-semibold">Charles’s Law (Volume–Temperature)</h3>
+                <p className="mb-2">
+                    <strong>Charles’s Law</strong> states that volume is
+                    <strong> directly proportional</strong> to Kelvin temperature
+                    when pressure and moles are constant.
+                </p>
+                <p className="mb-2">
+                    Formula: <strong>V₁ / T₁ = V₂ / T₂</strong>
+                </p>
+                <ul className="list-disc ml-6 mb-3">
+                    <li>If temperature increases, volume increases</li>
+                    <li>If temperature decreases, volume decreases</li>
+                </ul>
+                <p className="mb-2">
+                    <strong>Example:</strong> A balloon expands when heated.
+                </p>
+                <p className="italic text-gray-600 mb-6">
+                    <Image src="/charles.jpg" alt="Charles's Law volume temperature graph" height={300} width={200} />
+                </p>
+
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Physical_Properties_of_Matter/States_of_Matter/Properties_of_Gases/Charles'_Law"
+                        text="Learn more about Charles’s Law!"
+                    />
+                </div>
+
+                <h3 className="font-semibold">Gay-Lussac’s Law (Pressure–Temperature)</h3>
+                <p className="mb-2">
+                    <strong>Gay-Lussac’s Law</strong> states that pressure is
+                    <strong> directly proportional</strong> to Kelvin temperature
+                    when volume and moles are constant.
+                </p>
+                <p className="mb-2">
+                    Formula: <strong>P₁ / T₁ = P₂ / T₂</strong>
+                </p>
+                <p className="mb-2">
+                    <strong>Example:</strong> A sealed aerosol can increases in pressure when heated.
+                </p>
+                <p className="italic text-gray-600 mb-6">
+                    <Image src="/gaylussac.png" alt="Gay-Lussac's Law pressure temperature graph" height={300} width={200} />
+                </p>
+
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://www.britannica.com/science/Gay-Lussacs-law"
+                        text="Learn more about Gay-Lussac’s Law!"
+                    />
+                </div>
+
+                <h3 className="font-semibold">Avogadro’s Law (Volume–Moles)</h3>
+                <p className="mb-2">
+                    <strong>Avogadro’s Law</strong> states that volume is
+                    <strong> directly proportional</strong> to the number of moles
+                    at constant pressure and temperature.
+                </p>
+                <p className="mb-2">
+                    Formula: <strong>V₁ / n₁ = V₂ / n₂</strong>
+                </p>
+                <p className="mb-2">
+                    <strong>Example:</strong> Adding more gas particles inflates a balloon.
+                </p>
+                <p className="italic text-gray-600 mb-6">
+                    <Image src="/avogadro.png" alt="Avogadro's Law volume moles relationship" height={300} width={200} />
+                </p>
+
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://www.khanacademy.org/science/ap-chemistry-beta/x2eef969c74e0d802:gases-and-kinetic-molecular-theory/x2eef969c74e0d802:avogadros-law/v/avogadro-s-law"
+                        text="Learn more about Avogadro’s Law!"
+                    />
+                </div>
+
+                <h3 className="font-semibold">Combined Gas Law</h3>
+                <p className="mb-2">
+                    The <strong>Combined Gas Law</strong> combines Boyle’s, Charles’s,
+                    and Gay-Lussac’s Laws into one equation.
+                </p>
+                <p className="mb-2">
+                    Formula: <strong>(P₁V₁) / T₁ = (P₂V₂) / T₂</strong>
                 </p>
                 <p className="mb-4">
-                    Strength order (weakest → strongest):
-                    <strong> London Dispersion Forces → Dipole-Dipole → Hydrogen Bonding</strong>
+                    Use this law when <strong>moles are constant</strong> and multiple variables change.
                 </p>
 
-                <h3 className="font-semibold">London Dispersion Forces (LDF)</h3>
+                <h3 className="font-semibold">Ideal Gas Law</h3>
                 <p className="mb-2">
-                    <strong>London Dispersion Forces</strong> are the <strong>weakest</strong> type of IMF.
-                    They result from <strong>temporary induced dipoles</strong> caused by random electron movement.
-                </p>
-                <p className="mb-2">
-                    <strong>Present in all substances</strong> (anything with a chemical formula).
-                </p>
-                <p className="italic text-gray-600 mb-6">
-                    <img src="/ldf.jpg" alt="London dispersion forces diagram" height="300" width="200" />
-                </p>
-
-                <div className="mb-7">
-                    <CarbleLink
-                        url="https://byjus.com/chemistry/london-dispersion-forces/"
-                        text="Learn more about London Dispersion Forces!"
-                    />
-                </div>
-
-                <h3 className="font-semibold">Dipole–Dipole Forces (Polarity)</h3>
-                <p className="mb-2">
-                    <strong>Dipole–dipole forces</strong> are attractions between the
-                    <strong> partial positive end</strong> of one molecule and the
-                    <strong> partial negative end</strong> of another.
+                    The <strong>Ideal Gas Law</strong> describes the behavior of an ideal gas by
+                    combining all major variables.
                 </p>
                 <p className="mb-2">
-                    A molecule is <strong>polar</strong> when it has permanent dipoles.
-                    Dipole–dipole forces can occur <strong>between identical polar molecules</strong>.
-                </p>
-                <p className="mb-2">
-                    <strong>Can occur in molecules, acids, and bases.</strong>
-                </p>
-                <p className="italic text-gray-600 mb-6">
-                    <img src="/d-d.jpg" alt="dipole dipole forces diagram" height="300" width="200" />
-                </p>
-
-                <div className="mb-7">
-                    <CarbleLink
-                        url="https://www.masterorganicchemistry.com/2025/10/17/dipole-moments-and-dipoles/"
-                        text="Learn more about dipoles!"
-                    />
-                </div>
-
-                <h3 className="font-semibold">Hydrogen Bonding</h3>
-                <p className="mb-2">
-                    <strong>Hydrogen bonding</strong> is the <strong>strongest IMF</strong>.
-                </p>
-                <p className="mb-2">
-                    For a molecule to hydrogen bond with itself, it must be both a
-                    <strong> hydrogen donor</strong> and a <strong> hydrogen acceptor</strong>.
-                </p>
-                <ul className="list-disc ml-6 mb-4">
-                    <li>
-                        Hydrogen donor: H covalently bonded to <strong>N, O, or F</strong>
-                    </li>
-                    <li>
-                        Hydrogen acceptor: lone pair on <strong>N, O, or F</strong>
-                    </li>
-                </ul>
-                <p className="mb-2">
-                    <strong>Can occur in molecules, acids, and bases.</strong>
-                </p>
-                <p className="italic text-gray-600 mb-6">
-                    <img src="/hb.png" alt="hydrogen bonding diagram" height="300" width="200" />
-                </p>
-
-                <div className="mb-7">
-                    <CarbleLink
-                        url="https://www.chem.purdue.edu/gchelp/liquids/hbond.html"
-                        text="Learn more about Hydrogen Bonding!"
-                    />
-                </div>
-
-                <div className="mb-10">
-                    <CarbleLink
-                        url="https://www.khanacademy.org/test-prep/mcat/chemical-processes/covalent-bonds/a/intramolecular-and-intermolecular-forces"
-                        text="Learn more about intermolecular forces!"
-                    />
-                </div>
-
-                <h3 className="font-semibold">Ion</h3>
-                <p className="mb-2">
-                    An <strong>ion</strong> is an atom or molecule with an
-                    <strong> overall positive or negative charge</strong>
-                    caused by losing or gaining electrons.
-                </p>
-                <ul className="list-disc ml-6 mb-4">
-                    <li>Na⁺</li>
-                    <li>Cl⁻</li>
-                    <li>Ba²⁺</li>
-                </ul>
-                <p className="italic text-gray-600 mb-6">
-                    <img src="/ion.png" alt="ion examples" height="300" width="200" />
-                </p>
-
-                <h3 className="font-semibold">Cation</h3>
-                <p className="mb-2">
-                    A <strong>cation</strong> has a <strong>positive</strong> charge due to
-                    <strong> losing electrons</strong>.
-                </p>
-                <ul className="list-disc ml-6 mb-4">
-                    <li>K⁺</li>
-                    <li>Al³⁺</li>
-                    <li>NH₄⁺</li>
-                </ul>
-
-                <h3 className="font-semibold">Anion</h3>
-                <p className="mb-2">
-                    An <strong>anion</strong> has a <strong>negative</strong> charge due to
-                    <strong> gaining electrons</strong>.
-                </p>
-                <ul className="list-disc ml-6 mb-4">
-                    <li>F⁻</li>
-                    <li>O²⁻</li>
-                    <li>SO₄²⁻</li>
-                </ul>
-                <p className="italic text-gray-600 mb-6">
-                    <img src="/cat and an ion.jpg" alt="cation and anion diagram" height="300" width="200" />
-                </p>
-
-                <div className="mb-7">
-                    <CarbleLink
-                        url="https://www.geeksforgeeks.org/chemistry/cations-vs-anions/"
-                        text="Learn more about cations and anions!"
-                    />
-                </div>
-
-                <h3 className="font-semibold">Molecule</h3>
-                <p className="mb-2">
-                    A <strong>molecule</strong> consists of multiple
-                    <strong> nonmetal atoms or anions</strong> that are
-                    <strong> covalently bonded</strong> with a
-                    <strong> neutral overall charge</strong>.
+                    Formula: <strong>PV = nRT</strong>
                 </p>
                 <ul className="list-disc ml-6 mb-3">
-                    <li>CCl₄ : carbon tetrachloride</li>
-                    <li>N₂O₃ : dinitrogen trioxide</li>
-                    <li>CO₂ : carbon dioxide</li>
+                    <li>P = pressure</li>
+                    <li>V = volume</li>
+                    <li>n = moles</li>
+                    <li>T = temperature (K)</li>
+                    <li>R = 0.08206 L·atm/(mol·K)</li>
                 </ul>
                 <p className="mb-2">
-                    <strong>Intermolecular Forces: </strong>
-                     Always LDF, sometimes dipole–dipole or hydrogen bonding.
-                </p>
-                <p className="mb-2">
-                    Molecules have <strong>covalent intramolecular bonds </strong>
-                    and are represented using <strong>Lewis diagrams</strong>.
+                    Gases behave most ideally at <strong>low pressure</strong> and
+                    <strong> high temperature</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-6">
-                    <img src="/lewis.png" alt="lewis structure example" height="300" width="200" />
-                </p>
-
-                <div className="mb-7">
-                    <CarbleLink
-                        url="https://byjus.com/chemistry/atoms-and-molecules/"
-                        text="Learn more about atoms and molecules!"
-                    />
-                </div>
-
-                <h3 className="font-semibold">Ionic Compound</h3>
-                <p className="mb-2">
-                    An <strong>ionic compound</strong> forms between a
-                    <strong> cation and an anion</strong> and is
-                    <strong> electrically neutral</strong>.
-                </p>
-                <p className="mb-2">
-                    <strong>Intermolecular Forces: </strong>
-                    Only London Dispersion Forces.
-                </p>
-                <p className="mb-2">
-                    Ionic compounds form a <strong>crystal lattice</strong>
-                    and are typically <strong>solid and rigid</strong>.
-                </p>
-                <p className="italic text-gray-600 mb-6">
-                    <img src="/lattice.png" alt="ionic lattice structure" height="300" width="200" />
-                </p>
-
-                <div className="mb-7">
-                    <CarbleLink
-                        url="https://www.britannica.com/science/ionic-compound"
-                        text="Learn more about ionic compounds!"
-                    />
-                </div>
-
-                <h3 className="font-semibold">Acid</h3>
-                <p className="mb-2">
-                    An <strong>acid</strong> donates <strong>H⁺</strong>,
-                    has a <strong>pH below 7</strong>,
-                    and often contains strong dipoles.
-                </p>
-                <p className="mb-2">
-                    <strong>Intermolecular Forces: </strong>
-                    Always LDF, sometimes dipole–dipole or hydrogen bonding.
-                </p>
-
-                <h3 className="font-semibold">Base</h3>
-                <p className="mb-2">
-                    A <strong>base</strong> accepts <strong>H⁺</strong>,
-                    has a <strong>pH above 7</strong>,
-                    and may contain hydrogen bonding sites.
-                </p>
-                <p className="mb-2">
-                    <strong>Intermolecular Forces: </strong>
-                    Always LDF, sometimes dipole–dipole or hydrogen bonding.
-                </p>
-                <p className="italic text-gray-600 mb-6">
-                    <img src="/acid imf.jpg" alt="acid base intermolecular forces" height="300" width="200" />
-                </p>
-
-                <div className="mb-7">
-                    <CarbleLink
-                        url="https://www.pasco.com/resources/articles/acid-base-chemistry"
-                        text="Learn more about acids and bases!"
-                    />
-                </div>
-
-                <h3 className="font-semibold">Hydrocarbon</h3>
-                <p className="mb-2">
-                    A <strong>hydrocarbon</strong> is an organic molecule made only of
-                    <strong> carbon</strong> and <strong> hydrogen</strong>.
-                </p>
-                <ul className="list-disc ml-6 mb-3">
-                    <li>CH₄ : methane</li>
-                    <li>C₄H₁₀ : butane</li>
-                    <li>C₃H₈ : propane</li>
-                </ul>
-                <p className="mb-2">
-                    <strong>Intermolecular Forces: </strong>
-                    Only London Dispersion Forces.
-                </p>
-                <p className="mb-2">
-                    No polarity and no hydrogen bonding.
-                </p>
-                <p className="italic text-gray-600 mb-4">
-                    <img src="/hydrocarb.png" alt="hydrocarbon IMF diagram" height="300" width="200" />
-                </p>
-
-                <p className="font-semibold mb-4">
-                    There are also organic compounds related to hydrocarbons with more complex behavior,
-                    such as alcohols (C₂H₅OH) and ethanol (CH₃CH₂OH).
+                    <Image src="/ideal.png" alt="Ideal gas law variables diagram" height={300} width={200} />
                 </p>
 
                 <div className="mb-3">
                     <CarbleLink
-                        url="https://chem.libretexts.org/Bookshelves/General_Chemistry/ChemPRIME_(Moore_et_al.)/08%3A_Properties_of_Organic_Compounds/8.05%3A_Organic_Compounds-_Hydrocarbons"
-                        text="Learn more about hydrocarbons and organic compounds!"
+                        url="https://chem.libretexts.org/Bookshelves/General_Chemistry/Introductory_Chemistry_(Liberman)/09%3A_Gases/9.03%3A_The_Ideal_Gas_Law"
+                        text="Learn more about the Ideal Gas Law!"
                     />
                 </div>
             </div>
@@ -527,7 +320,7 @@ export const EasyLesson2048: Lesson = () => {
         <>
             <div className="w-full max-w-5xl mt-6 mb-6 p-4 bg-white rounded shadow">
                 <h2 className="text-2xl font-semibold mb-3">
-                    Play our original game: 2048 Molarity!
+                    Play our original game: 2048 Dilution!
                 </h2>
 
                 <ul className="list-disc list-inside space-y-2 text-gray-700">

@@ -1,5 +1,6 @@
 import CarbleLink from "@/components/ui/StemLink";
 import { Article, Lesson } from "@/structures/GameStructures";
+import Image from "next/image";
 
 export const CarbleEasyArticle: Article = () => {
     return (
@@ -35,7 +36,7 @@ export const CarbleEasyArticle: Article = () => {
                 </div>
 
                 <p className="italic text-gray-600 mb-4">
-                    <img src="/atomic and mass number.jpg" alt="atomic and mass number example" height="300" width="200" />
+                    <Image src="/atomic and mass number.jpg" alt="atomic and mass number example" height={300} width={200} />
                 </p>
 
                 <h3 className="font-semibold">Atomic Number</h3>
@@ -56,7 +57,7 @@ export const CarbleEasyArticle: Article = () => {
                     and <strong> increases dramatically</strong> as you move top → bottom <strong> down a group</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
-                    <img src="/4 protons diagram.png" alt="atom diagram example" height="300" width="200" />
+                    <Image src="/4 protons diagram.png" alt="atom diagram example" height={300} width={200} />
                 </p>
 
                 <h3 className="font-semibold">Atomic Mass</h3>
@@ -82,7 +83,7 @@ export const CarbleEasyArticle: Article = () => {
                     and <strong>increases dramatically</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
-                    <img src="/the structure of atom.jpg" alt="the structure of atom diagram" height="300" width="200" />
+                    <Image src="/the structure of atom.jpg" alt="the structure of atom diagram" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
@@ -123,7 +124,7 @@ export const CarbleEasyArticle: Article = () => {
                     <li>Group 18: 0</li>
                 </ul>
                 <p className="italic text-gray-600">
-                    <img src="/4 diagrams ionic charge.gif" alt="4 atom diagrams" height="400" width="300" />
+                    <Image src="/4 diagrams ionic charge.gif" alt="4 atom diagrams" height={400} width={300} />
                 </p>
                 <div className="mb-7 mt-5">
                     <CarbleLink url="https://chem.libretexts.org/Courses/Portland_Community_College/CH151%3A_Preparatory_Chemistry/06%3A_Ions_Ionic_Bonding_and_the_Nomenclature_of_Ionic_Compounds/6.01%3A_Ions" text="Learn more about ions and ionic charge!"></CarbleLink>
@@ -184,7 +185,7 @@ export const CarbleHardArticle: Article = () => {
                     and <strong>increases</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
-                    <img src="https://general.chemistrysteps.com/wp-content/uploads/2023/11/Atomic-Radius-and-periodic-table.png" alt="Atomic Radius Diagram" height="500" width="300" />
+                    <Image src="https://general.chemistrysteps.com/wp-content/uploads/2023/11/Atomic-Radius-and-periodic-table.png" alt="Atomic Radius Diagram" height={500} width={300} />
                 </p>
 
                 <h3 className="font-semibold">(1st) Ionization Energy</h3>
@@ -207,14 +208,14 @@ export const CarbleHardArticle: Article = () => {
                     and <strong>decreases</strong> as you move top → bottom <strong> down a group</strong>.
                 </p>
                 <p className="italic text-gray-600">
-                    <img src="https://media.geeksforgeeks.org/wp-content/uploads/20230310125901/ionization-energy-trend.png" alt="First Ionization Energy Diagram" height="500" width="350" />
+                    <Image src="https://media.geeksforgeeks.org/wp-content/uploads/20230310125901/ionization-energy-trend.png" alt="First Ionization Energy Diagram" height={500} width={350} />
                 </p>
 
                 <h3 className="font-semibold mt-5">Electronegativity</h3>
                 <p className="mb-2">
-                    The <strong>electronegativity</strong> is a measure of how well an atom attracts electrons. It is the strength of attraction forces between external electrons and an atom's nucleus.
+                    The <strong>electronegativity</strong> is a measure of how well an atom attracts electrons. It is the strength of attraction forces between external electrons and the nucleus of an atom.
                     As more protons are added to the nucleus to create new elements, forces between the nucleus and electrons are strengthened due to opposite charge attractions, more easily attracting electrons to join the atom and increasing electronegativity.
-                    But atoms with more electron shells have less electronegativity because the nucleus's force of attraction is less effective on electrons farther away, outside the atom's many electron shells.
+                    But atoms with more electron shells have less electronegativity because the force of attraction of the nucleus is less effective on electrons farther away, outside the many electron shells of an atom.
                     (Fun and common fact: Flourine is the most electronegative element!)
                 </p>
                 <p className="mb-3 italic text-gray-700">Note: Noble gases (group 18) do not have electronegativities! They want to keep their full valence shell, not attract new electrons. </p>
@@ -230,7 +231,7 @@ export const CarbleHardArticle: Article = () => {
                     and <strong>decreases</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
-                    <img src="https://media.geeksforgeeks.org/wp-content/uploads/20231207124854/Periodic-Table-Electronegativity-1.png" alt="Electronegativity Diagram" height="500" width="300" />
+                    <Image src="https://media.geeksforgeeks.org/wp-content/uploads/20231207124854/Periodic-Table-Electronegativity-1.png" alt="Electronegativity Diagram" height={500} width={300} />
                 </p>
                 <div className="mb-7 mt-3">
                     <CarbleLink url="https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Supplemental_Modules_and_Websites_(Inorganic_Chemistry)/Descriptive_Chemistry/Periodic_Trends_of_Elemental_Properties/Periodic_Trends" text="Learn more about atomic radius, electronegativity, 1st ionization energy, and other periodic trends!"></CarbleLink>
