@@ -1,11 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-#from .routers import post, user, auth, vote
-
+from app.routes.auth import router as auth_router
+from app.routes.users import router as users_router
 
 app = FastAPI()
 
-# Change in production code
 origins = [
     "http://localhost:3000",
     "http://localhost:8000",
@@ -20,10 +19,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# app.include_router(post.router)
-# app.include_router(user.router)
-# app.include_router(auth.router)
-# app.include_router(vote.router)
+app.include_router(auth_router)
+app.include_router(users_router)
 
 
 @app.get("/")
