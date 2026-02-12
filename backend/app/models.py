@@ -1,11 +1,22 @@
 from datetime import datetime
-from sqlalchemy import ARRAY, TIMESTAMP, BigInteger, String, Boolean, Integer, func, text
+from sqlalchemy import ARRAY, TIMESTAMP, BigInteger, CheckConstraint, String, Boolean, Integer, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 
 
 class User(Base):
     __tablename__ = "users"
+
+    __table_args__ = (
+        CheckConstraint(
+            "char_length(username) BETWEEN 5 AND 20",
+            name="ck_users_username_len",
+        ),
+        CheckConstraint(
+            "username ~ '^[A-Za-z0-9](?:[A-Za-z0-9_-]{3,18})[A-Za-z0-9]$'",
+            name="ck_users_username_format",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(
         BigInteger, primary_key=True, autoincrement=True
@@ -18,6 +29,13 @@ class User(Base):
     # Password hash
     password: Mapped[str] = mapped_column(
         String(255), nullable=False
+    )
+
+    username: Mapped[str] = mapped_column(
+        String(20),
+        unique=True,
+        index=True,
+        nullable=False,
     )
 
     streak: Mapped[int] = mapped_column(
