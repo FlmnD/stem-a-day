@@ -2,44 +2,44 @@
 import React, { useState, useEffect, useRef } from "react";
 
 const COMPOUNDS = [ 
-    { formula: "NaCl", name: "sodium chloride" }, 
-    { formula: "K₂O", name: "potassium oxide" }, 
-    { formula: "MgSe", name: "magnesium selenide" }, 
-    { formula: "CaCl₂", name: "calcium chloride" }, 
-    { formula: "Al₂O₃", name: "aluminum oxide" }, 
-    { formula: "FeO", name: "iron (II) oxide" }, 
-    { formula: "Fe₂O₃", name: "iron (III) oxide (also ferric oxide)" }, 
-    { formula: "CuCl", name: "copper (I) chloride" }, 
-    { formula: "CuCl₂", name: "copper (II) chloride" }, 
-    { formula: "Ca(OH)₂", name: "calcium hydroxide" }, 
-    { formula: "(NH₄)₂SO₄", name: "ammonium sulfate" }, 
-    { formula: "NaHCO₃", name: "sodium hydrogen carbonate (or sodium bicarbonate)" }, 
-    { formula: "K₂Cr₂O₇", name: "potassium dichromate" }, 
-    { formula: "CO", name: "carbon monoxide" }, 
-    { formula: "CO₂", name: "carbon dioxide" }, 
-    { formula: "N₂O", name: "dinitrogen monoxide" }, 
-    { formula: "N₂O₃", name: "dinitrogen trioxide" }, 
-    { formula: "PCl₅", name: "phosphorus pentachloride" }, 
-    { formula: "SF₆", name: "sulfur hexafluoride" }, 
-    { formula: "Cl₂O₇", name: "dichlorine heptoxide" }, 
-    { formula: "P₄O₆", name: "tetraphosphorus hexoxide" }, 
-    { formula: "CCl₄", name: "carbon tetrachloride" },
-    { formula: "HCl", name: "hydrochloric acid" }, 
-    { formula: "HBr", name: "hydrobromic acid" }, 
-    { formula: "HI", name: "hydroiodic acid" }, 
-    { formula: "H₂S", name: "hydrosulfuric acid" }, 
-    { formula: "H₂SO₄", name: "sulfuric acid" }, 
-    { formula: "H₂SO₃", name: "sulfurous acid" }, 
-    { formula: "HNO₃", name: "nitric acid" }, 
-    { formula: "HNO₂", name: "nitrous acid" }, 
-    { formula: "H₃PO₄", name: "phosphoric acid" }, 
-    { formula: "HC₂H₃O₂", name: "acetic acid" }, 
-    { formula: "CH₄", name: "methane" }, 
-    { formula: "C₂H₆", name: "ethane" }, 
-    { formula: "C₃H₈", name: "propane" }, 
-    { formula: "C₄H₁₀", name: "butane" }, 
-    { formula: "C₆H₁₂O₆", name: "glucose" }, 
-    { formula: "C₂H₅OH", name: "ethanol (ethyl alcohol)" }, 
+    { formula: "NaCl", name: "sodium chloride", type: "ionic compound" }, 
+    { formula: "K₂O", name: "potassium oxide", type: "ionic compound" }, 
+    { formula: "MgSe", name: "magnesium selenide", type: "ionic compound" }, 
+    { formula: "CaCl₂", name: "calcium chloride", type: "ionic compound" }, 
+    { formula: "Al₂O₃", name: "aluminum oxide", type: "ionic compound" }, 
+    { formula: "FeO", name: "iron (II) oxide", type: "ionic compound" }, 
+    { formula: "Fe₂O₃", name: "iron (III) oxide", type: "ionic compound" }, 
+    { formula: "CuCl", name: "copper (I) chloride", type: "ionic compound" }, 
+    { formula: "CuCl₂", name: "copper (II) chloride", type: "ionic compound" }, 
+    { formula: "Ca(OH)₂", name: "calcium hydroxide", type: "ionic compound" }, 
+    { formula: "(NH₄)₂SO₄", name: "ammonium sulfate", type: "ionic compound" }, 
+    { formula: "NaHCO₃", name: "sodium hydrogen carbonate", type: "ionic compound" }, 
+    { formula: "K₂Cr₂O₇", name: "potassium dichromate", type: "ionic compound" }, 
+    { formula: "CO", name: "carbon monoxide", type: "molecular compound" }, 
+    { formula: "CO₂", name: "carbon dioxide", type: "molecular compound" }, 
+    { formula: "N₂O", name: "dinitrogen monoxide", type: "molecular compound" }, 
+    { formula: "N₂O₃", name: "dinitrogen trioxide", type: "molecular compound" }, 
+    { formula: "PCl₅", name: "phosphorus pentachloride", type: "molecular compound" }, 
+    { formula: "SF₆", name: "sulfur hexafluoride", type: "molecular compound" }, 
+    { formula: "Cl₂O₇", name: "dichlorine heptoxide", type: "molecular compound" }, 
+    { formula: "P₄O₆", name: "tetraphosphorus hexoxide", type: "molecular compound" }, 
+    { formula: "CCl₄", name: "carbon tetrachloride", type: "molecular compound" },
+    { formula: "HCl", name: "hydrochloric acid", type: "acid" }, 
+    { formula: "HBr", name: "hydrobromic acid", type: "acid" }, 
+    { formula: "HI", name: "hydroiodic acid", type: "acid" }, 
+    { formula: "H₂S", name: "hydrosulfuric acid", type: "acid" }, 
+    { formula: "H₂SO₄", name: "sulfuric acid", type: "acid" }, 
+    { formula: "H₂SO₃", name: "sulfurous acid", type: "acid" }, 
+    { formula: "HNO₃", name: "nitric acid", type: "acid" }, 
+    { formula: "HNO₂", name: "nitrous acid", type: "acid" }, 
+    { formula: "H₃PO₄", name: "phosphoric acid", type: "acid" }, 
+    { formula: "HC₂H₃O₂", name: "acetic acid", type: "acid" }, 
+    { formula: "CH₄", name: "methane", type: "organic molecule" }, 
+    { formula: "C₂H₆", name: "ethane", type: "organic molecule" }, 
+    { formula: "C₃H₈", name: "propane", type: "organic molecule" }, 
+    { formula: "C₄H₁₀", name: "butane", type: "organic molecule" }, 
+    { formula: "C₆H₁₂O₆", name: "glucose", type: "organic molecule" }, 
+    { formula: "C₂H₅OH", name: "ethanol", type: "organic molecule" }, 
 ];
 
 const GRID_SIZE = 20;
@@ -68,6 +68,7 @@ export default function SnakeGame() {
   const [msg, setMsg] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [reverseMode, setReverseMode] = useState(false);
 
   const randPos = (size = 2) => ({
     x: Math.floor(Math.random() * (GRID_SIZE - size)),
@@ -161,7 +162,11 @@ export default function SnakeGame() {
         }
 
         existing.add(c.formula);
-        next.push({ ...pos, size: 2, compound: c });
+        next.push({
+          ...pos,
+          size: 2,
+          compound: c
+        });
         }
 
         return next;
@@ -180,7 +185,6 @@ export default function SnakeGame() {
     setRunning(true);
     setFeedback(null);
 
-    // 🔑 Immediately initialize game state
     setTimeout(() => {
         spawnApples();
         pickNewPrompt();
@@ -249,7 +253,11 @@ export default function SnakeGame() {
                     setFeedback("Correct!");
                 } else {
                     setSnakeLength(l => l - 0.5);
-                    setFeedback(`Wrong! It was ${prompt?.formula}`);
+                    if(reverseMode){
+                      setFeedback(`Wrong! It was ${prompt?.name}`);
+                    } else {
+                      setFeedback(`Wrong! It was ${prompt?.formula}`);
+                    }
                 }
 
                 pickNewPrompt();
@@ -269,7 +277,7 @@ export default function SnakeGame() {
     }, 200);
 
     return () => clearInterval(interval);
-  }, [running, dir, snakeLength, prompt]);
+  }, [running, dir, snakeLength, prompt, reverseMode]);
 
   useEffect(() => {
     if (snakeLength >= WIN_LENGTH) {
@@ -300,36 +308,48 @@ export default function SnakeGame() {
     });
 
     apples.forEach(a => {
+      const centerX = (a.x + a.size / 2) * CELL_SIZE;
+      const centerY = (a.y + a.size / 2) * CELL_SIZE;
+      const radius = (a.size / 2) * CELL_SIZE;
+
       ctx.fillStyle = "#ff4c4c";
       ctx.beginPath();
-      ctx.arc(
-        (a.x + a.size / 2) * CELL_SIZE,
-        (a.y + a.size / 2) * CELL_SIZE,
-        (a.size / 2) * CELL_SIZE,
-        0,
-        Math.PI * 2
-      );
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
       ctx.fill();
+
       ctx.fillStyle = "#000";
-      ctx.font = "14px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(
-        a.compound.formula,
-        (a.x + a.size / 2) * CELL_SIZE,
-        (a.y + a.size / 2) * CELL_SIZE
-      );
+
+      const text = reverseMode ? a.compound.name : a.compound.formula;
+      ctx.font = "13px Arial";
+      const maxWidth = radius * 1.6;
+      const words = text.split(" ");
+      const lines: string[] = [];
+      let currentLine = words[0];
+
+      for (let i = 1; i < words.length; i++) {
+        const testLine = currentLine + " " + words[i];
+        const metrics = ctx.measureText(testLine);
+
+        if (metrics.width < maxWidth) {
+          currentLine = testLine;
+        } else {
+          lines.push(currentLine);
+          currentLine = words[i];
+        }
+      }
+      lines.push(currentLine);
+
+      const lineHeight = 13;
+      const startY = centerY - ((lines.length - 1) * lineHeight) / 2;
+
+      lines.forEach((line, index) => {
+        ctx.fillText(line, centerX, startY + index * lineHeight);
+      });
     });
 
-    ctx.fillStyle = "#000";
-    ctx.font = "14px Arial";
-    ctx.textAlign = "right";
-    ctx.fillText(
-      `Snake Length: ${snakeLength}`,
-      GRID_SIZE * CELL_SIZE - 10,
-      GRID_SIZE * CELL_SIZE - 10
-    );
-  }, [snake, apples, snakeLength]);
+  }, [snake, apples, snakeLength, reverseMode]);
 
   useEffect(() => {
     if (!running) return;
@@ -338,12 +358,10 @@ export default function SnakeGame() {
         setApples(prev => {
         const next = [...prev];
 
-        // 30% chance to remove a random apple (never drop below MIN_APPLES)
         if (next.length > MIN_APPLES && Math.random() < 0.3) {
             next.splice(Math.floor(Math.random() * next.length), 1);
         }
 
-        // 50% chance to add a new apple
         if (Math.random() < 0.5) {
             const c = unusedCompound();
             if (c) {
@@ -354,16 +372,20 @@ export default function SnakeGame() {
               ) {
                 pos = randPos();
               }
-              next.push({ ...pos, size: 2, compound: c });
+              next.push({
+                ...pos,
+                size: 2,
+                compound: c
+              });
             }
         }
 
         return next;
         });
-    }, 1200 + Math.random() * 1200); // random timing
+    }, 1200 + Math.random() * 1200);
 
     return () => clearInterval(interval);
-  }, [running]);
+  }, [running, reverseMode]);
 
   useEffect(() => {
   if (!running) return;
@@ -373,7 +395,6 @@ export default function SnakeGame() {
       let next = [...prev];
       const existing = new Set(next.map(a => a.compound.formula));
 
-      // random removal (never remove prompt apple)
       if (
         next.length > MIN_APPLES &&
         Math.random() < 0.35
@@ -389,7 +410,6 @@ export default function SnakeGame() {
         }
       }
 
-      // random addition
       if (
         next.length < MAX_APPLES &&
         Math.random() < 0.45
@@ -404,7 +424,11 @@ export default function SnakeGame() {
             pos = randPos();
           }
 
-          next.push({ ...pos, size: 2, compound: c });
+          next.push({
+            ...pos,
+            size: 2,
+            compound: c
+          });
         }
       }
 
@@ -413,7 +437,7 @@ export default function SnakeGame() {
   }, 900 + Math.random() * 1400);
 
   return () => clearInterval(interval);
-}, [running, prompt]);
+}, [running, prompt, reverseMode]);
 
 
   useEffect(() => {
@@ -423,14 +447,12 @@ export default function SnakeGame() {
         setApples(prev => {
         if (prev.length <= MIN_APPLES) return prev;
 
-        // candidates that are NOT the prompt
         const removable = prev.filter(
             a => a.compound.formula !== prompt?.formula
         );
 
         if (removable.length === 0) return prev;
 
-        // 30% chance to remove one
         if (Math.random() < 0.3) {
             const remove = removable[Math.floor(Math.random() * removable.length)];
             return prev.filter(a => a !== remove);
@@ -443,13 +465,57 @@ export default function SnakeGame() {
     return () => clearInterval(interval);
   }, [running, prompt]);
 
-
-
   return (
     <div className="flex flex-col items-center p-6">
-      <div className="text-2xl font-bold mb-2">
-        Find: {prompt?.name ?? "Press Space"}
+      <div className="text-2xl font-extrabold mb-3 text-center">
+        <div className="flex items-center justify-center gap-6 mb-4">
+          <button
+            onClick={() => setReverseMode(prev => !prev)}
+            className="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg shadow hover:bg-indigo-700 transition"
+          >
+            {reverseMode ? "Name Mode" : "Formula Mode"}
+          </button>
+
+          <div className="text-2xl font-extrabold text-center">
+            {prompt ? (
+              reverseMode ? (
+                <>
+                  Find the{" "}
+                  <span className="text-purple-600">
+                    chemical formula
+                  </span>{" "}
+                  for the{" "}
+                  <span className="text-blue-600">
+                    {prompt.type}
+                  </span>
+                  :{" "}
+                  <span className="text-emerald-600 underline">
+                    {prompt.formula}
+                  </span>
+                </>
+              ) : (
+                <>
+                  Find the{" "}
+                  <span className="text-purple-600">
+                    name
+                  </span>{" "}
+                  for the{" "}
+                  <span className="text-blue-600">
+                    {prompt.type}
+                  </span>
+                  :{" "}
+                  <span className="text-emerald-600 underline">
+                    {prompt.formula}
+                  </span>
+                </>
+              )
+            ) : (
+              "Press Space"
+            )}
+          </div>
+        </div>
       </div>
+      
       <div
         className="relative"
         style={{
@@ -457,17 +523,39 @@ export default function SnakeGame() {
             height: GRID_SIZE * CELL_SIZE,
         }}
         >
-        <canvas
-            ref={canvasRef}
-            width={GRID_SIZE * CELL_SIZE}
-            height={GRID_SIZE * CELL_SIZE}
-            className={`border-4 border-gray-600 ${
-            !running && msg ? "opacity-40" : ""
-            }`}
-        />
-        <div className="mt-4 text-xl font-bold text-center text-black">
-          {feedback}
+        <div className="flex items-start gap-6">
+          <canvas
+              ref={canvasRef}
+              width={GRID_SIZE * CELL_SIZE}
+              height={GRID_SIZE * CELL_SIZE}
+              className={`border-4 border-gray-600 ${
+              !running && msg ? "opacity-40" : ""
+              }`}
+          />
+
+          <div className="text-2xl font-extrabold text-emerald-700">
+            Snake Length: {snakeLength}
+
+            <div
+              className={`text-2xl font-bold ${
+                feedback?.includes("Correct")
+                  ? "text-green-600"
+                  : feedback?.includes("Wrong")
+                  ? "text-red-600"
+                  : ""
+              }`}
+            >
+              {feedback}
+            </div>
+          </div>
         </div>
+
+        <div
+          className="flex justify-between items-center mt-3 w-full"
+          style={{ width: GRID_SIZE * CELL_SIZE }}
+        >
+        </div>
+
         {!running && msg && (
             <div className="absolute inset-0 flex flex-col items-center justify-center">
             <div className="bg-black/70 text-white px-8 py-6 rounded-xl text-center">

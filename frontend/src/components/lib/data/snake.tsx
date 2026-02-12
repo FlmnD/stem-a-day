@@ -42,6 +42,13 @@ export const SnakeEasyArticle: Article = () => {
                     <li>NH₄⁺</li>
                 </ul>
 
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(CK-12)/07%3A_Chemical_Nomenclature/7.03%3A_Cations"
+                        text="Learn more about cations!"
+                    />
+                </div>
+
                 <h3 className="font-semibold">Anion</h3>
                 <p className="mb-2">
                     An <strong>anion</strong> is an ion with a <strong>negative overall charge</strong>
@@ -53,16 +60,17 @@ export const SnakeEasyArticle: Article = () => {
                     <li>O²⁻</li>
                     <li>SO₄²⁻</li>
                 </ul>
-                <p className="italic text-gray-600 mb-6">
-                    <Image src="/cat and an ion.jpg" alt="cation and anion comparison" height={300} width={200} />
-                </p>
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.geeksforgeeks.org/chemistry/cations-vs-anions/"
-                        text="Learn more about cations and anions!"
+                        url="https://chem.libretexts.org/Under_Construction/Purgatory/Introductory_Chemistry_at_Solano_College_2022/08%3A_Chemical_Nomenclature/8.04%3A_Anions"
+                        text="Learn more about anions!"
                     />
                 </div>
+
+                <p className="italic text-gray-600 mb-6">
+                    <Image src="/cat and an ion.jpg" alt="cation and anion comparison" height={300} width={200} />
+                </p>
 
                 <h3 className="font-semibold">Polyatomic Ion</h3>
                 <p className="mb-2">
@@ -89,7 +97,7 @@ export const SnakeEasyArticle: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.khanacademy.org/science/hs-chemistry/x2613d8165d88df5e:chemical-bonding/x2613d8165d88df5e:ionic-nomenclature/a/polyatomic-ions-article"
+                        url="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(CK-12)/07%3A_Chemical_Nomenclature/7.09%3A_Polyatomic_Ions"
                         text="Learn more about polyatomic ions!"
                     />
                 </div>
@@ -126,7 +134,7 @@ export const SnakeEasyArticle: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://byjus.com/chemistry/atoms-and-molecules/"
+                        url="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Chemistry_for_Changing_Times_(Hill_and_McCreary)/02%3A_Atoms/2.06%3A_Atoms_and_Molecules-_Real_and_Relevant"
                         text="Learn more about atoms and molecules!"
                     />
                 </div>
@@ -159,7 +167,7 @@ export const SnakeEasyArticle: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.britannica.com/science/ionic-compound"
+                        url="https://chem.libretexts.org/Courses/Mt._San_Antonio_College/Chem_10_-_Chemistry_for_Allied_Health_Majors_(1st_semester)/04%3A_Ionic_Compounds/4.09%3A_Naming_Ionic_Compounds"
                         text="Learn more about ionic compounds!"
                     />
                 </div>
@@ -208,7 +216,7 @@ export const SnakeEasyArticle: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.pasco.com/resources/articles/acid-base-chemistry"
+                        url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Acids_and_Bases/Acid/Overview_of_Acids_and_Bases"
                         text="Learn more about acids and bases!"
                     />
                 </div>
@@ -285,7 +293,7 @@ export const SnakeHardArticle: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://byjus.com/chemistry/london-dispersion-forces/"
+                        url="https://chem.libretexts.org/Bookshelves/General_Chemistry/General_Chemistry_Supplement_(Eames)/Phases_and_Intermolecular_Forces/London_Dispersion_Forces"
                         text="Learn more about London Dispersion Forces!"
                     />
                 </div>
@@ -309,8 +317,8 @@ export const SnakeHardArticle: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.masterorganicchemistry.com/2025/10/17/dipole-moments-and-dipoles/"
-                        text="Learn more about dipoles!"
+                        url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Physical_Properties_of_Matter/Atomic_and_Molecular_Properties/Intermolecular_Forces/Specific_Interactions/Dipole-Dipole_Interactions"
+                        text="Learn more about Dipole-Dipole!"
                     />
                 </div>
 
@@ -339,14 +347,14 @@ export const SnakeHardArticle: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.chem.purdue.edu/gchelp/liquids/hbond.html"
+                        url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Physical_Properties_of_Matter/Atomic_and_Molecular_Properties/Intermolecular_Forces/Specific_Interactions/Hydrogen_Bonding"
                         text="Learn more about Hydrogen Bonding!"
                     />
                 </div>
 
                 <div className="mb-10">
                     <CarbleLink
-                        url="https://www.khanacademy.org/test-prep/mcat/chemical-processes/covalent-bonds/a/intramolecular-and-intermolecular-forces"
+                        url="https://chem.libretexts.org/Bookshelves/General_Chemistry/Map%3A_Chemistry_-_The_Central_Science_(Brown_et_al.)/11%3A_Liquids_and_Intermolecular_Forces/11.02%3A_Intermolecular_Forces"
                         text="Learn more about intermolecular forces!"
                     />
                 </div>
@@ -377,6 +385,13 @@ export const SnakeHardArticle: Article = () => {
                     <li>NH₄⁺</li>
                 </ul>
 
+                <div className="mb-7">
+                    <CarbleLink
+                        url="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(CK-12)/07%3A_Chemical_Nomenclature/7.03%3A_Cations"
+                        text="Learn more about cations!"
+                    />
+                </div>
+
                 <h3 className="font-semibold">Anion</h3>
                 <p className="mb-2">
                     An <strong>anion</strong> has a <strong>negative</strong> charge due to
@@ -393,8 +408,8 @@ export const SnakeHardArticle: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.geeksforgeeks.org/chemistry/cations-vs-anions/"
-                        text="Learn more about cations and anions!"
+                        url="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(CK-12)/07%3A_Chemical_Nomenclature/7.09%3A_Polyatomic_Ions"
+                        text="Learn more about polyatomic ions!"
                     />
                 </div>
 
@@ -424,7 +439,7 @@ export const SnakeHardArticle: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://byjus.com/chemistry/atoms-and-molecules/"
+                        url="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Chemistry_for_Changing_Times_(Hill_and_McCreary)/02%3A_Atoms/2.06%3A_Atoms_and_Molecules-_Real_and_Relevant"
                         text="Learn more about atoms and molecules!"
                     />
                 </div>
@@ -449,7 +464,7 @@ export const SnakeHardArticle: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.britannica.com/science/ionic-compound"
+                        url="https://chem.libretexts.org/Courses/Mt._San_Antonio_College/Chem_10_-_Chemistry_for_Allied_Health_Majors_(1st_semester)/04%3A_Ionic_Compounds/4.09%3A_Naming_Ionic_Compounds"
                         text="Learn more about ionic compounds!"
                     />
                 </div>
@@ -481,7 +496,7 @@ export const SnakeHardArticle: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.pasco.com/resources/articles/acid-base-chemistry"
+                        url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Acids_and_Bases/Acid/Overview_of_Acids_and_Bases"
                         text="Learn more about acids and bases!"
                     />
                 </div>

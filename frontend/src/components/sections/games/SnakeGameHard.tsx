@@ -8,13 +8,13 @@ const COMPOUNDS = [
   { formula: "CaCl₂", name: "calcium chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
   { formula: "Al₂O₃", name: "aluminum oxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
   { formula: "FeO", name: "iron (II) oxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
-  { formula: "Fe₂O₃", name: "iron (III) oxide (also ferric oxide)", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "Fe₂O₃", name: "iron (III) oxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
   { formula: "CuCl", name: "copper (I) chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
   { formula: "CuCl₂", name: "copper (II) chloride", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
 
   { formula: "Ca(OH)₂", name: "calcium hydroxide", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
   { formula: "(NH₄)₂SO₄", name: "ammonium sulfate", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
-  { formula: "NaHCO₃", name: "sodium hydrogen carbonate (or sodium bicarbonate)", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
+  { formula: "NaHCO₃", name: "sodium hydrogen carbonate", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
   { formula: "K₂Cr₂O₇", name: "potassium dichromate", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
 
   { formula: "CO", name: "carbon monoxide", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: false } },
@@ -45,7 +45,7 @@ const COMPOUNDS = [
   { formula: "C₄H₁₀", name: "butane", imf: { londonDispersion: true, dipoleDipole: false, hydrogenBonding: false } },
 
   { formula: "C₆H₁₂O₆", name: "glucose", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true } },
-  { formula: "C₂H₅OH", name: "ethanol (ethyl alcohol)", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true } },
+  { formula: "C₂H₅OH", name: "ethanol", imf: { londonDispersion: true, dipoleDipole: true, hydrogenBonding: true } },
 ];
 
 
@@ -84,6 +84,7 @@ export default function SnakeGame() {
   const [msg, setMsg] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [reverseMode, setReverseMode] = useState(false);
 
 
   const randPos = (size = 2) => ({
@@ -119,33 +120,10 @@ export default function SnakeGame() {
     });
   };
 
-  /*const pickNewPrompt = () => {
-    setApples(prev => {
-        if (prev.length === 0) return prev;
-
-        const choices = prev
-        .map(a => a.compound)
-        .filter(c => !used.has(c.formula));
-
-        if (choices.length === 0) {
-        setRunning(false);
-        setMsg("You Lost!");
-        setPrompt(null);
-        return prev;
-        }
-
-        const chosen = choices[Math.floor(Math.random() * choices.length)];
-        setPrompt(chosen);
-        return prev;
-    });
-  };*/
-
   const pickNewPrompt = () => {
     const next = IMF_PROMPTS[Math.floor(Math.random() * IMF_PROMPTS.length)];
     setPrompt(next);
   };
-
-
 
   const spawnApples = () => {
     setApples(prev => {
@@ -184,13 +162,11 @@ export default function SnakeGame() {
     setRunning(true);
     setFeedback(null);
 
-    // 🔑 Immediately initialize game state
     setTimeout(() => {
         spawnApples();
         pickNewPrompt();
     }, 0);
   };
-
 
   const handleKey = (e: KeyboardEvent) => {
     e.preventDefault();
@@ -262,11 +238,6 @@ export default function SnakeGame() {
           })
         );
 
-        //if (ate) {
-        //  spawnApples();
-        //  pickNewPrompt();
-        //}
-
         return [head, ...prev].slice(0, Math.floor(snakeLength));
       });
     }, 200);
@@ -303,35 +274,47 @@ export default function SnakeGame() {
     });
 
     apples.forEach(a => {
-      ctx.fillStyle = "#ff4c4c";
+      const centerX = (a.x + a.size / 2) * CELL_SIZE;
+      const centerY = (a.y + a.size / 2) * CELL_SIZE;
+      const radius = (a.size / 2) * CELL_SIZE;
+
       ctx.beginPath();
-      ctx.arc(
-        (a.x + a.size / 2) * CELL_SIZE,
-        (a.y + a.size / 2) * CELL_SIZE,
-        (a.size / 2) * CELL_SIZE,
-        0,
-        Math.PI * 2
-      );
+      ctx.fillStyle = "#ff4c4c";
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
       ctx.fill();
+
       ctx.fillStyle = "#000";
-      ctx.font = "14px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(
-        a.compound.formula,
-        (a.x + a.size / 2) * CELL_SIZE,
-        (a.y + a.size / 2) * CELL_SIZE
-      );
-    });
+      ctx.font = "13px Arial";
 
-    ctx.fillStyle = "#000";
-    ctx.font = "14px Arial";
-    ctx.textAlign = "right";
-    ctx.fillText(
-      `Snake Length: ${snakeLength}`,
-      GRID_SIZE * CELL_SIZE - 10,
-      GRID_SIZE * CELL_SIZE - 10
-    );
+      const text = reverseMode
+        ? a.compound.name   // <-- name in reverse mode
+        : a.compound.formula; // <-- formula in normal mode
+
+      const maxWidth = radius * 1.6;
+      const words = text.split(" ");
+      const lines: string[] = [];
+      let currentLine = words[0] || "";
+
+      for (let i = 1; i < words.length; i++) {
+        const testLine = currentLine + " " + words[i];
+        if (ctx.measureText(testLine).width < maxWidth) {
+          currentLine = testLine;
+        } else {
+          lines.push(currentLine);
+          currentLine = words[i];
+        }
+      }
+      lines.push(currentLine);
+
+      const lineHeight = 13;
+      const startY = centerY - ((lines.length - 1) * lineHeight) / 2;
+
+      lines.forEach((line, index) => {
+        ctx.fillText(line, centerX, startY + index * lineHeight);
+      });
+    });
   }, [snake, apples, snakeLength]);
 
   useEffect(() => {
@@ -341,12 +324,10 @@ export default function SnakeGame() {
         setApples(prev => {
         let next = [...prev];
 
-        // 30% chance to remove a random apple (never drop below MIN_APPLES)
         if (next.length > MIN_APPLES && Math.random() < 0.3) {
             next.splice(Math.floor(Math.random() * next.length), 1);
         }
 
-        // 50% chance to add a new apple
         if (Math.random() < 0.5) {
             const c = unusedCompound();
             if (c) {
@@ -364,7 +345,7 @@ export default function SnakeGame() {
 
         return next;
         });
-    }, 1200 + Math.random() * 1200); // random timing
+    }, 1200 + Math.random() * 1200);
 
     return () => clearInterval(interval);
   }, [running]);
@@ -377,10 +358,9 @@ export default function SnakeGame() {
       let next = [...prev];
       const existing = new Set(next.map(a => a.compound.formula));
 
-      // random removal (never remove prompt apple)
       if (next.length > MIN_APPLES && Math.random() < 0.35 && prompt) {
         const removable = next.filter(
-          a => !a.compound.imf[prompt.key] // keep apples that do NOT match the current IMF prompt
+          a => !a.compound.imf[prompt.key]
         );
 
         if (removable.length) {
@@ -389,8 +369,6 @@ export default function SnakeGame() {
         }
       }
 
-
-      // random addition
       if (
         next.length < MAX_APPLES &&
         Math.random() < 0.45
@@ -424,7 +402,6 @@ export default function SnakeGame() {
         setApples(prev => {
         if (prev.length <= MIN_APPLES) return prev;
 
-        // candidates that are NOT the prompt
         const removable = prev.filter(
           a => !(prompt && a.compound.imf[prompt.key])
         );
@@ -432,7 +409,6 @@ export default function SnakeGame() {
 
         if (removable.length === 0) return prev;
 
-        // 30% chance to remove one
         if (Math.random() < 0.3) {
             const remove = removable[Math.floor(Math.random() * removable.length)];
             return prev.filter(a => a !== remove);
@@ -445,13 +421,32 @@ export default function SnakeGame() {
     return () => clearInterval(interval);
   }, [running, prompt]);
 
-
-
   return (
     <div className="flex flex-col items-center p-6">
-      <div className="text-2xl font-bold mb-2">
-        Find: {prompt?.label ?? "Press Space"}
+      <div className="text-2xl font-extrabold mb-3 text-center">
+        <div className="flex items-center justify-center gap-6 mb-4">
+          <button
+            onClick={() => setReverseMode(prev => !prev)}
+            className="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg shadow hover:bg-indigo-700 transition"
+          >
+            {reverseMode ? "Name Mode" : "Formula Mode"}
+          </button>
+
+          <div className="text-2xl font-extrabold text-center">
+            {prompt ? (
+              <>
+                Find the substance with the IMF:{" "}
+                <span className="text-blue-600">
+                  {prompt.label}
+                </span>
+              </>
+            ) : (
+              "Press Space"
+            )}
+          </div>
+        </div>
       </div>
+      
       <div
         className="relative"
         style={{
@@ -459,17 +454,39 @@ export default function SnakeGame() {
             height: GRID_SIZE * CELL_SIZE,
         }}
         >
-        <canvas
-            ref={canvasRef}
-            width={GRID_SIZE * CELL_SIZE}
-            height={GRID_SIZE * CELL_SIZE}
-            className={`border-4 border-gray-600 ${
-            !running && msg ? "opacity-40" : ""
-            }`}
-        />
-        <div className="mt-4 text-xl font-bold text-center text-black">
-          {feedback}
+        <div className="flex items-start gap-6">
+          <canvas
+              ref={canvasRef}
+              width={GRID_SIZE * CELL_SIZE}
+              height={GRID_SIZE * CELL_SIZE}
+              className={`border-4 border-gray-600 ${
+              !running && msg ? "opacity-40" : ""
+              }`}
+          />
+
+          <div className="text-2xl font-extrabold text-emerald-700">
+            Snake Length: {snakeLength}
+
+            <div
+              className={`text-2xl font-bold ${
+                feedback?.includes("Correct")
+                  ? "text-green-600"
+                  : feedback?.includes("Wrong")
+                  ? "text-red-600"
+                  : ""
+              }`}
+            >
+              {feedback}
+            </div>
+          </div>
         </div>
+
+        <div
+          className="flex justify-between items-center mt-3 w-full"
+          style={{ width: GRID_SIZE * CELL_SIZE }}
+        >
+        </div>
+
         {!running && msg && (
             <div className="absolute inset-0 flex flex-col items-center justify-center">
             <div className="bg-black/70 text-white px-8 py-6 rounded-xl text-center">

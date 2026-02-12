@@ -185,7 +185,7 @@ export const CarbleHardArticle: Article = () => {
                     and <strong>increases</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
-                    <Image src="https://general.chemistrysteps.com/wp-content/uploads/2023/11/Atomic-Radius-and-periodic-table.png" alt="Atomic Radius Diagram" height={500} width={300} />
+                    <Image src="/atomic radius diagram.png" alt="Atomic Radius Diagram" height={500} width={300} />
                 </p>
 
                 <h3 className="font-semibold">(1st) Ionization Energy</h3>
@@ -208,7 +208,7 @@ export const CarbleHardArticle: Article = () => {
                     and <strong>decreases</strong> as you move top → bottom <strong> down a group</strong>.
                 </p>
                 <p className="italic text-gray-600">
-                    <Image src="https://media.geeksforgeeks.org/wp-content/uploads/20230310125901/ionization-energy-trend.png" alt="First Ionization Energy Diagram" height={500} width={350} />
+                    <Image src="/first ionization energy diagram.png" alt="First Ionization Energy Diagram" height={500} width={350} />
                 </p>
 
                 <h3 className="font-semibold mt-5">Electronegativity</h3>
@@ -231,7 +231,7 @@ export const CarbleHardArticle: Article = () => {
                     and <strong>decreases</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
                 <p className="italic text-gray-600 mb-4">
-                    <Image src="https://media.geeksforgeeks.org/wp-content/uploads/20231207124854/Periodic-Table-Electronegativity-1.png" alt="Electronegativity Diagram" height={500} width={300} />
+                    <Image src="/electronegativity diagram.png" alt="Electronegativity Diagram" height={500} width={300} />
                 </p>
                 <div className="mb-7 mt-3">
                     <CarbleLink url="https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Supplemental_Modules_and_Websites_(Inorganic_Chemistry)/Descriptive_Chemistry/Periodic_Trends_of_Elemental_Properties/Periodic_Trends" text="Learn more about atomic radius, electronegativity, 1st ionization energy, and other periodic trends!"></CarbleLink>

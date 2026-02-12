@@ -33,7 +33,7 @@ export const EasyArticle2048: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.khanacademy.org/science/hs-chemistry/x2613d8165d88df5e:stoichiometry/x2613d8165d88df5e:the-mole/a/the-mole"
+                        url="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/The_Basics_of_General_Organic_and_Biological_Chemistry_(Ball_et_al.)/06%3A_Quantities_in_Chemical_Reactions/6.01%3A_The_Mole"
                         text="Learn more about the mole!"
                     />
                 </div>
@@ -58,7 +58,7 @@ export const EasyArticle2048: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://chem.libretexts.org/Bookshelves/General_Chemistry/Introductory_Chemistry_(LibreTexts)/03%3A_Measurements/3.07%3A_Molar_Mass"
+                        url="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(CK-12)/10%3A_The_Mole/10.03%3A_Molar_Mass"
                         text="Learn more about molar mass!"
                     />
                 </div>
@@ -97,7 +97,7 @@ export const EasyArticle2048: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.britannica.com/science/molarity"
+                        url="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(CK-12)/16%3A_Solutions/16.08%3A_Molarity"
                         text="Learn more about molarity!"
                     />
                 </div>
@@ -122,7 +122,7 @@ export const EasyArticle2048: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.khanacademy.org/science/hs-chemistry/x2613d8165d88df5e:solutions-and-molarity/x2613d8165d88df5e:dilution/a/dilution"
+                        url="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(LibreTexts)/13%3A_Solutions/13.07%3A_Solution_Dilution"
                         text="Learn more about dilution!"
                     />
                 </div>
@@ -191,7 +191,7 @@ export const HardArticle2048: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.khanacademy.org/science/ap-chemistry-beta/x2eef969c74e0d802:gases-and-kinetic-molecular-theory/x2eef969c74e0d802:boyles-law/v/boyle-s-law"
+                        url="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(CK-12)/14%3A_The_Behavior_of_Gases/14.03%3A_Boyle's_Law"
                         text="Learn more about Boyle’s Law!"
                     />
                 </div>
@@ -218,7 +218,7 @@ export const HardArticle2048: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Physical_Properties_of_Matter/States_of_Matter/Properties_of_Gases/Charles'_Law"
+                        url="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(CK-12)/14%3A_The_Behavior_of_Gases/14.04%3A_Charles's_Law"
                         text="Learn more about Charles’s Law!"
                     />
                 </div>
@@ -241,7 +241,7 @@ export const HardArticle2048: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.britannica.com/science/Gay-Lussacs-law"
+                        url="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(CK-12)/14%3A_The_Behavior_of_Gases/14.05%3A_Gay-Lussac's_Law"
                         text="Learn more about Gay-Lussac’s Law!"
                     />
                 </div>
@@ -264,7 +264,7 @@ export const HardArticle2048: Article = () => {
 
                 <div className="mb-7">
                     <CarbleLink
-                        url="https://www.khanacademy.org/science/ap-chemistry-beta/x2eef969c74e0d802:gases-and-kinetic-molecular-theory/x2eef969c74e0d802:avogadros-law/v/avogadro-s-law"
+                        url="https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(CK-12)/14%3A_The_Behavior_of_Gases/14.07%3A_Avogadro's_Law"
                         text="Learn more about Avogadro’s Law!"
                     />
                 </div>
@@ -306,7 +306,7 @@ export const HardArticle2048: Article = () => {
 
                 <div className="mb-3">
                     <CarbleLink
-                        url="https://chem.libretexts.org/Bookshelves/General_Chemistry/Introductory_Chemistry_(Liberman)/09%3A_Gases/9.03%3A_The_Ideal_Gas_Law"
+                        url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Physical_Properties_of_Matter/States_of_Matter/Properties_of_Gases/Gas_Laws/The_Ideal_Gas_Law"
                         text="Learn more about the Ideal Gas Law!"
                     />
                 </div>
