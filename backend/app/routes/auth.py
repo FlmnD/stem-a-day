@@ -1,3 +1,4 @@
+from sqlalchemy import select, func
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
@@ -15,14 +16,23 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/register", response_model=TokenOut, status_code=status.HTTP_201_CREATED)
 def register(payload: RegisterIn, db: Session = Depends(get_db)):
     email = payload.email.lower().strip()
+    username = payload.username.strip()
 
-    existing = db.execute(select(User).where(
-        User.email == email)).scalar_one_or_none()
-    if existing:
+    existing_email = db.execute(
+        select(User).where(User.email == email)
+    ).scalar_one_or_none()
+    if existing_email:
         raise HTTPException(status_code=409, detail="Email already in use")
+
+    existing_username = db.execute(
+        select(User).where(func.lower(User.username) == username.lower())
+    ).scalar_one_or_none()
+    if existing_username:
+        raise HTTPException(status_code=409, detail="Username already in use")
 
     user = User(
         email=email,
+        username=username,
         password=hash_password(payload.password),
     )
     db.add(user)

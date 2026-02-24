@@ -3,14 +3,15 @@ from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 
 
-class UserCreate(BaseModel):
-    email: EmailStr
-    password: str = Field(min_length=8)
+# class UserCreate(BaseModel):
+#     email: EmailStr
+#     password: str = Field(min_length=8)
 
 
 class UserRead(BaseModel):
     id: int
     email: EmailStr
+    username: str
     streak: int
     glucose: int
     is_email_verified: bool
