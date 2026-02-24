@@ -1,363 +1,251 @@
-'use client';
-import { useEffect, useState } from "react";
+'use client'
+import React, { useState } from "react";
 
-type TileKind =
-  | "P" | "V"
-  | "n" | "T" | "R"
-  | "PV"
-  | "nR" | "nT" | "RT"
-  | "nRT"
-  | "EQUAL";
 
-interface Tile {
+type GasVar =
+  | 'P₁' | 'V₁' | 'T₁'
+  | 'P₂' | 'V₂' | 'T₂'
+  | 'n₁' | 'n₂'
+  | '1/T₁' | '1/T₂'
+  | '1/n₁' | '1/n₂'
+  | 'P' | 'V' | 'T' | 'n' | 'R';
+
+type Rotation = 0 | 1 | 2 | 3;
+
+interface Domino {
   id: number;
-  kind: TileKind;
-  value: number;
-  left?: number;
-  right?: number;
+  sides: [GasVar, GasVar];
+  rotation: Rotation;
+  x: number | null;
+  y: number | null;
 }
 
-const SIZE = 4;
-let idCounter = 0;
+interface Region {
+  id: string;
+  label: string;
+  cells: { x: number; y: number }[];
+  required: GasVar[];
+  color: string;
+}
 
-const COLORS: Record<TileKind, string> = {
-  P: "bg-blue-500",
-  V: "bg-blue-500",
-  n: "bg-green-500",
-  T: "bg-green-500",
-  R: "bg-green-500",
-  PV: "bg-orange-500",
-  nR: "bg-orange-500",
-  nT: "bg-orange-500",
-  RT: "bg-orange-500",
-  nRT: "bg-orange-500",
-  EQUAL: "bg-red-500",
-};
 
-const SPAWNABLE: TileKind[] = ["P", "V", "n", "T", "R"];
+const GRID = 10;
+const CELL = 55;
 
-const VALUES: Record<TileKind, number[]> = {
-  P: [1, 2, 5],
-  V: [2, 5, 10],
-  n: [1, 2, 5],
-  T: [100, 200, 500],
-  R: [0.1],
-  PV: [],
-  nR: [],
-  nT: [],
-  RT: [],
-  nRT: [],
-  EQUAL: [],
-};
+const MAP = [
+  {x:2,y:2},{x:3,y:2},{x:4,y:2},{x:5,y:2},{x:6,y:2},
+  {x:2,y:3},{x:3,y:3},{x:4,y:3},{x:5,y:3},{x:6,y:3},
+  {x:2,y:4},{x:3,y:4},{x:4,y:4},{x:5,y:4},{x:6,y:4},
+  {x:3,y:5},{x:4,y:5},{x:5,y:5},{x:4,y:6},{x:5,y:6}
+];
 
-const emptyGrid = () =>
-  Array.from({ length: SIZE }, () => Array(SIZE).fill(null));
+const insideMap = (x:number,y:number)=>
+  MAP.some(c=>c.x===x&&c.y===y);
 
-const round6 = (n: number) => Number(n.toPrecision(6));
 
-export default function Game2048GasLaws() {
-  const [grid, setGrid] = useState<(Tile | null)[][]>(emptyGrid);
-  const [started, setStarted] = useState(false);
-  const [gameOver, setGameOver] = useState(false);
-  const [win, setWin] = useState(false);
-  const [pending, setPending] = useState<{ left: number; right: number } | null>(null);
-  const [keyLocked, setKeyLocked] = useState(false);
+const REGIONS: Region[] = [
+  { id:"B1", label:"B1", color:"#fca5a5",
+    cells:[{x:2,y:2},{x:3,y:2}],
+    required:['P₁','V₁']
+  },
+  { id:"B2", label:"B2", color:"#f87171",
+    cells:[{x:4,y:2},{x:5,y:2}],
+    required:['P₂','V₂']
+  },
+  { id:"Ch1", label:"Ch1", color:"#93c5fd",
+    cells:[{x:2,y:3},{x:3,y:3}],
+    required:['V₁','1/T₁']
+  },
+  { id:"Ch2", label:"Ch2", color:"#60a5fa",
+    cells:[{x:4,y:3},{x:5,y:3}],
+    required:['V₂','1/T₂']
+  },
+  { id:"GL1", label:"GL1", color:"#c4b5fd",
+    cells:[{x:2,y:4},{x:3,y:4}],
+    required:['P₁','1/T₁']
+  },
+  { id:"GL2", label:"GL2", color:"#a78bfa",
+    cells:[{x:4,y:4},{x:5,y:4}],
+    required:['P₂','1/T₂']
+  },
+  { id:"A1", label:"A1", color:"#86efac",
+    cells:[{x:3,y:5},{x:4,y:5}],
+    required:['V₁','1/n₁']
+  },
+  { id:"A2", label:"A2", color:"#4ade80",
+    cells:[{x:5,y:5},{x:4,y:6}],
+    required:['V₂','1/n₂']
+  },
+];
 
-  function startGame() {
-    let g = emptyGrid();
-    g = spawnTile(g, "right");
-    g = spawnTile(g, "right");
-    setGrid(g);
-    setStarted(true);
-    setGameOver(false);
-    setWin(false);
-    setPending(null);
-  }
 
-  useEffect(() => {
-    startGame();
-  }, []);
+const INITIAL: Domino[] = [
+  {id:1,sides:['P₁','V₁'],rotation:0,x:null,y:null},
+  {id:2,sides:['P₂','V₂'],rotation:0,x:null,y:null},
+  {id:3,sides:['V₁','1/T₁'],rotation:0,x:null,y:null},
+  {id:4,sides:['V₂','1/T₂'],rotation:0,x:null,y:null},
+  {id:5,sides:['P','V'],rotation:0,x:null,y:null},
+  {id:6,sides:['n','R'],rotation:0,x:null,y:null},
+  {id:7,sides:['1/n₁','1/n₂'],rotation:0,x:null,y:null},
+  {id:8,sides:['T','n'],rotation:0,x:null,y:null},
+];
 
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (pending) return;
 
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-        e.preventDefault();
-        if (keyLocked || !started || gameOver || win) return;
-        setKeyLocked(true);
-        const dir = e.key.replace("Arrow", "").toLowerCase() as Direction;
-        const moved = moveGrid(grid, dir);
-        if (moved.changed) setGrid(spawnTile(moved.grid, dir));
-      }
+export default function GasLawPips(){
 
-      if (e.code === "Space") startGame();
-    };
+  const [dominos,setDominos]=useState(INITIAL);
+  const [dragId,setDragId]=useState<number|null>(null);
+  const [msg]=useState("Drag and rotate dominoes into the grey map.");
 
-    const up = () => setKeyLocked(false);
+  const occupied=(d:Domino)=>{
+    if(d.x===null||d.y===null) return [];
+    let tx=d.x, ty=d.y;
+    if(d.rotation===0) tx++;
+    else if(d.rotation===1) ty++;
+    else if(d.rotation===2) tx--;
+    else ty--;
+    return [
+      {x:d.x,y:d.y,val:d.sides[0]},
+      {x:tx,y:ty,val:d.sides[1]}
+    ];
+  };
 
-    window.addEventListener("keydown", down);
-    window.addEventListener("keyup", up);
-    return () => {
-      window.removeEventListener("keydown", down);
-      window.removeEventListener("keyup", up);
-    };
-  }, [grid, keyLocked, started, gameOver, win]);
+  const drop=(e:React.DragEvent,x:number,y:number)=>{
+    e.preventDefault();
+    if(dragId===null) return;
 
-  type Direction = "left" | "right" | "up" | "down";
+    const d=dominos.find(d=>d.id===dragId);
+    if(!d) return;
 
-  function moveGrid(g: (Tile | null)[][], dir: Direction) {
-    let changed = false;
-    let newGrid = emptyGrid();
+    let tx=x, ty=y;
+    if(d.rotation===0) tx++;
+    else if(d.rotation===1) ty++;
+    else if(d.rotation===2) tx--;
+    else ty--;
 
-    const map = (i: number, j: number): [number, number] => {
-      if (dir === "left") return [i, j];
-      if (dir === "right") return [i, SIZE - 1 - j];
-      if (dir === "up") return [j, i];
-      return [SIZE - 1 - j, i];
-    };
-
-    for (let i = 0; i < SIZE; i++) {
-      let buffer: Tile[] = [];
-
-      for (let j = 0; j < SIZE; j++) {
-        const [r, c] = map(i, j);
-        const t = g[r][c];
-        if (t) buffer.push({ ...t });
-      }
-
-      let merged: Tile[] = [];
-      for (let k = 0; k < buffer.length; k++) {
-        const a = buffer[k];
-        const b = buffer[k + 1];
-
-        if (b && canMerge(a, b)) {
-          merged.push(merge(a, b));
-          k++;
-          changed = true;
-        } else {
-          merged.push(a);
-        }
-      }
-
-      for (let j = 0; j < SIZE; j++) {
-        const [r, c] = map(i, j);
-        newGrid[r][c] = merged[j] || null;
-        if (g[r][c] !== newGrid[r][c]) changed = true;
-      }
+    if(insideMap(x,y)&&insideMap(tx,ty)){
+      setDominos(prev=>prev.map(dom=>
+        dom.id===dragId?{...dom,x,y}:dom
+      ));
     }
+    setDragId(null);
+  };
 
-    return { grid: newGrid, changed };
-  }
-  const hasP = (k: TileKind) => k === "P" || k === "PV";
-  const hasV = (k: TileKind) => k === "V" || k === "PV";
+  const rotate=(id:number)=>{
+    setDominos(prev=>
+      prev.map(d=>
+        d.id===id
+          ? {...d,rotation:((d.rotation+1)%4)as Rotation}
+          : d
+      )
+    );
+  };
 
-  const hasN = (k: TileKind) => ["n", "nR", "nT", "nRT"].includes(k);
-  const hasR = (k: TileKind) => ["R", "nR", "RT", "nRT"].includes(k);
-  const hasT = (k: TileKind) => ["T", "nT", "RT", "nRT"].includes(k);
+  return(
+  <div className="flex flex-col items-center p-6 bg-white min-h-screen">
 
-  const countVars = (k: TileKind) =>
-    (hasN(k) ? 1 : 0) + (hasR(k) ? 1 : 0) + (hasT(k) ? 1 : 0);
+    <h1 className="text-xl font-bold mb-6">Gas Laws PIPS</h1>
 
-  function canMerge(a: Tile, b: Tile) {
-    if (a.kind === b.kind) return true;
-    if (
-      (a.kind === "P" || a.kind === "V" || a.kind === "PV") &&
-      (b.kind === "P" || b.kind === "V" || b.kind === "PV")
-    ) return true;
-    if (["n", "R", "T", "nR", "nT", "RT", "nRT"].includes(a.kind) &&
-        ["n", "R", "T", "nR", "nT", "RT", "nRT"].includes(b.kind))
-      return true;
-    if (
-      (a.kind === "PV" && b.kind === "nRT") ||
-      (a.kind === "nRT" && b.kind === "PV")
-    ) return true;
-    return false;
-  }
+    <div className="flex gap-8">
 
-  function merge(a: Tile, b: Tile): Tile {
-    //if (a.kind === "R" && b.kind === "R") {
-    //  return { id: idCounter++, kind: "R", value: 0.1 };
-    //}
+      <div className="relative border"
+        style={{width:GRID*CELL,height:GRID*CELL}}>
 
-    // SAME VARIABLE MERGES (n+n, T+T, R+R, etc.)
-    if (a.kind === b.kind && a.kind !== "PV" && a.kind !== "nRT") {
-      return {
-        id: idCounter++,
-        kind: a.kind,
-        value:
-          round6(a.value * b.value),
-      };
-    }
+        {MAP.map((c,i)=>(
+          <div key={i}
+            className="absolute bg-gray-200 border"
+            style={{
+              left:c.x*CELL,
+              top:c.y*CELL,
+              width:CELL,
+              height:CELL
+            }}
+          />
+        ))}
 
-    if (
-      ["n", "R", "T", "nR", "nT", "RT", "nRT"].includes(a.kind) &&
-      ["n", "R", "T", "nR", "nT", "RT", "nRT"].includes(b.kind)
-    ) {
-      const vars = {
-        n: hasN(a.kind) || hasN(b.kind),
-        R: hasR(a.kind) || hasR(b.kind),
-        T: hasT(a.kind) || hasT(b.kind),
-      };
+        {REGIONS.map(r=>
+          r.cells.map((c,i)=>(
+            <div key={r.id+i}
+              className="absolute text-[10px] font-bold flex items-end justify-end p-1"
+              style={{
+                left:c.x*CELL,
+                top:c.y*CELL,
+                width:CELL,
+                height:CELL,
+                background:r.color
+              }}
+            >
+              {i===0&&r.label}
+            </div>
+          ))
+        )}
 
-      let value = a.value;
+        <div className="absolute inset-0 grid"
+          style={{gridTemplateColumns:`repeat(${GRID},1fr)`}}>
+          {Array.from({length:GRID*GRID}).map((_,i)=>(
+            <div key={i}
+              onDragOver={e=>e.preventDefault()}
+              onDrop={e=>drop(e,i%GRID,Math.floor(i/GRID))}
+            />
+          ))}
+        </div>
 
-      //if (a.kind !== "R" && b.kind !== "R") {
-      value = round6(a.value * b.value);
-      //}
+        {dominos.map(d=>{
+          if(d.x===null||d.y===null) return null;
 
-      if (vars.n && vars.R && vars.T)
-        return { id: idCounter++, kind: "nRT", value };
+          const baseX=d.x;
+          const baseY=d.y;
+          const cells=occupied(d);
 
-      if (vars.n && vars.R)
-        return { id: idCounter++, kind: "nR", value };
-
-      if (vars.n && vars.T)
-        return { id: idCounter++, kind: "nT", value };
-
-      if (vars.R && vars.T)
-        return { id: idCounter++, kind: "RT", value };
-    }
-
-    if (
-      (hasP(a.kind) && hasV(b.kind)) ||
-      (hasV(a.kind) && hasP(b.kind))
-    ) {
-      return {
-        id: idCounter++,
-        kind: "PV",
-        value: round6(a.value * b.value),
-      };
-    }
-
-    //ERROR: T + T --> nRT, n + n --> nRT, R + R --> nRT
-    /*if (
-      (hasN(a.kind) || hasR(a.kind) || hasT(a.kind)) &&
-      (hasN(b.kind) || hasR(b.kind) || hasT(b.kind))
-    ) {
-      let value = a.value;
-
-      //if (a.kind !== "R" && b.kind !== "R") {
-      value = round6(a.value * b.value);
-      //}
-
-      return {
-        id: idCounter++,
-        kind: "nRT",
-        value,
-      };
-    }*/
-
-    const val = round6(a.value * b.value);
-
-    if (a.kind === b.kind) return { id: idCounter++, kind: a.kind, value: val };
-
-    if ((a.kind === "P" && b.kind === "V") || (a.kind === "V" && b.kind === "P"))
-      return { id: idCounter++, kind: "PV", value: val };
-
-    const pair = new Set([a.kind, b.kind]);
-
-    if (pair.has("n") && pair.has("R")) return { id: idCounter++, kind: "nR", value: val };
-    if (pair.has("n") && pair.has("T")) return { id: idCounter++, kind: "nT", value: val };
-    if (pair.has("R") && pair.has("T")) return { id: idCounter++, kind: "RT", value: val };
-
-    if (["nR", "nT", "RT"].includes(a.kind) || ["nR", "nT", "RT"].includes(b.kind))
-      return { id: idCounter++, kind: "nRT", value: val };
-
-    if ((a.kind === "PV" && b.kind === "nRT") || (a.kind === "nRT" && b.kind === "PV")) {
-      setPending({ left: a.value, right: b.value });
-      return {
-        id: idCounter++,
-        kind: "EQUAL",
-        value: a.value,
-        left: a.value,
-        right: b.value,
-      };
-    }
-
-    return a;
-  }
-
-  function spawnTile(g: (Tile | null)[][], dir: Direction) {
-    const copy = g.map(r => r.slice());
-    const spots: { r: number; c: number }[] = [];
-
-    for (let i = 0; i < SIZE; i++) {
-      for (let j = 0; j < SIZE; j++) {
-        const edge =
-          (dir === "left" && j === SIZE - 1) ||
-          (dir === "right" && j === 0) ||
-          (dir === "up" && i === SIZE - 1) ||
-          (dir === "down" && i === 0);
-        if (edge && !copy[i][j]) spots.push({ r: i, c: j });
-      }
-    }
-
-    if (!spots.length) return copy;
-    const { r, c } = spots[Math.floor(Math.random() * spots.length)];
-    const kind = SPAWNABLE[Math.floor(Math.random() * SPAWNABLE.length)];
-    const value = VALUES[kind][Math.floor(Math.random() * VALUES[kind].length)];
-    copy[r][c] = { id: idCounter++, kind, value };
-    return copy;
-  }
-
-  useEffect(() => {
-    if (!pending) return;
-    
-    const timeout = setTimeout(() => {
-      const left = Math.round(pending.left);
-      const right = Math.round(pending.right);
-      setKeyLocked(true);
-      if (left === right) {
-        setWin(true);
-      } else {
-        setGameOver(true);
-      }
-
-      setPending(null);
-    }, 700);
-
-    return () => clearTimeout(timeout);
-  }, [pending]);
-
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <h1 className="text-2xl font-bold">2048 Gas Laws</h1>
-
-      <p className="text-gray-600 font-semibold">
-        Press <span className="font-bold">SPACE</span> to restart
-      </p>
-
-      {gameOver && <p className="text-red-600 font-bold">Game Over</p>}
-      {win && <p className="text-green-600 font-bold">You Win</p>}
-
-      <div className="grid grid-cols-4 gap-2 bg-gray-300 p-2 rounded">
-        {grid.flat().map((cell, i) => (
-          <div
-            key={i}
-            className={`w-20 h-20 flex items-center justify-center rounded text-white font-bold ${
-              cell ? COLORS[cell.kind] : "bg-gray-100"
-            }`}
+          return(
+          <div key={d.id}
+            draggable
+            onDragStart={()=>setDragId(d.id)}
+            onClick={()=>rotate(d.id)}
+            className="absolute cursor-move"
+            style={{left:baseX*CELL,top:baseY*CELL}}
           >
-            {cell && (
-              <div className="text-center text-sm">
-                {cell.kind === "EQUAL" ? (
-                  <div className="text-xs leading-tight">
-                    {Math.round(cell.left!)} PV{" "}
-                    {Math.round(cell.left!) === Math.round(cell.right!) ? "=" : "!="}{" "}
-                    {Math.round(cell.right!)} nRT
-                  </div>
-                ) : (
-                  <>
-                    <div>{cell.kind}</div>
-                    <div>{cell.value}</div>
-                  </>
-                )}
+            {cells.map((o,i)=>(
+              <div key={i}
+                className="absolute bg-white border flex items-center justify-center font-bold"
+                style={{
+                  width:CELL-4,
+                  height:CELL-4,
+                  left:(o.x-baseX)*CELL+2,
+                  top:(o.y-baseY)*CELL+2
+                }}>
+                {o.val}
               </div>
-            )}
+            ))}
+          </div>
+          );
+        })}
+
+      </div>
+
+      <div className="w-60 border p-4 flex flex-wrap gap-4">
+        {dominos.map(d=>d.x===null&&(
+          <div key={d.id}
+            draggable
+            onDragStart={()=>setDragId(d.id)}
+            onClick={()=>rotate(d.id)}
+            className={`border bg-white flex cursor-pointer ${
+              d.rotation%2===1?'flex-col w-12 h-24':'flex-row w-24 h-12'
+            }`}>
+            <div className="flex-1 flex items-center justify-center font-bold">
+              {d.sides[0]}
+            </div>
+            <div className="flex-1 flex items-center justify-center font-bold border-l">
+              {d.sides[1]}
+            </div>
           </div>
         ))}
       </div>
+
     </div>
+
+    <div className="mt-6 font-semibold">{msg}</div>
+
+  </div>
   );
 }
