@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
+import SignOutButton from "@/components/auth/SignOutButton";
+
 
 type UserRead = {
     id: number;
@@ -134,6 +136,8 @@ export default async function SettingsPage() {
                     <Row label="Email" value={me.email} />
                     <Row label="Streak" value={`${me.streak}`} />
                     <Row label="Glucose" value={`${me.glucose}`} />
+
+                    <SignOutButton />
                 </div>
             </div>
         </section>
