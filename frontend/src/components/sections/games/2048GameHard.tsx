@@ -1,8 +1,6 @@
 'use client'
 import React, { useState } from "react";
 
-/* ---------------- TYPES ---------------- */
-
 type GasVar =
   | 'P₁' | 'V₁' | 'T₁'
   | 'P₂' | 'V₂' | 'T₂'
@@ -35,8 +33,6 @@ interface GameState {
   dominos:Domino[];
 }
 
-/* ---------------- CONSTANTS ---------------- */
-
 const GRID = 10;
 const CELL = 55;
 
@@ -54,19 +50,14 @@ const VAR_POOL: [GasVar,GasVar][] = [
   ['P','R'],
 ];
 
-/* ---------------- HELPERS ---------------- */
-
 const shuffle = <T,>(arr:T[]) =>
   [...arr].sort(()=>Math.random()-0.5);
 
 const inside = (cells:{x:number,y:number}[],x:number,y:number)=>
   cells.some(c=>c.x===x&&c.y===y);
 
-/* ---------------- GAME GENERATOR ---------------- */
-
 const generateGame = ():GameState => {
 
-  // 5–8 dominos
   const dominoCount = Math.floor(Math.random()*4)+5;
   const chosen = shuffle(VAR_POOL).slice(0,dominoCount);
 
@@ -74,7 +65,6 @@ const generateGame = ():GameState => {
   const regions:Region[]=[];
   const dominos:Domino[]=[];
 
-  // Start near center
   let cursor = {x:4,y:4};
   const used = new Set<string>();
 
@@ -150,8 +140,6 @@ const generateGame = ():GameState => {
     dominos:shuffle(dominos)
   };
 };
-
-/* ---------------- COMPONENT ---------------- */
 
 export default function GasLawPips(){
 
@@ -243,7 +231,6 @@ export default function GasLawPips(){
           height:GRID*CELL
         }}>
 
-        {/* Map Cells */}
         {game.mapCells.map((c,i)=>(
           <div key={i}
             className="absolute border"
@@ -257,7 +244,6 @@ export default function GasLawPips(){
           />
         ))}
 
-        {/* Regions */}
         {game.regions.map(r=>
           r.cells.map((c,i)=>(
             <div key={r.id+i}
@@ -276,7 +262,6 @@ export default function GasLawPips(){
           ))
         )}
 
-        {/* Drop Grid */}
         <div className="absolute inset-0 grid"
           style={{gridTemplateColumns:`repeat(${GRID},1fr)`}}>
           {Array.from({length:GRID*GRID}).map((_,i)=>(
@@ -287,7 +272,6 @@ export default function GasLawPips(){
           ))}
         </div>
 
-        {/* Placed Dominos */}
         {dominos.map(d=>{
           if(d.x===null||d.y===null) return null;
           const baseX=d.x;
@@ -320,7 +304,6 @@ export default function GasLawPips(){
 
       </div>
 
-      {/* Tray */}
       <div className="w-64 border p-4 flex flex-wrap gap-4">
         {dominos.map(d=>d.x===null&&(
           <div key={d.id}
