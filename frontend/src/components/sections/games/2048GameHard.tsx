@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from "react";
 
+/* ---------------- TYPES ---------------- */
 
 type GasVar =
   | 'P₁' | 'V₁' | 'T₁'
@@ -28,74 +29,135 @@ interface Region {
   color: string;
 }
 
+interface GameState {
+  mapCells:{x:number,y:number}[];
+  regions:Region[];
+  dominos:Domino[];
+}
+
+/* ---------------- CONSTANTS ---------------- */
 
 const GRID = 10;
 const CELL = 55;
 
-const MAP = [
-  {x:2,y:2},{x:3,y:2},{x:4,y:2},{x:5,y:2},{x:6,y:2},
-  {x:2,y:3},{x:3,y:3},{x:4,y:3},{x:5,y:3},{x:6,y:3},
-  {x:2,y:4},{x:3,y:4},{x:4,y:4},{x:5,y:4},{x:6,y:4},
-  {x:3,y:5},{x:4,y:5},{x:5,y:5},{x:4,y:6},{x:5,y:6}
+const VAR_POOL: [GasVar,GasVar][] = [
+  ['P₁','V₁'],
+  ['P₂','V₂'],
+  ['V₁','1/T₁'],
+  ['V₂','1/T₂'],
+  ['P₁','1/T₁'],
+  ['P₂','1/T₂'],
+  ['V₁','1/n₁'],
+  ['V₂','1/n₂'],
+  ['P','V'],
+  ['V','T'],
+  ['P','R'],
 ];
 
-const insideMap = (x:number,y:number)=>
-  MAP.some(c=>c.x===x&&c.y===y);
+/* ---------------- HELPERS ---------------- */
 
+const shuffle = <T,>(arr:T[]) =>
+  [...arr].sort(()=>Math.random()-0.5);
 
-const REGIONS: Region[] = [
-  { id:"B1", label:"B1", color:"#fca5a5",
-    cells:[{x:2,y:2},{x:3,y:2}],
-    required:['P₁','V₁']
-  },
-  { id:"B2", label:"B2", color:"#f87171",
-    cells:[{x:4,y:2},{x:5,y:2}],
-    required:['P₂','V₂']
-  },
-  { id:"Ch1", label:"Ch1", color:"#93c5fd",
-    cells:[{x:2,y:3},{x:3,y:3}],
-    required:['V₁','1/T₁']
-  },
-  { id:"Ch2", label:"Ch2", color:"#60a5fa",
-    cells:[{x:4,y:3},{x:5,y:3}],
-    required:['V₂','1/T₂']
-  },
-  { id:"GL1", label:"GL1", color:"#c4b5fd",
-    cells:[{x:2,y:4},{x:3,y:4}],
-    required:['P₁','1/T₁']
-  },
-  { id:"GL2", label:"GL2", color:"#a78bfa",
-    cells:[{x:4,y:4},{x:5,y:4}],
-    required:['P₂','1/T₂']
-  },
-  { id:"A1", label:"A1", color:"#86efac",
-    cells:[{x:3,y:5},{x:4,y:5}],
-    required:['V₁','1/n₁']
-  },
-  { id:"A2", label:"A2", color:"#4ade80",
-    cells:[{x:5,y:5},{x:4,y:6}],
-    required:['V₂','1/n₂']
-  },
-];
+const inside = (cells:{x:number,y:number}[],x:number,y:number)=>
+  cells.some(c=>c.x===x&&c.y===y);
 
+/* ---------------- GAME GENERATOR ---------------- */
 
-const INITIAL: Domino[] = [
-  {id:1,sides:['P₁','V₁'],rotation:0,x:null,y:null},
-  {id:2,sides:['P₂','V₂'],rotation:0,x:null,y:null},
-  {id:3,sides:['V₁','1/T₁'],rotation:0,x:null,y:null},
-  {id:4,sides:['V₂','1/T₂'],rotation:0,x:null,y:null},
-  {id:5,sides:['P','V'],rotation:0,x:null,y:null},
-  {id:6,sides:['n','R'],rotation:0,x:null,y:null},
-  {id:7,sides:['1/n₁','1/n₂'],rotation:0,x:null,y:null},
-  {id:8,sides:['T','n'],rotation:0,x:null,y:null},
-];
+const generateGame = ():GameState => {
 
+  // 5–8 dominos
+  const dominoCount = Math.floor(Math.random()*4)+5;
+  const chosen = shuffle(VAR_POOL).slice(0,dominoCount);
+
+  const mapCells:{x:number,y:number}[]=[];
+  const regions:Region[]=[];
+  const dominos:Domino[]=[];
+
+  // Start near center
+  let cursor = {x:4,y:4};
+  const used = new Set<string>();
+
+  const directions = [
+    {x:1,y:0},
+    {x:-1,y:0},
+    {x:0,y:1},
+    {x:0,y:-1},
+  ];
+
+  for(let i=0;i<dominoCount;i++){
+
+    let placed=false;
+    let attempts=0;
+
+    while(!placed && attempts<200){
+
+      attempts++;
+
+      const dir = directions[Math.floor(Math.random()*4)];
+      const nx = cursor.x + dir.x;
+      const ny = cursor.y + dir.y;
+
+      const key1 = `${cursor.x},${cursor.y}`;
+      const key2 = `${nx},${ny}`;
+
+      if(
+        nx>1 && nx<GRID-2 &&
+        ny>1 && ny<GRID-2 &&
+        !used.has(key1) &&
+        !used.has(key2)
+      ){
+        used.add(key1);
+        used.add(key2);
+
+        const cells=[
+          {x:cursor.x,y:cursor.y},
+          {x:nx,y:ny}
+        ];
+
+        mapCells.push(...cells);
+
+        regions.push({
+          id:`R${i}`,
+          label:`R${i+1}`,
+          cells,
+          required:chosen[i],
+          color:`hsl(${Math.random()*360},70%,75%)`
+        });
+
+        dominos.push({
+          id:i+1,
+          sides:chosen[i],
+          rotation:0,
+          x:null,
+          y:null
+        });
+
+        cursor = {x:nx,y:ny};
+        placed=true;
+      } else {
+        cursor={
+          x:Math.floor(Math.random()*6)+2,
+          y:Math.floor(Math.random()*6)+2
+        };
+      }
+    }
+  }
+
+  return {
+    mapCells,
+    regions,
+    dominos:shuffle(dominos)
+  };
+};
+
+/* ---------------- COMPONENT ---------------- */
 
 export default function GasLawPips(){
 
-  const [dominos,setDominos]=useState(INITIAL);
+  const [game,setGame]=useState<GameState>(generateGame());
+  const [dominos,setDominos]=useState(game.dominos);
   const [dragId,setDragId]=useState<number|null>(null);
-  const [msg]=useState("Drag and rotate dominoes into the grey map.");
 
   const occupied=(d:Domino)=>{
     if(d.x===null||d.y===null) return [];
@@ -108,6 +170,14 @@ export default function GasLawPips(){
       {x:d.x,y:d.y,val:d.sides[0]},
       {x:tx,y:ty,val:d.sides[1]}
     ];
+  };
+
+  const regionMatch=(d:Domino,x:number,y:number)=>{
+    const region = game.regions.find(r =>
+      r.cells.some(c=>c.x===x&&c.y===y)
+    );
+    if(!region) return false;
+    return region.required.every(req => d.sides.includes(req));
   };
 
   const drop=(e:React.DragEvent,x:number,y:number)=>{
@@ -123,11 +193,16 @@ export default function GasLawPips(){
     else if(d.rotation===2) tx--;
     else ty--;
 
-    if(insideMap(x,y)&&insideMap(tx,ty)){
+    if(
+      inside(game.mapCells,x,y) &&
+      inside(game.mapCells,tx,ty) &&
+      regionMatch(d,x,y)
+    ){
       setDominos(prev=>prev.map(dom=>
         dom.id===dragId?{...dom,x,y}:dom
       ));
     }
+
     setDragId(null);
   };
 
@@ -141,29 +216,49 @@ export default function GasLawPips(){
     );
   };
 
+  const newGame=()=>{
+    const g=generateGame();
+    setGame(g);
+    setDominos(g.dominos);
+  };
+
   return(
   <div className="flex flex-col items-center p-6 bg-white min-h-screen">
 
-    <h1 className="text-xl font-bold mb-6">Gas Laws PIPS</h1>
+    <h1 className="text-xl font-bold mb-4">Gas Laws PIPS</h1>
+
+    <button
+      onClick={newGame}
+      className="mb-6 px-4 py-2 bg-blue-600 text-white rounded"
+    >
+      New Game
+    </button>
 
     <div className="flex gap-8">
 
-      <div className="relative border"
-        style={{width:GRID*CELL,height:GRID*CELL}}>
+      <div
+        className="relative border-4 border-gray-600 bg-[#e5e7eb]"
+        style={{
+          width:GRID*CELL,
+          height:GRID*CELL
+        }}>
 
-        {MAP.map((c,i)=>(
+        {/* Map Cells */}
+        {game.mapCells.map((c,i)=>(
           <div key={i}
-            className="absolute bg-gray-200 border"
+            className="absolute border"
             style={{
               left:c.x*CELL,
               top:c.y*CELL,
               width:CELL,
-              height:CELL
+              height:CELL,
+              background:"#b7a99a"
             }}
           />
         ))}
 
-        {REGIONS.map(r=>
+        {/* Regions */}
+        {game.regions.map(r=>
           r.cells.map((c,i)=>(
             <div key={r.id+i}
               className="absolute text-[10px] font-bold flex items-end justify-end p-1"
@@ -172,7 +267,8 @@ export default function GasLawPips(){
                 top:c.y*CELL,
                 width:CELL,
                 height:CELL,
-                background:r.color
+                background:r.color,
+                border:"2px solid black"
               }}
             >
               {i===0&&r.label}
@@ -180,6 +276,7 @@ export default function GasLawPips(){
           ))
         )}
 
+        {/* Drop Grid */}
         <div className="absolute inset-0 grid"
           style={{gridTemplateColumns:`repeat(${GRID},1fr)`}}>
           {Array.from({length:GRID*GRID}).map((_,i)=>(
@@ -190,9 +287,9 @@ export default function GasLawPips(){
           ))}
         </div>
 
+        {/* Placed Dominos */}
         {dominos.map(d=>{
           if(d.x===null||d.y===null) return null;
-
           const baseX=d.x;
           const baseY=d.y;
           const cells=occupied(d);
@@ -223,7 +320,8 @@ export default function GasLawPips(){
 
       </div>
 
-      <div className="w-60 border p-4 flex flex-wrap gap-4">
+      {/* Tray */}
+      <div className="w-64 border p-4 flex flex-wrap gap-4">
         {dominos.map(d=>d.x===null&&(
           <div key={d.id}
             draggable
@@ -243,8 +341,6 @@ export default function GasLawPips(){
       </div>
 
     </div>
-
-    <div className="mt-6 font-semibold">{msg}</div>
 
   </div>
   );
