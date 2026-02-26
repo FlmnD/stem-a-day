@@ -129,16 +129,16 @@ export default function Games() {
                     <div className="flex items-center gap-3 mb-2">
                         <FlaskConical className="text-sky-500" size={24} />
                         <h2 className="text-xl font-semibold text-gray-800">
-                            2048: Dilution
+                            Pips: Molarity
                         </h2>
                     </div>
                     <p className="text-sm text-gray-500 mb-4">Difficulty: <span className="font-medium text-green-600">Easy</span></p>
                     <p className="text-gray-700 mb-6">
-                        Put your chemistry skills to the test with <strong>dilutions</strong>.
-                         Combine concentrations and volumes to solve dilution problems.
+                        Put your chemistry skills to the test with <strong>molarity</strong>.
+                         Match each domino to its correct relationship on the concept map.
                     </p>
                     <Link
-                        href="/games/2048-easy"
+                        href="/games/pips-easy"
                         className="inline-block bg-sky-500 hover:bg-sky-600 text-white font-medium py-2 px-4 rounded-lg transition-all"
                     >
                         Play Easy Version
@@ -149,16 +149,16 @@ export default function Games() {
                     <div className="flex items-center gap-3 mb-2">
                         <Atom className="text-red-500" size={24} />
                         <h2 className="text-xl font-semibold text-gray-800">
-                            2048: Gas Laws
+                            Pips: Gas Laws
                         </h2>
                     </div>
                     <p className="text-sm text-gray-500 mb-4">Difficulty: <span className="font-medium text-red-600">Hard</span></p>
                     <p className="text-gray-700 mb-6">
-                        Take on the challenge of <strong>gas laws</strong>.
-                         Combine variables, balance equations, and think strategically as you work toward satisfying the ideal gas law.
+                        Put your chemistry skills to the test with <strong>gas laws</strong>.
+                         Match each domino to its correct law and state on the concept map.
                     </p>
                     <Link
-                        href="/games/2048-hard"
+                        href="/games/pips-hard"
                         className="inline-block bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-all"
                     >
                         Play Hard Version

@@ -2,7 +2,7 @@ import CarbleLink from "@/components/ui/StemLink";
 import { Article, Lesson } from "@/structures/GameStructures";
 import Image from "next/image";
 
-export const EasyArticle2048: Article = () => {
+export const EasyArticlePips: Article = () => {
     return (
         <>
             <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
@@ -10,8 +10,8 @@ export const EasyArticle2048: Article = () => {
 
                 <p className="mb-4">
                     This section covers the core ideas behind <strong>moles, molar mass, volume,
-                    molarity, and dilution</strong>. These relationships are essential for solving
-                    solution chemistry problems and for succeeding in the 2048 Dilution game.
+                    molarity, and </strong>. These relationships are essential for solving
+                    solution chemistry problems and for succeeding in the Pips Molarity game.
                     You should spend at least <strong>6–7 minutes</strong> reviewing this material
                     before playing.
                 </p>
@@ -117,7 +117,7 @@ export const EasyArticle2048: Article = () => {
                     <li>The amount of solute does not change</li>
                 </ul>
                 <p className="italic text-gray-600 mb-6">
-                    <Image src="/dilution.png" alt="dilution equation diagram" height={300} width={200} />
+                    <Image src="/.png" alt=" equation diagram" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
@@ -129,7 +129,7 @@ export const EasyArticle2048: Article = () => {
 
                 <h3 className="font-semibold">How These Variables Relate (Game Strategy)</h3>
                 <p className="mb-2">
-                    All molarity problems — and the 2048 Molarity game — rely on understanding
+                    All molarity problems - and the Pips Molarity game - rely on understanding
                     how these variables interact.
                 </p>
                 <ul className="list-disc ml-6 mb-4">
@@ -148,7 +148,7 @@ export const EasyArticle2048: Article = () => {
     );
 };
 
-export const HardArticle2048: Article = () => {
+export const HardArticlePips: Article = () => {
     return (
         <>
             <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
@@ -315,70 +315,62 @@ export const HardArticle2048: Article = () => {
     );
 }
 
-export const EasyLesson2048: Lesson = () => {
+export const EasyLessonPips: Lesson = () => {
     return (
         <>
             <div className="w-full max-w-5xl mt-6 mb-6 p-4 bg-white rounded shadow">
                 <h2 className="text-2xl font-semibold mb-3">
-                    Play our original game: 2048 Dilution!
+                    Play our original game: Molarity Pips!
                 </h2>
 
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
                     <li>
-                        The game is played on a 4×4 grid using arrow keys
+                        The game is played on a concept map grid with colored regions
                     </li>
 
                     <li>
-                        <strong>Goal</strong> — Strategically combine variables to satisfy the
-                        Solution Dilutions relationship: <strong>M1V1 = M2V2</strong>
+                        <strong>Goal</strong> - Place each domino onto the region whose gas law it represents
                     </li>
 
                     <li>
                         <strong>How to Play</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Use arrow keys to slide tiles across the grid</li>
-                            <li>Compatible variable tiles merge into compound expressions</li>
-                            <li>Each move spawns a new variable tile</li>
+                            <li>Click a domino in the tray to select it (highlighted in blue)</li>
+                            <li>Click a cell on the map to place it - the domino occupies that cell and the next one in its current orientation</li>
+                            <li>To return a placed domino to the tray, click it on the map then click empty space in the tray</li>
                         </ul>
                     </li>
 
                     <li>
-                        <strong>Variable Rules</strong>
+                        <strong>Rotating Dominos</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>M1, V1, M2, and V2 tiles can combine into multi-variable tiles</li>
-                            <li>Merges occur between tiles of the same variable and corresponding initial/final variable tiles</li>
+                            <li>Double-click a domino (in the tray or on the map) to rotate it 90° clockwise</li>
+                            <li>Repeat to continue rotating</li>
+                            <li>A rotation that would cause overlap or go out of bounds is ignored</li>
                         </ul>
                     </li>
 
                     <li>
-                        <strong>Equation Check</strong>
+                        <strong>Region Codes</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>When <strong>M1V1</strong> collides with <strong>M2V2</strong>, the game checks the equation</li>
-                            <li>If the values are equal, you win</li>
-                            <li>If the values are not equal, the game ends</li>
+                            <li>Each colored region is labeled with a code like <strong>Mo</strong>, <strong>MM</strong>, <strong>Mc</strong>, etc.</li>
+                            <li>The letters indicate the formula; for , the number indicates initial (1) or final (2) state</li>
+                            <li>Consult the Region Code Key and Full Reference panels on the right</li>
                         </ul>
                     </li>
 
                     <li>
                         <strong>To Win</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Correctly balance the dilution equation</li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        <strong>To Lose</strong>
-                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>M1V1 and M2V2 collide but the equation is incorrect</li>
-                            <li>No valid moves remain on the grid</li>
+                            <li>Place all dominos so each one exactly covers its matching region</li>
+                            <li>Press <strong>Check Solution</strong> - it activates once every domino is placed</li>
                         </ul>
                     </li>
 
                     <li>
                         <strong>To Start / Restart the Game</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Press the space bar</li>
-                            <li>No pausing or undoing moves</li>
+                            <li>Press <strong>New Game</strong> to generate a fresh puzzle at any time</li>
                         </ul>
                     </li>
                 </ul>
@@ -387,71 +379,62 @@ export const EasyLesson2048: Lesson = () => {
     );
 };
 
-export const HardLesson2048: Lesson = () => {
+export const HardLessonPips: Lesson = () => {
     return (
         <>
             <div className="w-full max-w-5xl mt-6 mb-6 p-4 bg-white rounded shadow">
                 <h2 className="text-2xl font-semibold mb-3">
-                    Play our original game: 2048 Gas Laws!
+                    Play our original game: Gas Laws Pips!
                 </h2>
 
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
                     <li>
-                        The game is played on a 4×4 grid using arrow keys
+                        The game is played on a concept map grid with colored regions
                     </li>
 
                     <li>
-                        <strong>Goal</strong> — Strategically combine variables to satisfy the
-                        Ideal Gas Law relationship: <strong>PV = nRT</strong>
+                        <strong>Goal</strong> - Place each domino onto the region whose gas law it represents
                     </li>
 
                     <li>
                         <strong>How to Play</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Use arrow keys to slide tiles across the grid</li>
-                            <li>Compatible variable tiles merge into compound expressions</li>
-                            <li>Each move spawns a new variable tile</li>
+                            <li>Click a domino in the tray to select it (highlighted in blue)</li>
+                            <li>Click a cell on the map to place it - the domino occupies that cell and the next one in its current orientation</li>
+                            <li>To return a placed domino to the tray, click it on the map then click empty space in the tray</li>
                         </ul>
                     </li>
 
                     <li>
-                        <strong>Variable Rules</strong>
+                        <strong>Rotating Dominos</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>P, V, n, and T tiles can combine into multi-variable tiles</li>
-                            <li>R is a constant and always has a fixed value</li>
-                            <li>Repeated merges may be required to build full expressions</li>
+                            <li>Double-click a domino (in the tray or on the map) to rotate it 90° clockwise</li>
+                            <li>Repeat to continue rotating</li>
+                            <li>A rotation that would cause overlap or go out of bounds is ignored</li>
                         </ul>
                     </li>
 
                     <li>
-                        <strong>Equation Check</strong>
+                        <strong>Region Codes</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>When <strong>PV</strong> collides with <strong>nRT</strong>, the game checks the equation</li>
-                            <li>If the values are equal, you win</li>
-                            <li>If the values are not equal, the game ends</li>
+                            <li>Each colored region is labeled with a code like <strong>Bo1</strong>, <strong>Ch2</strong>, <strong>GL1</strong>, etc.</li>
+                            <li>The letters indicate the gas law; the number indicates initial (1) or final (2) state</li>
+                            <li>Consult the Region Code Key and Full Gas Law Reference panels on the right</li>
                         </ul>
                     </li>
 
                     <li>
                         <strong>To Win</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Correctly balance the gas law equation</li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        <strong>To Lose</strong>
-                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>PV and nRT collide but the equation is incorrect</li>
-                            <li>No valid moves remain on the grid</li>
+                            <li>Place all dominos so each one exactly covers its matching region</li>
+                            <li>Press <strong>Check Solution</strong> - it activates once every domino is placed</li>
                         </ul>
                     </li>
 
                     <li>
                         <strong>To Start / Restart the Game</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li>Press the space bar</li>
-                            <li>No pausing or undoing moves</li>
+                            <li>Press <strong>New Game</strong> to generate a fresh puzzle at any time</li>
                         </ul>
                     </li>
                 </ul>

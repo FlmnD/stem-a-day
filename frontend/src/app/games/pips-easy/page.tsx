@@ -1,16 +1,16 @@
 import Collapsible from "@/components/ui/Collapsible";
-import Easy2048 from "@/components/sections/games/2048GameEasy";
+import EasyPips from "@/components/sections/games/PipsGameEasy";
 import {
-  EasyArticle2048,
-  EasyLesson2048,
-} from "@/components/lib/data/2048";
+  EasyArticlePips,
+  EasyLessonPips,
+} from "@/components/lib/data/pips";
 
-export default function EasyPage2048() {
+export default function EasyPagePips() {
   return (
     <div className="min-h-screen flex flex-col items-center py-10 bg-gray-100">
 
       <h1 className="text-3xl font-bold mb-6">
-        2048: Dilution
+        Pips: Molarity
       </h1>
 
       <Collapsible
@@ -18,12 +18,12 @@ export default function EasyPage2048() {
         className="max-w-7xl"
         defaultOpen={true}
       >
-        <EasyArticle2048 />
+        <EasyArticlePips />
       </Collapsible>
 
-      <EasyLesson2048 />
+      <EasyLessonPips />
 
-      <Easy2048 />
+      <EasyPips />
 
     </div>
   );
