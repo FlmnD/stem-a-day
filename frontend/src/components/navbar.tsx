@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import cn from "@/components/lib/cn";
 import ThemeToggle from "@/components/ui/ThemeToggle";
-import { Settings } from "lucide-react";
+import { User } from "lucide-react";
 
 type NavItem = { href: string; label: string };
 
@@ -79,7 +79,6 @@ export default function Navbar() {
 
                     <ThemeToggle />
 
-                    {/* Settings button on far right */}
                     <Link
                         href="/settings"
                         className="inline-flex items-center justify-center rounded-lg p-2
@@ -87,10 +86,10 @@ export default function Navbar() {
               dark:text-gray-200 dark:hover:text-white dark:hover:bg-gray-800/70
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-300
               dark:focus-visible:ring-teal-500 dark:focus-visible:ring-offset-0"
-                        aria-label="Settings"
-                        title="Settings"
+                        aria-label="Account"
+                        title="Account"
                     >
-                        <Settings className="h-5 w-5" />
+                        <User className="h-5 w-5" />
                     </Link>
                 </div>
 
@@ -173,7 +172,7 @@ export default function Navbar() {
                                 onClick={() => setOpen(false)}
                             >
                                 <span className="inline-flex items-center gap-2">
-                                    <Settings className="h-5 w-5" />
+                                    <User className="h-5 w-5" />
                                     Settings
                                 </span>
                             </Link>
