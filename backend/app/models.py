@@ -1,3 +1,5 @@
+from sqlalchemy.sql import func
+from sqlalchemy import String, Integer, ForeignKey, TIMESTAMP, ARRAY, UniqueConstraint
 from datetime import datetime
 from sqlalchemy import ARRAY, TIMESTAMP, BigInteger, CheckConstraint, String, Boolean, Integer, func, text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -74,4 +76,39 @@ class User(Base):
         nullable=False,
         default=list,
         server_default=text("'{}'"),
+    )
+
+
+class Plant(Base):
+    __tablename__ = "plants"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    name: Mapped[str] = mapped_column(String(128), nullable=False)
+    price: Mapped[int] = mapped_column(Integer, nullable=False)
+    image_url: Mapped[str | None] = mapped_column(String(512))
+
+
+class UserPlant(Base):
+    __tablename__ = "user_plants"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey(
+        "users.id", ondelete="CASCADE"), primary_key=True)
+    plant_id: Mapped[str] = mapped_column(ForeignKey(
+        "plants.id", ondelete="RESTRICT"), primary_key=True)
+
+    level: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default="1")
+    level_xp: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default="0")
+
+    accessories: Mapped[list[str]] = mapped_column(
+        ARRAY(String(64)), nullable=False, server_default=text("'{}'")
+    )
+
+    acquired_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
+    )
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "plant_id", name="uq_user_plant"),
     )
