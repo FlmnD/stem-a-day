@@ -45,20 +45,17 @@ export default function PlantsPage() {
 
     async function refreshAll() {
         try {
-            // Always load catalog (public shop preview)
+
             const catP = fetch("/api/plants/catalog", { cache: "no-store", credentials: "include" });
 
-            // Check auth first
             const meR = await fetch("/api/me", { cache: "no-store", credentials: "include" });
 
-            // Wait for catalog either way
             const catR = await catP;
 
             if (catR.ok) setCatalog(await catR.json().catch(() => []));
             else console.error("GET /api/plants/catalog failed", catR.status);
 
             if (meR.status === 401) {
-                // Logged out: don't treat as an error
                 setIsAuthed(false);
                 setMe(null);
                 setInv([]);
@@ -73,11 +70,9 @@ export default function PlantsPage() {
                 return;
             }
 
-            // Logged in
             setIsAuthed(true);
             setMe(await meR.json().catch(() => null));
 
-            // Only fetch inventory if authenticated
             const invR = await fetch("/api/plants/inventory", { cache: "no-store", credentials: "include" });
             if (invR.ok) setInv(await invR.json().catch(() => []));
             else console.error("GET /api/plants/inventory failed", invR.status);
@@ -276,7 +271,6 @@ export default function PlantsPage() {
                 </div>
             )}
 
-            {/* SHOP */}
             <div className="mt-10">
                 <h2 className="text-2xl font-semibold text-sky-700 mb-6">Shop</h2>
 
@@ -312,7 +306,6 @@ export default function PlantsPage() {
                 </div>
             </div>
 
-            {/* INVENTORY */}
             <div className="mt-16">
                 <h2 className="text-2xl font-semibold text-sky-700 mb-6">Your Inventory</h2>
 
