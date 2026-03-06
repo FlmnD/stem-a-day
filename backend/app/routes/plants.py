@@ -82,7 +82,7 @@ def buy_plant(
     return {"ok": True}
 
 
-@router.post("/{plant_id}/sell")
+@router.post("/sell/{plant_id}")
 def sell_plant(
     plant_id: str,
     db: Session = Depends(get_db),
@@ -114,10 +114,10 @@ def sell_plant(
     return {"ok": True, "refund": plant.price}
 
 
-@router.post("/{plant_id}/upgrade")
+@router.post("/upgrade/{plant_id}")
 def upgrade_plant(
     plant_id: str,
-    payload: dict,  # {"spend": int}
+    payload: dict, 
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):

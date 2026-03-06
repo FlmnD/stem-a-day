@@ -37,25 +37,50 @@ export default function PlantsPage() {
     const [upgradeSpend, setUpgradeSpend] = useState<Record<string, number>>({});
     const [msg, setMsg] = useState<string>("");
 
+    const [isAuthed, setIsAuthed] = useState<boolean>(false);
+
     const [buyingId, setBuyingId] = useState<string | null>(null);
     const [sellingId, setSellingId] = useState<string | null>(null);
     const [upgradingId, setUpgradingId] = useState<string | null>(null);
 
     async function refreshAll() {
         try {
-            const [meR, catR, invR] = await Promise.all([
-                fetch("/api/me", { cache: "no-store", credentials: "include" }),
-                fetch("/api/plants/catalog", { cache: "no-store", credentials: "include" }),
-                fetch("/api/plants/inventory", { cache: "no-store", credentials: "include" }),
-            ]);
+            // Always load catalog (public shop preview)
+            const catP = fetch("/api/plants/catalog", { cache: "no-store", credentials: "include" });
 
-            if (meR.ok) setMe(await meR.json().catch(() => null));
+            // Check auth first
+            const meR = await fetch("/api/me", { cache: "no-store", credentials: "include" });
+
+            // Wait for catalog either way
+            const catR = await catP;
+
             if (catR.ok) setCatalog(await catR.json().catch(() => []));
-            if (invR.ok) setInv(await invR.json().catch(() => []));
+            else console.error("GET /api/plants/catalog failed", catR.status);
 
-            if (!meR.ok) console.error("GET /api/me failed", meR.status);
-            if (!catR.ok) console.error("GET /api/plants/catalog failed", catR.status);
-            if (!invR.ok) console.error("GET /api/plants/inventory failed", invR.status);
+            if (meR.status === 401) {
+                // Logged out: don't treat as an error
+                setIsAuthed(false);
+                setMe(null);
+                setInv([]);
+                return;
+            }
+
+            if (!meR.ok) {
+                console.error("GET /api/me failed", meR.status);
+                setIsAuthed(false);
+                setMe(null);
+                setInv([]);
+                return;
+            }
+
+            // Logged in
+            setIsAuthed(true);
+            setMe(await meR.json().catch(() => null));
+
+            // Only fetch inventory if authenticated
+            const invR = await fetch("/api/plants/inventory", { cache: "no-store", credentials: "include" });
+            if (invR.ok) setInv(await invR.json().catch(() => []));
+            else console.error("GET /api/plants/inventory failed", invR.status);
         } catch (e) {
             console.error("refreshAll failed:", e);
         }
@@ -68,6 +93,10 @@ export default function PlantsPage() {
     const ownedSet = useMemo(() => new Set(inv.map((p) => p.plant_id)), [inv]);
 
     async function buy(plantId: string) {
+        if (!isAuthed) {
+            setMsg("Please log in to buy plants.");
+            return;
+        }
         if (buyingId) return;
 
         setMsg("");
@@ -81,6 +110,14 @@ export default function PlantsPage() {
                 headers: { Accept: "application/json" },
             });
 
+            if (r.status === 401) {
+                setIsAuthed(false);
+                setMe(null);
+                setInv([]);
+                setMsg("Session expired — please log in again.");
+                return;
+            }
+
             const data: any = await readJsonOrText(r);
 
             if (data?.__nonJson) {
@@ -88,7 +125,7 @@ export default function PlantsPage() {
                 return;
             }
 
-            if (!r.ok || data?.success === false) {
+            if (!r.ok || data?.success === false || data?.ok === false) {
                 setMsg(data?.detail ?? data?.message ?? "Buy failed");
                 return;
             }
@@ -103,6 +140,10 @@ export default function PlantsPage() {
     }
 
     async function sell(plantId: string, basePrice: number) {
+        if (!isAuthed) {
+            setMsg("Please log in to sell plants.");
+            return;
+        }
         if (sellingId) return;
 
         const ok = confirm(
@@ -121,6 +162,14 @@ export default function PlantsPage() {
                 headers: { Accept: "application/json" },
             });
 
+            if (r.status === 401) {
+                setIsAuthed(false);
+                setMe(null);
+                setInv([]);
+                setMsg("Session expired — please log in again.");
+                return;
+            }
+
             const data: any = await readJsonOrText(r);
 
             if (data?.__nonJson) {
@@ -128,12 +177,12 @@ export default function PlantsPage() {
                 return;
             }
 
-            if (!r.ok || data?.success === false) {
+            if (!r.ok || data?.success === false || data?.ok === false) {
                 setMsg(data?.detail ?? data?.message ?? "Sell failed");
                 return;
             }
 
-            setMsg(data?.message ?? "Sold!");
+            setMsg(data?.message ?? `Sold! Refunded ${data?.refund ?? basePrice} glucose.`);
             await refreshAll();
         } catch (e: any) {
             setMsg(`Sell failed: ${e?.message ?? String(e)}`);
@@ -143,6 +192,10 @@ export default function PlantsPage() {
     }
 
     async function upgrade(plantId: string) {
+        if (!isAuthed) {
+            setMsg("Please log in to upgrade plants.");
+            return;
+        }
         if (upgradingId) return;
 
         const spend = upgradeSpend[plantId] ?? 0;
@@ -163,6 +216,14 @@ export default function PlantsPage() {
                 body: JSON.stringify({ spend }),
             });
 
+            if (r.status === 401) {
+                setIsAuthed(false);
+                setMe(null);
+                setInv([]);
+                setMsg("Session expired — please log in again.");
+                return;
+            }
+
             const data: any = await readJsonOrText(r);
 
             if (data?.__nonJson) {
@@ -170,12 +231,11 @@ export default function PlantsPage() {
                 return;
             }
 
-            if (!r.ok || data?.success === false) {
+            if (!r.ok || data?.success === false || data?.ok === false) {
                 setMsg(data?.detail ?? data?.message ?? "Upgrade failed");
                 return;
             }
 
-            // If your API returns these fields, this message is nice; otherwise it’ll fall back.
             if (typeof data?.used === "number" && typeof data?.gained_xp === "number") {
                 setMsg(`Upgraded! Used ${data.used} glucose → +${data.gained_xp} XP`);
             } else {
@@ -200,9 +260,15 @@ export default function PlantsPage() {
 
                 <div className="flex items-center gap-2 bg-white shadow-sm px-4 py-2 rounded-xl border border-sky-100">
                     <span className="text-2xl">🧪</span>
-                    <span className="text-lg font-semibold text-sky-700">{me ? me.glucose : "..."}</span>
+                    <span className="text-lg font-semibold text-sky-700">{isAuthed && me ? me.glucose : "—"}</span>
                 </div>
             </div>
+
+            {!isAuthed && (
+                <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900">
+                    You’re not logged in. You can browse the shop, but you must log in to buy, sell, or upgrade.
+                </div>
+            )}
 
             {msg && (
                 <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sky-800">
@@ -232,11 +298,12 @@ export default function PlantsPage() {
 
                                     <button
                                         type="button"
-                                        disabled={owned || !!buyingId}
+                                        disabled={!isAuthed || owned || !!buyingId}
                                         onClick={() => buy(p.id)}
                                         className="rounded-2xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-50"
+                                        title={!isAuthed ? "Log in to buy" : owned ? "Already owned" : ""}
                                     >
-                                        {owned ? "Owned" : isBuyingThis ? "Buying..." : "Buy"}
+                                        {!isAuthed ? "Log in" : owned ? "Owned" : isBuyingThis ? "Buying..." : "Buy"}
                                     </button>
                                 </div>
                             </div>
@@ -249,15 +316,18 @@ export default function PlantsPage() {
             <div className="mt-16">
                 <h2 className="text-2xl font-semibold text-sky-700 mb-6">Your Inventory</h2>
 
-                {inv.length === 0 ? (
+                {!isAuthed ? (
+                    <div className="bg-white rounded-2xl border border-sky-100 p-6 shadow-sm text-gray-500">
+                        Log in to view your inventory.
+                    </div>
+                ) : inv.length === 0 ? (
                     <div className="bg-white rounded-2xl border border-sky-100 p-6 shadow-sm text-gray-500">
                         You haven’t purchased any plants yet.
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {inv.map((p) => {
-                            const percent =
-                                p.xp_needed > 0 ? Math.min(100, Math.round((p.level_xp / p.xp_needed) * 100)) : 0;
+                            const percent = p.xp_needed > 0 ? Math.min(100, Math.round((p.level_xp / p.xp_needed) * 100)) : 0;
 
                             const isSellingThis = sellingId === p.plant_id;
                             const isUpgradingThis = upgradingId === p.plant_id;
