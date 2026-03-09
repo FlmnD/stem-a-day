@@ -34,7 +34,8 @@ export default function PlantsPage() {
     const [me, setMe] = useState<Me | null>(null);
     const [catalog, setCatalog] = useState<CatalogPlant[]>([]);
     const [inv, setInv] = useState<OwnedPlant[]>([]);
-    const [upgradeSpend, setUpgradeSpend] = useState<Record<string, number>>({});
+
+    const [upgradeSpend, setUpgradeSpend] = useState<Record<string, string>>({});
     const [msg, setMsg] = useState<string>("");
 
     const [isAuthed, setIsAuthed] = useState<boolean>(false);
@@ -45,7 +46,6 @@ export default function PlantsPage() {
 
     async function refreshAll() {
         try {
-
             const catP = fetch("/api/plants/catalog", { cache: "no-store", credentials: "include" });
 
             const meR = await fetch("/api/me", { cache: "no-store", credentials: "include" });
@@ -193,8 +193,10 @@ export default function PlantsPage() {
         }
         if (upgradingId) return;
 
-        const spend = upgradeSpend[plantId] ?? 0;
-        if (spend <= 0) {
+        const raw = upgradeSpend[plantId];
+        const spend = raw == null ? 50 : Math.trunc(Number(raw));
+
+        if (!Number.isFinite(spend) || spend <= 0) {
             setMsg("Enter a spend amount > 0.");
             return;
         }
@@ -246,33 +248,43 @@ export default function PlantsPage() {
     }
 
     return (
-        <section className="min-h-[calc(100dvh-3.5rem)] bg-linear-to-b from-sky-50 via-white to-white px-6 py-10">
+        <section
+            className="min-h-[calc(100dvh-3.5rem)] px-6 py-10
+        bg-linear-to-b from-sky-50 via-white to-white
+        dark:from-black dark:via-[#0b0b0b] dark:to-[#0b0b0b]"
+        >
             <div className="flex justify-between items-start">
                 <div>
-                    <h1 className="text-3xl font-bold text-sky-800 mb-2">Plants</h1>
-                    <p className="mt-2 text-gray-600">Buy, upgrade, and manage your plants.</p>
+                    <h1 className="text-3xl font-bold text-sky-800 dark:text-slate-100 mb-2">Plants</h1>
+                    <p className="mt-2 text-gray-600 dark:text-slate-300">Buy, upgrade, and manage your plants.</p>
                 </div>
 
-                <div className="flex items-center gap-2 bg-white shadow-sm px-4 py-2 rounded-xl border border-sky-100">
+                <div className="flex items-center gap-2 bg-white/80 shadow-sm px-4 py-2 rounded-xl border border-sky-100 backdrop-blur
+                        dark:bg-slate-950/60 dark:border-slate-700">
                     <span className="text-2xl">🧪</span>
-                    <span className="text-lg font-semibold text-sky-700">{isAuthed && me ? me.glucose : "—"}</span>
+                    <span className="text-lg font-semibold text-sky-700 dark:text-slate-100">
+                        {isAuthed && me ? me.glucose : "—"}
+                    </span>
                 </div>
             </div>
 
             {!isAuthed && (
-                <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900">
+                <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900
+                        dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-200">
                     You’re not logged in. You can browse the shop, but you must log in to buy, sell, or upgrade.
                 </div>
             )}
 
             {msg && (
-                <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sky-800">
+                <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sky-800
+                        dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-100">
                     {msg}
                 </div>
             )}
 
+            {/* SHOP */}
             <div className="mt-10">
-                <h2 className="text-2xl font-semibold text-sky-700 mb-6">Shop</h2>
+                <h2 className="text-2xl font-semibold text-sky-700 dark:text-slate-100 mb-6">Shop</h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {catalog.map((p) => {
@@ -280,21 +292,29 @@ export default function PlantsPage() {
                         const isBuyingThis = buyingId === p.id;
 
                         return (
-                            <div key={p.id} className="bg-white rounded-2xl shadow-md p-6 border border-sky-100">
-                                <div className="h-32 bg-sky-50 rounded-lg flex items-center justify-center mb-4 text-sky-300 text-4xl">
+                            <div
+                                key={p.id}
+                                className="rounded-2xl p-6 border border-sky-100 bg-white shadow-md
+                           dark:border-slate-700 dark:bg-slate-950/60 dark:shadow-black/30"
+                            >
+                                <div className="h-32 rounded-lg flex items-center justify-center mb-4 text-4xl
+                                bg-sky-50 text-sky-300
+                                dark:bg-slate-900/60 dark:text-teal-200/80">
                                     🌱
                                 </div>
 
-                                <h3 className="text-lg font-semibold text-sky-800">{p.name}</h3>
+                                <h3 className="text-lg font-semibold text-sky-800 dark:text-slate-100">{p.name}</h3>
 
                                 <div className="mt-4 flex justify-between items-center">
-                                    <span className="font-semibold text-sky-700">{p.price} 🧪</span>
+                                    <span className="font-semibold text-sky-700 dark:text-slate-200">{p.price} 🧪</span>
 
                                     <button
                                         type="button"
                                         disabled={!isAuthed || owned || !!buyingId}
                                         onClick={() => buy(p.id)}
-                                        className="rounded-2xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-50"
+                                        className="rounded-2xl px-4 py-2 text-sm font-semibold
+                               bg-sky-600 text-white hover:bg-sky-700 disabled:opacity-50
+                               dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400"
                                         title={!isAuthed ? "Log in to buy" : owned ? "Already owned" : ""}
                                     >
                                         {!isAuthed ? "Log in" : owned ? "Owned" : isBuyingThis ? "Buying..." : "Buy"}
@@ -307,30 +327,37 @@ export default function PlantsPage() {
             </div>
 
             <div className="mt-16">
-                <h2 className="text-2xl font-semibold text-sky-700 mb-6">Your Inventory</h2>
+                <h2 className="text-2xl font-semibold text-sky-700 dark:text-slate-100 mb-6">Your Inventory</h2>
 
                 {!isAuthed ? (
-                    <div className="bg-white rounded-2xl border border-sky-100 p-6 shadow-sm text-gray-500">
+                    <div className="rounded-2xl border border-sky-100 bg-white p-6 shadow-sm text-gray-500
+                          dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-300">
                         Log in to view your inventory.
                     </div>
                 ) : inv.length === 0 ? (
-                    <div className="bg-white rounded-2xl border border-sky-100 p-6 shadow-sm text-gray-500">
+                    <div className="rounded-2xl border border-sky-100 bg-white p-6 shadow-sm text-gray-500
+                          dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-300">
                         You haven’t purchased any plants yet.
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {inv.map((p) => {
-                            const percent = p.xp_needed > 0 ? Math.min(100, Math.round((p.level_xp / p.xp_needed) * 100)) : 0;
+                            const percent =
+                                p.xp_needed > 0 ? Math.min(100, Math.round((p.level_xp / p.xp_needed) * 100)) : 0;
 
                             const isSellingThis = sellingId === p.plant_id;
                             const isUpgradingThis = upgradingId === p.plant_id;
 
                             return (
-                                <div key={p.plant_id} className="bg-white rounded-2xl shadow-md p-6 border border-sky-100">
+                                <div
+                                    key={p.plant_id}
+                                    className="rounded-2xl p-6 border border-sky-100 bg-white shadow-md
+                             dark:border-slate-700 dark:bg-slate-950/60 dark:shadow-black/30"
+                                >
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <h3 className="text-lg font-semibold text-sky-800">{p.name}</h3>
-                                            <p className="text-sm text-gray-600 mt-1">
+                                            <h3 className="text-lg font-semibold text-sky-800 dark:text-slate-100">{p.name}</h3>
+                                            <p className="text-sm text-gray-600 dark:text-slate-300 mt-1">
                                                 Level {p.level} • {percent}%
                                             </p>
                                         </div>
@@ -339,17 +366,22 @@ export default function PlantsPage() {
                                             type="button"
                                             disabled={!!sellingId || !!upgradingId}
                                             onClick={() => sell(p.plant_id, p.price)}
-                                            className="rounded-2xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"
+                                            className="rounded-2xl border px-4 py-2 text-sm font-semibold disabled:opacity-50
+                                 border-red-200 text-red-700 hover:bg-red-50
+                                 dark:border-red-900/40 dark:text-red-200 dark:hover:bg-red-950/30"
                                         >
                                             {isSellingThis ? "Selling..." : "Sell"}
                                         </button>
                                     </div>
 
                                     <div className="mt-4">
-                                        <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
-                                            <div className="h-2 bg-sky-500" style={{ width: `${percent}%` }} />
+                                        <div className="h-2 w-full rounded-full overflow-hidden bg-slate-100 dark:bg-slate-900/60">
+                                            <div
+                                                className="h-2 bg-sky-500 dark:bg-teal-400"
+                                                style={{ width: `${percent}%` }}
+                                            />
                                         </div>
-                                        <div className="mt-2 text-xs text-gray-500">
+                                        <div className="mt-2 text-xs text-gray-500 dark:text-slate-400">
                                             XP: {p.level_xp} / {p.xp_needed}
                                         </div>
                                     </div>
@@ -359,27 +391,31 @@ export default function PlantsPage() {
                                             type="number"
                                             min={1}
                                             step={1}
-                                            value={upgradeSpend[p.plant_id] ?? 50}
-                                            onChange={(e) =>
-                                                setUpgradeSpend((prev) => ({
-                                                    ...prev,
-                                                    [p.plant_id]: parseInt(e.target.value || "0", 10),
-                                                }))
-                                            }
-                                            className="w-full sm:w-40 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-sky-400"
+                                            value={upgradeSpend[p.plant_id] ?? "50"}
+                                            onChange={(e) => {
+                                                const v = e.target.value; // "" or numeric string
+                                                if (v === "" || /^\d+$/.test(v)) {
+                                                    setUpgradeSpend((prev) => ({ ...prev, [p.plant_id]: v }));
+                                                }
+                                            }}
+                                            className="w-full sm:w-40 rounded-2xl border bg-white px-4 py-3 text-sm outline-none
+                                 border-slate-200 text-slate-900 focus:border-sky-400
+                                 dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-100 dark:focus:border-teal-400"
                                         />
 
                                         <button
                                             type="button"
                                             disabled={!!sellingId || !!upgradingId}
                                             onClick={() => upgrade(p.plant_id)}
-                                            className="rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-50"
+                                            className="rounded-2xl px-5 py-3 text-sm font-semibold text-white disabled:opacity-50
+                                 bg-sky-600 hover:bg-sky-700
+                                 dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400"
                                         >
                                             {isUpgradingThis ? "Upgrading..." : "Spend glucose → XP"}
                                         </button>
                                     </div>
 
-                                    <p className="mt-3 text-xs text-gray-500">
+                                    <p className="mt-3 text-xs text-gray-500 dark:text-slate-400">
                                         Upgrades spend glucose permanently. Selling refunds only the base price.
                                     </p>
                                 </div>

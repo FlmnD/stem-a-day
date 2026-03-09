@@ -1,12 +1,24 @@
+
 import CarbleLink from "@/components/ui/StemLink";
 import { Article, Lesson } from "@/structures/GameStructures";
 import Image from "next/image";
 
+/** Shared "card" styling: light mode unchanged, dark mode teal/black theme */
+const cardClass =
+    "max-w-7xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6 " +
+    "dark:bg-slate-950/60 dark:text-slate-100 dark:border dark:border-slate-800";
+
+const lessonCardClass =
+    "w-full max-w-5xl mt-6 mb-6 p-4 bg-white rounded shadow " +
+    "dark:bg-slate-950/60 dark:text-slate-100 dark:border dark:border-slate-800";
+
+const mutedText = "text-gray-600 dark:text-slate-300";
+const mutedText2 = "text-gray-700 dark:text-slate-300";
+
 export const CarbleEasyArticle: Article = () => {
     return (
         <>
-
-            <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
+            <div className={cardClass}>
                 <h2 className="text-xl font-bold mb-3">Learn About the Essentials!</h2>
 
                 <p className="mb-4">
@@ -22,6 +34,7 @@ export const CarbleEasyArticle: Article = () => {
                     An <strong>element</strong> is a pure substance that cannot be broken down or transformed
                     into another substance.
                 </p>
+
                 <h3 className="font-semibold">Atom</h3>
                 <p className="mb-1">
                     An <strong>atom</strong> is the smallest chemical particle of an element. It includes:
@@ -31,12 +44,22 @@ export const CarbleEasyArticle: Article = () => {
                     <li>Negative <strong>electrons</strong></li>
                     <li>Neutral <strong>neutrons</strong></li>
                 </ul>
+
+                {/* Link wrapper stays your component; dark mode should be teal-ish in that component too */}
                 <div className="mb-7 mt-3">
-                    <CarbleLink url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Atomic_Theory/The_Atom" text="Learn more about atoms and elements!"></CarbleLink>
+                    <CarbleLink
+                        url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Atomic_Theory/The_Atom"
+                        text="Learn more about atoms and elements!"
+                    />
                 </div>
 
-                <p className="italic text-gray-600 mb-4">
-                    <Image src="/atomic and mass number.jpg" alt="atomic and mass number example" height={300} width={200} />
+                <p className={`italic mb-4 ${mutedText}`}>
+                    <Image
+                        src="/atomic and mass number.jpg"
+                        alt="atomic and mass number example"
+                        height={300}
+                        width={200}
+                    />
                 </p>
 
                 <h3 className="font-semibold">Atomic Number</h3>
@@ -46,17 +69,20 @@ export const CarbleEasyArticle: Article = () => {
                     The atomic number increases by one as one proton is added to create the next element on the periodic table.
                     An element is defined by there number of protons it has. One proton is always a Hydrogen atom. Two protons is always a Helium atom and so on.
                 </p>
+
                 <p className="mb-2">Examples:</p>
                 <ul className="list-disc ml-6 mb-3">
                     <li>Hydrogen: 1</li>
                     <li>Helium: 2</li>
                     <li>Carbon: 6</li>
                 </ul>
+
                 <p className="mb-4">
                     It <strong>increases by one</strong> as you move left → right <strong>across a period</strong>
                     and <strong> increases dramatically</strong> as you move top → bottom <strong> down a group</strong>.
                 </p>
-                <p className="italic text-gray-600 mb-4">
+
+                <p className={`italic mb-4 ${mutedText}`}>
                     <Image src="/4 protons diagram.png" alt="atom diagram example" height={300} width={200} />
                 </p>
 
@@ -67,27 +93,34 @@ export const CarbleEasyArticle: Article = () => {
                     (Be aware that the periodic table is an average based on the probability of atoms for each element, so <strong>values will vary from theoretical</strong> and experimental values.)
                     Approximate values:
                 </p>
+
                 <ul className="list-disc ml-6 mb-3">
                     <li>1 proton (p⁺) ≈ 1 amu</li>
                     <li>1 neutron ≈ 1 amu</li>
                     <li>1 electron (e⁻) ≈ 0 amu (so electrons barely affect mass)</li>
                 </ul>
+
                 <p className="mb-2">Examples:</p>
                 <ul className="list-disc ml-6 mb-3">
                     <li>Hydrogen: 1 p + 1 e⁻ → ~1 amu</li>
                     <li>Helium: 2 p + 2 n + 2 e⁻ → ~4 amu</li>
                     <li>Carbon: 6 p + 6 n + 6 e⁻ → ~12 amu</li>
                 </ul>
+
                 <p className="mb-4">
                     It <strong>increases</strong> as you move left → right <strong>across a period</strong>
                     and <strong>increases dramatically</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
-                <p className="italic text-gray-600 mb-4">
+
+                <p className={`italic mb-4 ${mutedText}`}>
                     <Image src="/the structure of atom.jpg" alt="the structure of atom diagram" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">
-                    <CarbleLink url="https://chem.libretexts.org/Courses/Furman_University/CHM101%3A_Chemistry_and_Global_Awareness_(Gordon)/03%3A_Atoms_and_the_Periodic_Table/3.04%3A_Atomic_Mass_and_Atomic_Number" text="Learn more about atomic mass and atomic number!"></CarbleLink>
+                    <CarbleLink
+                        url="https://chem.libretexts.org/Courses/Furman_University/CHM101%3A_Chemistry_and_Global_Awareness_(Gordon)/03%3A_Atoms_and_the_Periodic_Table/3.04%3A_Atomic_Mass_and_Atomic_Number"
+                        text="Learn more about atomic mass and atomic number!"
+                    />
                 </div>
 
                 <h3 className="font-semibold">Ionic Charge</h3>
@@ -96,7 +129,9 @@ export const CarbleEasyArticle: Article = () => {
                     Charge is only depends on how many valence (outermost) electrons an atom originally has.
                     It can then lose all those electrons or gain more electrons in order to have a full valence shell (typically of 8 electrons but 2 for H and He).
                 </p>
-                <p className="mb-3 italic text-gray-700">Reminder: electrons have a negative charge!</p>
+
+                <p className={`mb-3 italic ${mutedText2}`}>Reminder: electrons have a negative charge!</p>
+
                 <p className="mb-2">Examples:</p>
                 <ul className="list-disc ml-6 mb-3">
                     <li>Hydrogen: +</li>
@@ -104,6 +139,7 @@ export const CarbleEasyArticle: Article = () => {
                     <li>Fluorine: –</li>
                     <li>Neon: 0</li>
                 </ul>
+
                 <p className="font-semibold mb-2">General Patterns:</p>
                 <ul className="list-disc ml-6 mb-4">
                     <li>Metals: positive charge</li>
@@ -111,6 +147,7 @@ export const CarbleEasyArticle: Article = () => {
                     <li>Transition metals: variable charges</li>
                     <li>Noble gases: 0 charge</li>
                 </ul>
+
                 <p className="font-semibold mb-2">Charge by Group:</p>
                 <ul className="list-disc ml-6 mb-3">
                     <li>Group 1: +</li>
@@ -123,23 +160,26 @@ export const CarbleEasyArticle: Article = () => {
                     <li>Group 17: –</li>
                     <li>Group 18: 0</li>
                 </ul>
-                <p className="italic text-gray-600">
+
+                <p className={`italic ${mutedText}`}>
                     <Image src="/4 diagrams ionic charge.gif" alt="4 atom diagrams" height={400} width={300} />
                 </p>
+
                 <div className="mb-7 mt-5">
-                    <CarbleLink url="https://chem.libretexts.org/Courses/Portland_Community_College/CH151%3A_Preparatory_Chemistry/06%3A_Ions_Ionic_Bonding_and_the_Nomenclature_of_Ionic_Compounds/6.01%3A_Ions" text="Learn more about ions and ionic charge!"></CarbleLink>
+                    <CarbleLink
+                        url="https://chem.libretexts.org/Courses/Portland_Community_College/CH151%3A_Preparatory_Chemistry/06%3A_Ions_Ionic_Bonding_and_the_Nomenclature_of_Ionic_Compounds/6.01%3A_Ions"
+                        text="Learn more about ions and ionic charge!"
+                    />
                 </div>
             </div>
         </>
     );
-}
+};
 
 export const CarbleHardArticle: Article = () => {
-
     return (
         <>
-
-            <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow mb-8 text-sm leading-6">
+            <div className={cardClass}>
                 <h2 className="text-xl font-bold mb-3">Learn About the Essentials!</h2>
 
                 <p className="mb-4">
@@ -155,6 +195,7 @@ export const CarbleHardArticle: Article = () => {
                     An <strong>element</strong> is a pure substance that cannot be broken down or transformed
                     into another substance.
                 </p>
+
                 <h3 className="font-semibold">Atom</h3>
                 <p className="mb-1">
                     An <strong>atom</strong> is the smallest chemical particle of an element. It includes:
@@ -164,8 +205,12 @@ export const CarbleHardArticle: Article = () => {
                     <li>Negative <strong>electrons</strong></li>
                     <li>Neutral <strong>neutrons</strong></li>
                 </ul>
+
                 <div className="mb-7 mt-3">
-                    <CarbleLink url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Atomic_Theory/The_Atom" text="Learn more about atoms and elements!"></CarbleLink>
+                    <CarbleLink
+                        url="https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Atomic_Theory/The_Atom"
+                        text="Learn more about atoms and elements!"
+                    />
                 </div>
 
                 <h3 className="font-semibold">Atomic Radius</h3>
@@ -174,17 +219,20 @@ export const CarbleHardArticle: Article = () => {
                     As more protons are added to the nucleus to create new elements, forces between the nucleus and electrons are strengthened due to opposite charge attractions, pulling electrons closer into the atom and reducing the atomic radius.
                     But atoms with more electron shells have larger atomic radii because the outermost shell is farther from the nucleus.
                 </p>
+
                 <p className="mb-2">Examples:</p>
                 <ul className="list-disc ml-6 mb-3">
                     <li>Hydrogen: 53</li>
                     <li>Sodium: 190</li>
                     <li>Carbon: 67</li>
                 </ul>
+
                 <p className="mb-4">
                     It <strong>decreases</strong> as you move left → right <strong>across a period</strong>
                     and <strong>increases</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
-                <p className="italic text-gray-600 mb-4">
+
+                <p className={`italic mb-4 ${mutedText}`}>
                     <Image src="/atomic radius diagram.png" alt="Atomic Radius Diagram" height={500} width={300} />
                 </p>
 
@@ -196,18 +244,24 @@ export const CarbleHardArticle: Article = () => {
                     But atoms with more electron shells have lower ionization energies because the outermost shell is farther from the nucleus, weakening these forces.
                     Examples:
                 </p>
-                <p className="mb-3 italic text-gray-700">Note: Noble gases (group 18) have super high ionization energies because they want to keep and not lose ANY electrons from their full valence shell! </p>
+
+                <p className={`mb-3 italic ${mutedText2}`}>
+                    Note: Noble gases (group 18) have super high ionization energies because they want to keep and not lose ANY electrons from their full valence shell!
+                </p>
+
                 <ul className="list-disc ml-6 mb-3">
                     <li>Hydrogen: 1312</li>
                     <li>Helium: 2372.3</li>
                     <li>Carbon: 1086.5</li>
                     <li>Neon: 2080.7</li>
                 </ul>
+
                 <p className="mb-4">
                     It <strong>increases dramatically</strong> as you move left → right <strong> across a period </strong>
                     and <strong>decreases</strong> as you move top → bottom <strong> down a group</strong>.
                 </p>
-                <p className="italic text-gray-600">
+
+                <p className={`italic ${mutedText}`}>
                     <Image src="/first ionization energy diagram.png" alt="First Ionization Energy Diagram" height={500} width={350} />
                 </p>
 
@@ -218,7 +272,11 @@ export const CarbleHardArticle: Article = () => {
                     But atoms with more electron shells have less electronegativity because the force of attraction of the nucleus is less effective on electrons farther away, outside the many electron shells of an atom.
                     (Fun and common fact: Flourine is the most electronegative element!)
                 </p>
-                <p className="mb-3 italic text-gray-700">Note: Noble gases (group 18) do not have electronegativities! They want to keep their full valence shell, not attract new electrons. </p>
+
+                <p className={`mb-3 italic ${mutedText2}`}>
+                    Note: Noble gases (group 18) do not have electronegativities! They want to keep their full valence shell, not attract new electrons.
+                </p>
+
                 <p className="mb-2">Examples:</p>
                 <ul className="list-disc ml-6 mb-3">
                     <li>Hydrogen: 2.2</li>
@@ -226,29 +284,33 @@ export const CarbleHardArticle: Article = () => {
                     <li>Carbon: 2.55</li>
                     <li>Flourine: 3.98</li>
                 </ul>
+
                 <p className="mb-4">
                     It <strong>increases dramatically</strong> as you move left → right <strong>across a period </strong>
                     and <strong>decreases</strong> as you move top → bottom <strong>down a group</strong>.
                 </p>
-                <p className="italic text-gray-600 mb-4">
+
+                <p className={`italic mb-4 ${mutedText}`}>
                     <Image src="/electronegativity diagram.png" alt="Electronegativity Diagram" height={500} width={300} />
                 </p>
+
                 <div className="mb-7 mt-3">
-                    <CarbleLink url="https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Supplemental_Modules_and_Websites_(Inorganic_Chemistry)/Descriptive_Chemistry/Periodic_Trends_of_Elemental_Properties/Periodic_Trends" text="Learn more about atomic radius, electronegativity, 1st ionization energy, and other periodic trends!"></CarbleLink>
+                    <CarbleLink
+                        url="https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Supplemental_Modules_and_Websites_(Inorganic_Chemistry)/Descriptive_Chemistry/Periodic_Trends_of_Elemental_Properties/Periodic_Trends"
+                        text="Learn more about atomic radius, electronegativity, 1st ionization energy, and other periodic trends!"
+                    />
                 </div>
             </div>
         </>
     );
-}
-
+};
 
 export const CarbleEasyLesson: Lesson = () => {
-
     return (
         <>
-            <div className="w-full max-w-5xl mt-6 mb-6 p-4 bg-white rounded shadow">
+            <div className={lessonCardClass}>
                 <h2 className="text-2xl font-semibold mb-3">Play our original game!</h2>
-                <ul className="list-disc list-inside space-y-2 text-gray-700">
+                <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-slate-300">
                     <li>
                         <strong>Goal</strong> — Find the correct element which is randomly picked as
                         one of the pink elements in the periodic table.
@@ -271,24 +333,26 @@ export const CarbleEasyLesson: Lesson = () => {
                     <li>
                         <strong>Reading the game table</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li><span className="text-yellow-600 font-semibold">Yellow cell</span> = the value is close to the correct element’s value</li>
-                            <li><span className="text-green-600 font-semibold">Green cell</span> = the value matches the correct element exactly</li>
+                            <li>
+                                <span className="text-yellow-600 font-semibold dark:text-amber-300">Yellow cell</span> = the value is close to the correct element’s value
+                            </li>
+                            <li>
+                                <span className="text-green-600 font-semibold dark:text-teal-300">Green cell</span> = the value matches the correct element exactly
+                            </li>
                         </ul>
                     </li>
                 </ul>
             </div>
         </>
     );
-}
-
+};
 
 export const CarbleHardLesson: Lesson = () => {
-
     return (
         <>
-            <div className="w-full max-w-5xl mt-6 mb-6 p-4 bg-white rounded shadow">
+            <div className={lessonCardClass}>
                 <h2 className="text-2xl font-semibold mb-3">Play our original game!</h2>
-                <ul className="list-disc list-inside space-y-2 text-gray-700">
+                <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-slate-300">
                     <li>
                         <strong>Goal</strong> — Find the correct element which is randomly picked as
                         one of the pink elements in the periodic table.
@@ -311,12 +375,16 @@ export const CarbleHardLesson: Lesson = () => {
                     <li>
                         <strong>Reading the game table</strong>
                         <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                            <li><span className="text-yellow-600 font-semibold">Yellow cell</span> = the value is close to the correct element’s value</li>
-                            <li><span className="text-green-600 font-semibold">Green cell</span> = the value matches the correct element exactly</li>
+                            <li>
+                                <span className="text-yellow-600 font-semibold dark:text-amber-300">Yellow cell</span> = the value is close to the correct element’s value
+                            </li>
+                            <li>
+                                <span className="text-green-600 font-semibold dark:text-teal-300">Green cell</span> = the value matches the correct element exactly
+                            </li>
                         </ul>
                     </li>
                 </ul>
             </div>
         </>
     );
-}
+};
