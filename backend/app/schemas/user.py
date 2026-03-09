@@ -41,3 +41,7 @@ class PlantsRemove(BaseModel):
 
 class PlantsReplace(BaseModel):
     plants: list[str] = Field(default_factory=list)
+
+
+class GlucoseAdd(BaseModel):
+    amount: int = Field(gt=0, le=100000)

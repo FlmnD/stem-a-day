@@ -5,14 +5,11 @@ export async function GET() {
     const token = (await cookies()).get("access_token")?.value;
     if (!token) return NextResponse.json({ message: "Not logged in" }, { status: 401 });
 
-    const r = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/users/me`, {
+    const r = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/plants/inventory`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",
     });
 
-    const text = await r.text();
-    let data: any = {};
-    try { data = text ? JSON.parse(text) : {}; } catch { data = { message: text }; }
-
+    const data = await r.json().catch(() => ({}));
     return NextResponse.json(data, { status: r.status });
 }

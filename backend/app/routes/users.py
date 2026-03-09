@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import update
 
 from app.database import get_db
 from app.models import User
-from app.schemas.user import UserRead, UserUpdate, PlantsAdd
+from app.schemas.user import UserRead, UserUpdate, PlantsAdd, GlucoseAdd
 from app.deps import get_current_user
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -73,3 +74,20 @@ def remove_plant_me(
         db.refresh(current_user)
 
     return current_user
+
+
+@router.post("/me/glucose/add", response_model=UserRead)
+def add_coins_me(
+    payload: GlucoseAdd,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    stmt = (
+        update(User)
+        .where(User.id == current_user.id)
+        .values(glucose=User.glucose + payload.amount)
+        .returning(User)
+    )
+    updated_user = db.execute(stmt).scalar_one()
+    db.commit()
+    return updated_user

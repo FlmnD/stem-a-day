@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import SignOutButton from "@/components/auth/SignOutButton";
+import AddGlucoseCard from "@/components/settings/AddGlucoseCard";
 
 
 type UserRead = {
@@ -28,7 +29,7 @@ export default async function SettingsPage() {
             >
                 <div className="mx-auto max-w-4xl px-6 py-10">
                     <h1 className="text-3xl font-semibold text-slate-900 dark:text-slate-100">
-                        Settings
+                        Account
                     </h1>
 
                     <div
@@ -138,6 +139,7 @@ export default async function SettingsPage() {
                     <Row label="Glucose" value={`${me.glucose}`} />
 
                     <SignOutButton />
+                    <AddGlucoseCard />
                 </div>
             </div>
         </section>
