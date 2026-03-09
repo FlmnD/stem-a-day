@@ -117,7 +117,7 @@ export const EasyArticlePips: Article = () => {
                     <li>The amount of solute does not change</li>
                 </ul>
                 <p className="italic text-gray-600 mb-6">
-                    <Image src="/.png" alt=" equation diagram" height={300} width={200} />
+                    <Image src="/dilution.png" alt=" equation diagram" height={300} width={200} />
                 </p>
 
                 <div className="mb-7">

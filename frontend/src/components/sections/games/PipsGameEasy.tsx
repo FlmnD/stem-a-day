@@ -42,17 +42,12 @@ interface GameState {
 const GRID = 10;
 const CELL = 55;
 
-// Each pair represents variables that go together for a given relationship
-// Molarity: M = n/V  → pairs: M & n, M & V, n & V
-// Dilution: M₁V₁ = M₂V₂ → pairs: M₁ & V₁, M₂ & V₂
-// Moles from mass: n = g/MM → pairs: n & g, n & MM, g & MM
-// Moles from conc (initial/final): n₁ = M₁V₁, n₂ = M₂V₂
 const VAR_POOL: [MolarVar, MolarVar][] = [
-  ['n', '1/V'],    // Molarity
-  ['M₁', 'V₁'],   // Dilution initial
-  ['M₂', 'V₂'],   // Dilution final
-  ['g', '1/MM'],   // Moles from Mass
-  ['M', 'V'],      // Moles from Concentration
+  ['n', '1/V'],
+  ['M₁', 'V₁'],
+  ['M₂', 'V₂'],
+  ['g', '1/MM'],
+  ['M', 'V'],
 ];
 
 const shuffle = <T,>(arr: T[]) =>
@@ -112,13 +107,11 @@ const generateGame = (): GameState => {
       const dir = dirs[Math.floor(Math.random() * 4)];
       const nx = cursor.x + dir.x;
       const ny = cursor.y + dir.y;
-
       const k1 = `${cursor.x},${cursor.y}`;
       const k2 = `${nx},${ny}`;
 
       if (nx > 1 && nx < GRID - 2 && ny > 1 && ny < GRID - 2 &&
         !used.has(k1) && !used.has(k2)) {
-
         used.add(k1);
         used.add(k2);
 
@@ -130,23 +123,11 @@ const generateGame = (): GameState => {
         const code = LAW_CODES[law] + state;
 
         regions.push({
-          id: `R${i}`,
-          label: code,
-          law,
-          code,
-          cells,
-          required: chosen[i],
-          color: LAW_COLORS[law]
+          id: `R${i}`, label: code, law, code,
+          cells, required: chosen[i], color: LAW_COLORS[law]
         });
 
-        dominos.push({
-          id: i + 1,
-          sides: chosen[i],
-          rotation: 0,
-          x: null,
-          y: null
-        });
-
+        dominos.push({ id: i + 1, sides: chosen[i], rotation: 0, x: null, y: null });
         cursor = { x: nx, y: ny };
         placed = true;
       } else {
@@ -158,27 +139,62 @@ const generateGame = (): GameState => {
     }
   }
 
-  return {
-    mapCells,
-    regions,
-    dominos: shuffle(dominos)
-  };
+  return { mapCells, regions, dominos: shuffle(dominos) };
 };
 
-export default function EasyPips() {
+const INTRO_STEPS = [
+  {
+    image: "/molaritypips1.png",
+    title: 'Welcome to Molarity Pips',
+    body: 'Match each domino to the molarity relationship it represents on the concept map.',
+    sub: 'Click through to learn how to play.',
+  },
+  {
+    image: "/molaritypips2.png",
+    title: 'Select a Domino',
+    body: 'Click a domino in the tray to select it.',
+    sub: 'The selected domino highlights in blue.',
+  },
+  {
+    image: "/molaritypips3.png",
+    title: 'Place it on the Map',
+    body: 'Click a colored cell on the map to place the domino. It will occupy that cell and the adjacent one based on its orientation.',
+    sub: 'Each domino covers exactly two cells.',
+  },
+  {
+    image: "/molaritypips4.png",
+    title: 'Rotate Dominos',
+    body: 'Double-click any domino — in the tray or on the map — to rotate it 90° clockwise.',
+    sub: 'Rotations that cause overlap or go out of bounds are ignored.',
+  },
+  {
+    image: "/molaritypips5.png",
+    title: 'Read the Region Codes',
+    body: 'Each region is labeled with a code like Mo, Di1, Mm, Mc. The letters = the relationship, the number = initial (1) or final (2) state.',
+    sub: 'Use the Region Code Key and Full Reference panels on the right.',
+  },
+  {
+    image: "/molaritypips6.png",
+    title: 'Check Your Solution',
+    body: "Once all dominos are placed, press Check Solution to see if you're correct.",
+    sub: 'Press New Game at any time to start a fresh puzzle.',
+  },
+];
 
+export default function EasyPips() {
   const [game, setGame] = useState<GameState | null>(null);
   const [dominos, setDominos] = useState<Domino[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [result, setResult] = useState<'correct' | 'wrong' | null>(null);
+  const [introStep, setIntroStep] = useState(0);
+  const [showIntro, setShowIntro] = useState(true);
+  const [hasSeenIntro, setHasSeenIntro] = useState(false);
 
   useEffect(() => {
     const g = generateGame();
     setGame(g);
     setDominos(g.dominos);
   }, []);
-
-  if (!game) return null;
 
   const occupied = (d: Domino) => {
     if (d.x === null || d.y === null) return [];
@@ -191,6 +207,7 @@ export default function EasyPips() {
   };
 
   const checkSolution = () => {
+    if (!game) return;
     const correct = game.regions.every(r => {
       const placed = dominos.filter(d =>
         d.x !== null && r.cells.some(c => c.x === d.x && c.y === d.y)
@@ -210,6 +227,7 @@ export default function EasyPips() {
   };
 
   const rotate = (id: number) => {
+    if (!game) return;
     setDominos(prev => {
       const d = prev.find(d => d.id === id);
       if (!d) return prev;
@@ -237,35 +255,60 @@ export default function EasyPips() {
   };
 
   const handleMapCellClick = (cx: number, cy: number) => {
-    if (selectedId === null) return;
+    if (!game || selectedId === null) return;
     const d = dominos.find(d => d.id === selectedId);
     if (!d) return;
-    let tx = cx, ty = cy;
-    if (d.rotation === 0) tx++;
-    else if (d.rotation === 1) ty++;
-    else if (d.rotation === 2) tx--;
-    else ty--;
-    const otherOccupied = dominos.filter(od => od.id !== selectedId).flatMap(od => {
-      if (od.x === null || od.y === null) return [];
-      let ox = od.x, oy = od.y;
-      if (od.rotation === 0) ox++;
-      else if (od.rotation === 1) oy++;
-      else if (od.rotation === 2) ox--;
-      else oy--;
-      return [{ x: od.x, y: od.y }, { x: ox, y: oy }];
-    });
-    const overlaps = (x: number, y: number) => otherOccupied.some(c => c.x === x && c.y === y);
-    const valid = inside(game.mapCells, cx, cy) && inside(game.mapCells, tx, ty) && !overlaps(cx, cy) && !overlaps(tx, ty);
-    if (valid) {
-      setDominos(prev => prev.map(dom => dom.id === selectedId ? { ...dom, x: cx, y: cy } : dom));
-      setSelectedId(null);
-    }
+
+    const tryPlace = (ax: number, ay: number, rot: Rotation): boolean => {
+      let tx = ax, ty = ay;
+      if (rot === 0) tx++;
+      else if (rot === 1) ty++;
+      else if (rot === 2) tx--;
+      else ty--;
+
+      const otherOccupied = dominos.filter(od => od.id !== selectedId).flatMap(od => {
+        if (od.x === null || od.y === null) return [];
+        let ox = od.x, oy = od.y;
+        if (od.rotation === 0) ox++;
+        else if (od.rotation === 1) oy++;
+        else if (od.rotation === 2) ox--;
+        else oy--;
+        return [{ x: od.x, y: od.y }, { x: ox, y: oy }];
+      });
+      const overlaps = (x: number, y: number) => otherOccupied.some(c => c.x === x && c.y === y);
+      const valid =
+        inside(game.mapCells, ax, ay) &&
+        inside(game.mapCells, tx, ty) &&
+        !overlaps(ax, ay) &&
+        !overlaps(tx, ty);
+
+      if (valid) {
+        setDominos(prev => prev.map(dom =>
+          dom.id === selectedId ? { ...dom, x: ax, y: ay, rotation: rot } : dom
+        ));
+        setSelectedId(null);
+        setResult(null);
+        return true;
+      }
+      return false;
+    };
+
+    const rot = d.rotation;
+
+    if (tryPlace(cx, cy, rot)) return;
+
+    const reverseAnchors: Record<Rotation, { x: number; y: number }> = {
+      0: { x: cx - 1, y: cy },
+      1: { x: cx, y: cy - 1 },
+      2: { x: cx + 1, y: cy },
+      3: { x: cx, y: cy + 1 },
+    };
+    tryPlace(reverseAnchors[rot].x, reverseAnchors[rot].y, rot);
   };
 
   const returnToTray = (id: number) => {
-    setDominos(prev =>
-      prev.map(d => d.id === id ? { ...d, x: null, y: null } : d)
-    );
+    setDominos(prev => prev.map(d => d.id === id ? { ...d, x: null, y: null } : d));
+    setResult(null);
   };
 
   const newGame = () => {
@@ -275,6 +318,19 @@ export default function EasyPips() {
     setResult(null);
     setSelectedId(null);
   };
+
+  const openIntro = () => {
+    setIntroStep(0);
+    setShowIntro(true);
+  };
+
+  const closeIntro = () => {
+    setShowIntro(false);
+    setHasSeenIntro(true);
+    setIntroStep(0);
+  };
+
+  const step = INTRO_STEPS[introStep];
 
   return (
     <div className="flex flex-col items-center p-6 bg-white min-h-screen">
@@ -287,182 +343,199 @@ export default function EasyPips() {
         </button>
         <button
           onClick={checkSolution}
-          disabled={dominos.some(d => d.x === null)}
+          disabled={!game || dominos.some(d => d.x === null)}
           className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-30 disabled:cursor-not-allowed"
         >
           Check Solution
         </button>
+        {hasSeenIntro && (
+          <button onClick={openIntro} className="px-4 py-2 bg-gray-200 text-gray-700 rounded">
+            How to Play
+          </button>
+        )}
         {result === 'correct' && <span className="text-green-600 font-bold">🎉 Correct!</span>}
         {result === 'wrong' && <span className="text-red-500 font-bold">❌ Try again!</span>}
       </div>
 
-      <div className="flex gap-8 items-start">
+      {game && (
+        <div className="flex gap-8 items-start">
 
-        {/* MAP */}
-        <div
-          className="relative border-4 border-gray-600 bg-[#e5e7eb]"
-          style={{ width: GRID * CELL, height: GRID * CELL }}
-        >
+          <div className="relative">
 
-          {game.mapCells.map((c, i) => (
-            <div key={i}
-              className="absolute border cursor-pointer"
-              style={{
-                left: c.x * CELL,
-                top: c.y * CELL,
-                width: CELL,
-                height: CELL,
-                background: selectedId !== null ? "#c9b89e" : "#b7a99a"
-              }}
-              onClick={() => handleMapCellClick(c.x, c.y)}
-            />
-          ))}
+            {showIntro && (
+              <div
+                className="absolute inset-0 z-50 flex items-center justify-center rounded"
+                style={{ background: 'rgba(255,255,255,0.96)', width: GRID * CELL, height: GRID * CELL }}
+              >
+                <div className="w-80 p-6 text-center">
+                  <img
+                    src={step.image}
+                    alt={step.title}
+                    className="w-full rounded mb-4 border object-cover"
+                    style={{ maxHeight: 200 }}
+                  />
+                  <h2 className="text-xl font-bold mb-3">{step.title}</h2>
+                  <p className="text-gray-700 mb-2">{step.body}</p>
+                  <p className="text-sm text-gray-400">{step.sub}</p>
 
-          {game.regions.map(r =>
-            r.cells.map((c, i) => (
-              <div key={r.id + i}
-                className="absolute text-[10px] font-bold flex items-end justify-end p-1"
-                style={{
-                  left: c.x * CELL,
-                  top: c.y * CELL,
-                  width: CELL,
-                  height: CELL,
-                  background: r.color,
-                  border: "2px solid black",
-                  pointerEvents: selectedId !== null ? 'auto' : 'none'
-                }}
-                onClick={() => handleMapCellClick(c.x, c.y)}>
-                {i === 0 && (
-                  <div className="text-sm font-bold">
-                    {r.label}
+                  <div className="flex justify-center gap-2 mt-5 mb-5">
+                    {INTRO_STEPS.map((_, i) => (
+                      <div key={i} className="w-2 h-2 rounded-full"
+                        style={{ background: i === introStep ? '#2563eb' : '#d1d5db' }} />
+                    ))}
                   </div>
-                )}
+
+                  <div className="flex justify-between">
+                    {introStep > 0
+                      ? <button onClick={() => setIntroStep(s => s - 1)} className="px-4 py-2 bg-gray-200 rounded">Back</button>
+                      : <div />
+                    }
+                    {introStep < INTRO_STEPS.length - 1
+                      ? <button onClick={() => setIntroStep(s => s + 1)} className="px-4 py-2 bg-blue-600 text-white rounded">Next</button>
+                      : <button onClick={closeIntro} className="px-4 py-2 bg-green-600 text-white rounded">Start Game</button>
+                    }
+                  </div>
+                </div>
               </div>
-            ))
-          )}
+            )}
 
-          {dominos.map(d => {
-            if (d.x === null || d.y === null) return null;
-            const baseX = d.x;
-            const baseY = d.y;
-            const cells = occupied(d);
+            <div
+              className="relative border-4 border-gray-600 bg-[#e5e7eb]"
+              style={{ width: GRID * CELL, height: GRID * CELL }}
+            >
+              {game.mapCells.map((c, i) => (
+                <div key={i}
+                  className="absolute border cursor-pointer"
+                  style={{
+                    left: c.x * CELL, top: c.y * CELL,
+                    width: CELL, height: CELL,
+                    background: selectedId !== null ? "#c9b89e" : "#b7a99a"
+                  }}
+                  onClick={() => handleMapCellClick(c.x, c.y)}
+                />
+              ))}
 
-            return (
-              <div key={d.id}
-                onDoubleClick={() => rotate(d.id)}
-                onClick={() => setSelectedId(prev => prev === d.id ? null : d.id)}
-                className="absolute cursor-pointer"
-                style={{
-                  left: baseX * CELL, top: baseY * CELL,
-                  zIndex: selectedId === d.id ? 20 : 10
-                }}>
-                {cells.map((o, i) => (
-                  <div key={i}
-                    className="absolute bg-white flex items-center justify-center font-bold text-sm"
+              {game.regions.map(r =>
+                r.cells.map((c, i) => (
+                  <div key={r.id + i}
+                    className="absolute text-[10px] font-bold flex items-end justify-end p-1"
                     style={{
-                      width: CELL - 4, height: CELL - 4,
-                      left: (o.x - baseX) * CELL + 2, top: (o.y - baseY) * CELL + 2,
-                      border: selectedId === d.id ? '2px solid #2563eb' : '2px solid #555'
+                      left: c.x * CELL, top: c.y * CELL,
+                      width: CELL, height: CELL,
+                      background: r.color,
+                      border: "2px solid black",
+                      pointerEvents: selectedId !== null ? 'auto' : 'none'
+                    }}
+                    onClick={() => handleMapCellClick(c.x, c.y)}>
+                    {i === 0 && <div className="text-sm font-bold">{r.label}</div>}
+                  </div>
+                ))
+              )}
+
+              {dominos.map(d => {
+                if (d.x === null || d.y === null) return null;
+                const baseX = d.x, baseY = d.y;
+                const cells = occupied(d);
+                return (
+                  <div key={d.id}
+                    onDoubleClick={() => rotate(d.id)}
+                    onClick={() => setSelectedId(prev => prev === d.id ? null : d.id)}
+                    className="absolute cursor-pointer"
+                    style={{
+                      left: baseX * CELL, top: baseY * CELL,
+                      zIndex: selectedId === d.id ? 20 : 10,
+                      userSelect: 'none',
                     }}>
-                    {d.sides[i]}
+                    {cells.map((o, i) => (
+                      <div key={i}
+                        className="absolute bg-white flex items-center justify-center font-bold text-sm"
+                        style={{
+                          width: CELL - 4, height: CELL - 4,
+                          left: (o.x - baseX) * CELL + 2, top: (o.y - baseY) * CELL + 2,
+                          border: selectedId === d.id ? '2px solid #2563eb' : '2px solid #555',
+                          userSelect: 'none',
+                        }}>
+                        {d.sides[i]}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-4 items-start">
+
+              <div
+                className="border p-4 flex flex-wrap gap-4"
+                style={{ width: 220, minHeight: 80 }}
+                onClick={() => { if (selectedId !== null) { returnToTray(selectedId); setSelectedId(null); } }}
+              >
+                {dominos.map(d => d.x === null && (
+                  <div key={d.id}
+                    onDoubleClick={() => rotate(d.id)}
+                    onClick={e => { e.stopPropagation(); setSelectedId(prev => prev === d.id ? null : d.id); }}
+                    className={`bg-white flex cursor-pointer ${d.rotation % 2 === 1 ? 'flex-col w-12 h-24' : 'flex-row w-24 h-12'}`}
+                    style={{
+                      border: selectedId === d.id ? '2px solid #2563eb' : '2px solid #555',
+                      userSelect: 'none',
+                    }}>
+                    <div className="flex-1 flex items-center justify-center font-bold" style={{ userSelect: 'none' }}>{d.sides[0]}</div>
+                    <div className="flex-1 flex items-center justify-center font-bold border-l" style={{ userSelect: 'none' }}>{d.sides[1]}</div>
                   </div>
                 ))}
               </div>
-            );
-          })}
 
-        </div>
+              <div className="flex flex-col gap-4 w-64">
 
-        {/* RIGHT SIDE */}
-        <div className="flex flex-col gap-4">
-
-          {/* TRAY + INFO side by side */}
-          <div className="flex gap-4 items-start">
-
-            {/* DOMINO TRAY */}
-            <div
-              className="border p-4 flex flex-wrap gap-4"
-              style={{ width: 220, minHeight: 80 }}
-              onClick={() => { if (selectedId !== null) { returnToTray(selectedId); setSelectedId(null); } }}
-            >
-              {dominos.map(d => d.x === null && (
-                <div key={d.id}
-                  onDoubleClick={() => rotate(d.id)}
-                  onClick={e => { e.stopPropagation(); setSelectedId(prev => prev === d.id ? null : d.id); }}
-                  className={`bg-white flex cursor-pointer ${d.rotation % 2 === 1 ? 'flex-col w-12 h-24' : 'flex-row w-24 h-12'}`}
-                  style={{ border: selectedId === d.id ? '2px solid #2563eb' : '2px solid #555' }}>
-                  <div className="flex-1 flex items-center justify-center font-bold">
-                    {d.sides[0]}
-                  </div>
-                  <div className="flex-1 flex items-center justify-center font-bold border-l">
-                    {d.sides[1]}
-                  </div>
+                <div className="text-sm border p-3 bg-gray-50">
+                  <h2 className="font-bold mb-2">Region Code Key</h2>
+                  <p style={{ color: 'hsl(210,70%,50%)' }}><strong>Mo</strong> = Molarity</p>
+                  <p style={{ color: 'hsl(0,70%,50%)' }}><strong>Di</strong> = Dilution</p>
+                  <p style={{ color: 'hsl(120,60%,40%)' }}><strong>Mm</strong> = Moles from Mass</p>
+                  <p style={{ color: 'hsl(280,60%,50%)' }}><strong>Mc</strong> = Moles from Concentration</p>
+                  <hr className="my-2" />
+                  <p><strong>1</strong> = Initial state</p>
+                  <p><strong>2</strong> = Final state</p>
+                  <hr className="my-2" />
+                  <p className="italic">Example: Di1 → M₁ · V₁</p>
                 </div>
-              ))}
-            </div>
 
-            {/* INFO COLUMN */}
-            <div className="flex flex-col gap-4 w-64">
+                <details className="border bg-gray-50 text-sm">
+                  <summary className="cursor-pointer font-bold px-3 py-2 bg-gray-200">
+                    Full Reference
+                  </summary>
+                  <div className="p-3 space-y-3">
+                    <div style={{ color: 'hsl(210,70%,50%)' }}>
+                      <p className="font-semibold">Molarity</p>
+                      <p>M = n / V</p>
+                      <p className="italic">moles per liter of solution</p>
+                    </div>
+                    <div style={{ color: 'hsl(0,70%,50%)' }}>
+                      <p className="font-semibold">Dilution</p>
+                      <p>M₁V₁ = M₂V₂</p>
+                      <p className="italic">moles of solute stay constant</p>
+                    </div>
+                    <div style={{ color: 'hsl(120,60%,40%)' }}>
+                      <p className="font-semibold">Moles from Mass</p>
+                      <p>n = g / MM</p>
+                      <p className="italic">g = grams, MM = molar mass</p>
+                    </div>
+                    <div style={{ color: 'hsl(280,60%,50%)' }}>
+                      <p className="font-semibold">Moles from Concentration</p>
+                      <p>n = M · V</p>
+                      <p className="italic">initial: n₁ = M₁V₁ · final: n₂ = M₂V₂</p>
+                    </div>
+                  </div>
+                </details>
 
-              {/* REGION CODE KEY */}
-              <div className="text-sm border p-3 bg-gray-50">
-                <h2 className="font-bold mb-2">Region Code Key</h2>
-
-                <p style={{ color: 'hsl(210,70%,50%)' }}><strong>Mo</strong> = Molarity</p>
-                <p style={{ color: 'hsl(0,70%,50%)' }}><strong>Di</strong> = Dilution</p>
-                <p style={{ color: 'hsl(120,60%,40%)' }}><strong>Mm</strong> = Moles from Mass</p>
-                <p style={{ color: 'hsl(280,60%,50%)' }}><strong>Mc</strong> = Moles from Concentration</p>
-
-                <hr className="my-2" />
-
-                <p><strong>1</strong> = Initial state</p>
-                <p><strong>2</strong> = Final state</p>
-
-                <hr className="my-2" />
-
-                <p className="italic">Example: Di1 → M₁ · V₁</p>
               </div>
-
-              {/* COLLAPSIBLE FULL REFERENCE */}
-              <details className="border bg-gray-50 text-sm">
-                <summary className="cursor-pointer font-bold px-3 py-2 bg-gray-200">
-                  Full Reference
-                </summary>
-
-                <div className="p-3 space-y-3">
-
-                  <div style={{ color: 'hsl(210,70%,50%)' }}>
-                    <p className="font-semibold">Molarity</p>
-                    <p>M = n / V</p>
-                    <p className="italic">moles per liter of solution</p>
-                  </div>
-
-                  <div style={{ color: 'hsl(0,70%,50%)' }}>
-                    <p className="font-semibold">Dilution</p>
-                    <p>M₁V₁ = M₂V₂</p>
-                    <p className="italic">moles of solute stay constant</p>
-                  </div>
-
-                  <div style={{ color: 'hsl(120,60%,40%)' }}>
-                    <p className="font-semibold">Moles from Mass</p>
-                    <p>n = g / MM</p>
-                    <p className="italic">g = grams, MM = molar mass</p>
-                  </div>
-
-                  <div style={{ color: 'hsl(280,60%,50%)' }}>
-                    <p className="font-semibold">Moles from Concentration</p>
-                    <p>n = M · V</p>
-                    <p className="italic">initial: n₁ = M₁V₁ · final: n₂ = M₂V₂</p>
-                  </div>
-
-                </div>
-              </details>
-
             </div>
           </div>
-        </div>
 
-      </div>
+        </div>
+      )}
     </div>
   );
 }
