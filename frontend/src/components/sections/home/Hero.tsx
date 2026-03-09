@@ -81,7 +81,7 @@ export default function Hero() {
                     </Button>
                 </div>
 
-                <div className="mx-auto mt-12 max-w-5xl">
+                {/* <div className="mx-auto mt-12 max-w-5xl">
                     <div
                         className="rounded-2xl border p-3 shadow-sm backdrop-blur
                        border-sky-200 bg-white/80
@@ -97,7 +97,7 @@ export default function Hero() {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 <p className="mt-4 text-xs text-sky-900/70 dark:text-gray-400">
                     No ads. Built for students &amp; teachers.

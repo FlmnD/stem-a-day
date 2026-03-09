@@ -1,17 +1,25 @@
+
 import { dailyLessons } from "@/components/lib/data/home";
 
 export default function DailyPreview() {
     return (
-        <section className="bg-gradient-to-b from-white to-sky-50/70">
+        <section
+            className="bg-linear-to-b from-white to-sky-50/70
+            dark:from-black dark:via-[#0b0b0b] dark:to-[#0b0b0b]"
+        >
             <div className="mx-auto max-w-6xl px-4 pb-10 pt-8">
-                <div className="rounded-2xl border border-sky-200 bg-white p-6 shadow-sm">
+                <div
+                    className="rounded-2xl border border-sky-200 bg-white p-6 shadow-sm
+                    dark:border-slate-700 dark:bg-slate-950/60 dark:shadow-black/30"
+                >
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                        <h2 className="text-xl font-semibold text-sky-900">
+                        <h2 className="text-xl font-semibold text-sky-900 dark:text-slate-100">
                             Today’s lineup
                         </h2>
                         <a
                             href="/games"
-                            className="text-sm font-medium text-sky-700 hover:underline"
+                            className="text-sm font-medium text-sky-700 hover:underline
+                            dark:text-teal-300"
                         >
                             View all lessons →
                         </a>
@@ -21,23 +29,25 @@ export default function DailyPreview() {
                         {dailyLessons.map((l) => (
                             <li
                                 key={l.title}
-                                className="rounded-xl border border-sky-200 bg-sky-50/60 p-4 transition hover:bg-sky-100"
+                                className="rounded-xl border border-sky-200 bg-sky-50/60 p-4 transition hover:bg-sky-100
+                                dark:border-slate-700 dark:bg-slate-900/60 dark:hover:bg-slate-900"
                             >
-                                <span className="text-xs font-medium text-sky-700">
+                                <span className="text-xs font-medium text-sky-700 dark:text-teal-300">
                                     {l.tag}
                                 </span>
 
-                                <p className="mt-1 font-medium text-gray-900">
+                                <p className="mt-1 font-medium text-gray-900 dark:text-slate-100">
                                     {l.title}
                                 </p>
 
-                                <p className="mt-1 text-sm text-gray-600">
+                                <p className="mt-1 text-sm text-gray-600 dark:text-slate-300">
                                     {l.time}
                                 </p>
 
                                 <a
                                     href={l.href}
-                                    className="mt-3 inline-flex text-sm font-medium text-sky-700 hover:underline"
+                                    className="mt-3 inline-flex text-sm font-medium text-sky-700 hover:underline
+                                    dark:text-teal-300"
                                 >
                                     Start lesson
                                 </a>
