@@ -1,3 +1,4 @@
+
 import Collapsible from "@/components/ui/Collapsible";
 import HardPips from "@/components/sections/games/PipsGameHard";
 import {
@@ -7,9 +8,8 @@ import {
 
 export default function HardPagePips() {
   return (
-    <div className="min-h-screen flex flex-col items-center py-10 bg-gray-100">
-
-      <h1 className="text-3xl font-bold mb-6">
+    <div className="min-h-screen flex flex-col items-center py-10 bg-gray-100 dark:bg-black dark:text-slate-100">
+      <h1 className="text-3xl font-bold mb-6 text-slate-900 dark:text-slate-100">
         Pips: Gas Laws
       </h1>
 
@@ -24,7 +24,6 @@ export default function HardPagePips() {
       <HardLessonPips />
 
       <HardPips />
-
     </div>
   );
 }

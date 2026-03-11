@@ -1,3 +1,4 @@
+
 'use client'
 import React, { useEffect, useState } from "react";
 
@@ -44,13 +45,14 @@ interface GameState {
 
 const GRID = 10;
 const CELL = 55;
+const COIN_REWARD = 35;
 
 const VAR_POOL: [GasVar, GasVar][] = [
-  ['P₁','V₁'],['P₂','V₂'],
-  ['V₁','1/T₁'],['V₂','1/T₂'],
-  ['P₁','1/T₁'],['P₂','1/T₂'],
-  ['V₁','1/n₁'],['V₂','1/n₂'],
-  ['P','V'],['V','T'],['P','R'],
+  ['P₁', 'V₁'], ['P₂', 'V₂'],
+  ['V₁', '1/T₁'], ['V₂', '1/T₂'],
+  ['P₁', '1/T₁'], ['P₂', '1/T₂'],
+  ['V₁', '1/n₁'], ['V₂', '1/n₂'],
+  ['P', 'V'], ['V', 'T'], ['P', 'R'],
 ];
 
 const shuffle = <T,>(arr: T[]) =>
@@ -116,8 +118,10 @@ const generateGame = (): GameState => {
       const k1 = `${cursor.x},${cursor.y}`;
       const k2 = `${nx},${ny}`;
 
-      if (nx > 1 && nx < GRID - 2 && ny > 1 && ny < GRID - 2 &&
-        !used.has(k1) && !used.has(k2)) {
+      if (
+        nx > 1 && nx < GRID - 2 && ny > 1 && ny < GRID - 2 &&
+        !used.has(k1) && !used.has(k2)
+      ) {
         used.add(k1);
         used.add(k2);
 
@@ -196,6 +200,12 @@ export default function HardPips() {
   const [showIntro, setShowIntro] = useState(true);
   const [hasSeenIntro, setHasSeenIntro] = useState(false);
 
+  const [rewardPopupOpen, setRewardPopupOpen] = useState(false);
+  const [rewardAmount, setRewardAmount] = useState(0);
+  const [rewardStatus, setRewardStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
+  const [rewardMessage, setRewardMessage] = useState("");
+  const [rewardClaimed, setRewardClaimed] = useState(false);
+
   useEffect(() => {
     const g = generateGame();
     setGame(g);
@@ -211,6 +221,35 @@ export default function HardPips() {
     else ty--;
     return [{ x: d.x, y: d.y }, { x: tx, y: ty }];
   };
+
+  async function awardCoins(amount: number) {
+    setRewardAmount(amount);
+    setRewardPopupOpen(true);
+    setRewardStatus("loading");
+    setRewardMessage("");
+
+    try {
+      const r = await fetch("/api/coins/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount }),
+      });
+
+      const data = await r.json().catch(() => ({}));
+
+      if (!r.ok) {
+        setRewardStatus("error");
+        setRewardMessage(data?.message ?? data?.detail ?? "Failed to add coins.");
+        return;
+      }
+
+      setRewardStatus("ok");
+      setRewardMessage(`You earned ${amount} coins!`);
+    } catch {
+      setRewardStatus("error");
+      setRewardMessage("Network error. Could not update coins.");
+    }
+  }
 
   const checkSolution = () => {
     if (!game) return;
@@ -229,10 +268,16 @@ export default function HardPips() {
       const sidesMatch = isIdeal
         ? d.sides.every(s => idealVars.includes(s))
         : d.sides.every(s => r.required.includes(s)) &&
-          r.required.every(s => d.sides.includes(s));
+        r.required.every(s => d.sides.includes(s));
       return coversRegion && sidesMatch;
     });
+
     setResult(correct ? 'correct' : 'wrong');
+
+    if (correct && !rewardClaimed) {
+      setRewardClaimed(true);
+      void awardCoins(COIN_REWARD);
+    }
   };
 
   const rotate = (id: number) => {
@@ -257,7 +302,11 @@ export default function HardPips() {
         return [{ x: od.x, y: od.y }, { x: ox, y: oy }];
       });
       const overlaps = (x: number, y: number) => otherOccupied.some(c => c.x === x && c.y === y);
-      const valid = inside(game.mapCells, d.x!, d.y!) && inside(game.mapCells, tx, ty) && !overlaps(d.x!, d.y!) && !overlaps(tx, ty);
+      const valid =
+        inside(game.mapCells, d.x!, d.y!) &&
+        inside(game.mapCells, tx, ty) &&
+        !overlaps(d.x!, d.y!) &&
+        !overlaps(tx, ty);
       if (valid) return prev.map(dom => dom.id === id ? { ...dom, rotation: newRot } : dom);
       return prev;
     });
@@ -327,6 +376,12 @@ export default function HardPips() {
     setDominos(g.dominos);
     setResult(null);
     setSelectedId(null);
+
+    setRewardPopupOpen(false);
+    setRewardAmount(0);
+    setRewardStatus("idle");
+    setRewardMessage("");
+    setRewardClaimed(false);
   };
 
   const openIntro = () => {
@@ -343,214 +398,299 @@ export default function HardPips() {
   const step = INTRO_STEPS[introStep];
 
   return (
-    <div className="flex flex-col items-center p-6 bg-white min-h-screen">
+    <>
+      <div className="flex flex-col items-center p-6 bg-white text-slate-900 min-h-screen dark:bg-black dark:text-slate-100">
+        <h1 className="text-xl font-bold mb-4 text-slate-900 dark:text-slate-100">Gas Laws Pips</h1>
 
-      <h1 className="text-xl font-bold mb-4">Gas Laws Pips</h1>
-
-      <div className="mb-6 flex gap-3 items-center">
-        <button onClick={newGame} className="px-4 py-2 bg-blue-600 text-white rounded">
-          New Game
-        </button>
-        <button
-          onClick={checkSolution}
-          disabled={!game || dominos.some(d => d.x === null)}
-          className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          Check Solution
-        </button>
-        {hasSeenIntro && (
-          <button onClick={openIntro} className="px-4 py-2 bg-gray-200 text-gray-700 rounded">
-            How to Play
+        <div className="mb-6 flex gap-3 items-center flex-wrap">
+          <button
+            onClick={newGame}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-sky-500 dark:text-black dark:hover:bg-sky-400"
+          >
+            New Game
           </button>
-        )}
-        {result === 'correct' && <span className="text-green-600 font-bold">🎉 Correct!</span>}
-        {result === 'wrong' && <span className="text-red-500 font-bold">❌ Try again!</span>}
-      </div>
+          <button
+            onClick={checkSolution}
+            disabled={!game || dominos.some(d => d.x === null)}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-30 disabled:cursor-not-allowed dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400"
+          >
+            Check Solution
+          </button>
+          {hasSeenIntro && (
+            <button
+              onClick={openIntro}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+            >
+              How to Play
+            </button>
+          )}
+          {result === 'correct' && <span className="text-green-600 dark:text-emerald-300 font-bold">🎉 Correct!</span>}
+          {result === 'wrong' && <span className="text-red-500 dark:text-red-300 font-bold">❌ Try again!</span>}
+        </div>
 
-      {game && (
-        <div className="flex gap-8 items-start">
+        {game && (
+          <div className="flex gap-8 items-start flex-wrap">
+            <div className="relative">
+              {showIntro && (
+                <div
+                  className="absolute inset-0 z-50 flex items-center justify-center rounded bg-white/95 dark:bg-slate-950/95"
+                  style={{ width: GRID * CELL, height: GRID * CELL }}
+                >
+                  <div className="w-80 p-6 text-center">
+                    <img
+                      src={step.image}
+                      alt={step.title}
+                      className="w-full rounded mb-4 border border-slate-300 dark:border-slate-700 object-cover"
+                      style={{ maxHeight: 200 }}
+                    />
+                    <h2 className="text-xl font-bold mb-3 text-slate-900 dark:text-slate-100">{step.title}</h2>
+                    <p className="text-gray-700 dark:text-slate-300 mb-2">{step.body}</p>
+                    <p className="text-sm text-gray-400 dark:text-slate-500">{step.sub}</p>
 
-          <div className="relative">
+                    <div className="flex justify-center gap-2 mt-5 mb-5">
+                      {INTRO_STEPS.map((_, i) => (
+                        <div
+                          key={i}
+                          className={`w-2 h-2 rounded-full ${i === introStep ? 'bg-blue-600 dark:bg-sky-400' : 'bg-gray-300 dark:bg-slate-700'}`}
+                        />
+                      ))}
+                    </div>
 
-            {showIntro && (
-              <div
-                className="absolute inset-0 z-50 flex items-center justify-center rounded"
-                style={{ background: 'rgba(255,255,255,0.96)', width: GRID * CELL, height: GRID * CELL }}
-              >
-                <div className="w-80 p-6 text-center">
-                  <img
-                    src={step.image}
-                    alt={step.title}
-                    className="w-full rounded mb-4 border object-cover"
-                    style={{ maxHeight: 200 }}
-                  />
-                  <h2 className="text-xl font-bold mb-3">{step.title}</h2>
-                  <p className="text-gray-700 mb-2">{step.body}</p>
-                  <p className="text-sm text-gray-400">{step.sub}</p>
-
-                  <div className="flex justify-center gap-2 mt-5 mb-5">
-                    {INTRO_STEPS.map((_, i) => (
-                      <div key={i} className="w-2 h-2 rounded-full"
-                        style={{ background: i === introStep ? '#2563eb' : '#d1d5db' }} />
-                    ))}
-                  </div>
-
-                  <div className="flex justify-between">
-                    {introStep > 0
-                      ? <button onClick={() => setIntroStep(s => s - 1)} className="px-4 py-2 bg-gray-200 rounded">Back</button>
-                      : <div />
-                    }
-                    {introStep < INTRO_STEPS.length - 1
-                      ? <button onClick={() => setIntroStep(s => s + 1)} className="px-4 py-2 bg-blue-600 text-white rounded">Next</button>
-                      : <button onClick={closeIntro} className="px-4 py-2 bg-green-600 text-white rounded">Start Game</button>
-                    }
+                    <div className="flex justify-between">
+                      {introStep > 0 ? (
+                        <button
+                          onClick={() => setIntroStep(s => s - 1)}
+                          className="px-4 py-2 bg-gray-200 text-slate-900 rounded hover:bg-gray-300 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+                        >
+                          Back
+                        </button>
+                      ) : (
+                        <div />
+                      )}
+                      {introStep < INTRO_STEPS.length - 1 ? (
+                        <button
+                          onClick={() => setIntroStep(s => s + 1)}
+                          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-sky-500 dark:text-black dark:hover:bg-sky-400"
+                        >
+                          Next
+                        </button>
+                      ) : (
+                        <button
+                          onClick={closeIntro}
+                          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400"
+                        >
+                          Start Game
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-
-            <div
-              className="relative border-4 border-gray-600 bg-[#e5e7eb]"
-              style={{ width: GRID * CELL, height: GRID * CELL }}
-            >
-              {game.mapCells.map((c, i) => (
-                <div key={i}
-                  className="absolute border cursor-pointer"
-                  style={{
-                    left: c.x * CELL, top: c.y * CELL,
-                    width: CELL, height: CELL,
-                    background: selectedId !== null ? "#c9b89e" : "#b7a99a"
-                  }}
-                  onClick={() => handleMapCellClick(c.x, c.y)}
-                />
-              ))}
-
-              {game.regions.map(r =>
-                r.cells.map((c, i) => (
-                  <div key={r.id + i}
-                    className="absolute text-[10px] font-bold flex items-end justify-end p-1"
-                    style={{
-                      left: c.x * CELL, top: c.y * CELL,
-                      width: CELL, height: CELL,
-                      background: r.color,
-                      border: "2px solid black",
-                      pointerEvents: selectedId !== null ? 'auto' : 'none'
-                    }}
-                    onClick={() => handleMapCellClick(c.x, c.y)}>
-                    {i === 0 && <div className="text-sm font-bold">{r.label}</div>}
-                  </div>
-                ))
               )}
 
-              {dominos.map(d => {
-                if (d.x === null || d.y === null) return null;
-                const baseX = d.x, baseY = d.y;
-                const cells = occupied(d);
-                return (
-                  <div key={d.id}
-                    onDoubleClick={() => rotate(d.id)}
-                    onClick={() => setSelectedId(prev => prev === d.id ? null : d.id)}
-                    className="absolute cursor-pointer"
-                    style={{
-                      left: baseX * CELL, top: baseY * CELL,
-                      zIndex: selectedId === d.id ? 20 : 10,
-                      userSelect: 'none',
-                    }}>
-                    {cells.map((o, i) => (
-                      <div key={i}
-                        className="absolute bg-white flex items-center justify-center font-bold text-sm"
-                        style={{
-                          width: CELL - 4, height: CELL - 4,
-                          left: (o.x - baseX) * CELL + 2, top: (o.y - baseY) * CELL + 2,
-                          border: selectedId === d.id ? '2px solid #2563eb' : '2px solid #555',
-                          userSelect: 'none',
-                        }}>
-                        {d.sides[i]}
-                      </div>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <div className="flex gap-4 items-start">
-
               <div
-                className="border p-4 flex flex-wrap gap-4"
-                style={{ width: 220, minHeight: 80 }}
-                onClick={() => { if (selectedId !== null) { returnToTray(selectedId); setSelectedId(null); } }}
+                className="relative border-4 border-gray-600 bg-[#e5e7eb] dark:border-slate-500 dark:bg-slate-800"
+                style={{ width: GRID * CELL, height: GRID * CELL }}
               >
-                {dominos.map(d => d.x === null && (
-                  <div key={d.id}
-                    onDoubleClick={() => rotate(d.id)}
-                    onClick={e => { e.stopPropagation(); setSelectedId(prev => prev === d.id ? null : d.id); }}
-                    className={`bg-white flex cursor-pointer ${d.rotation % 2 === 1 ? 'flex-col w-12 h-24' : 'flex-row w-24 h-12'}`}
+                {game.mapCells.map((c, i) => (
+                  <div
+                    key={i}
+                    className={`absolute border cursor-pointer ${selectedId !== null ? "bg-[#c9b89e] dark:bg-[#5c5248]" : "bg-[#b7a99a] dark:bg-[#4c433b]"}`}
                     style={{
-                      border: selectedId === d.id ? '2px solid #2563eb' : '2px solid #555',
-                      userSelect: 'none',
-                    }}>
-                    <div className="flex-1 flex items-center justify-center font-bold" style={{ userSelect: 'none' }}>{d.sides[0]}</div>
-                    <div className="flex-1 flex items-center justify-center font-bold border-l" style={{ userSelect: 'none' }}>{d.sides[1]}</div>
-                  </div>
+                      left: c.x * CELL,
+                      top: c.y * CELL,
+                      width: CELL,
+                      height: CELL,
+                    }}
+                    onClick={() => handleMapCellClick(c.x, c.y)}
+                  />
                 ))}
+
+                {game.regions.map(r =>
+                  r.cells.map((c, i) => (
+                    <div
+                      key={r.id + i}
+                      className="absolute text-[10px] font-bold flex items-end justify-end p-1"
+                      style={{
+                        left: c.x * CELL,
+                        top: c.y * CELL,
+                        width: CELL,
+                        height: CELL,
+                        background: r.color,
+                        border: "2px solid black",
+                        pointerEvents: selectedId !== null ? 'auto' : 'none'
+                      }}
+                      onClick={() => handleMapCellClick(c.x, c.y)}
+                    >
+                      {i === 0 && <div className="text-sm font-bold text-black">{r.label}</div>}
+                    </div>
+                  ))
+                )}
+
+                {dominos.map(d => {
+                  if (d.x === null || d.y === null) return null;
+                  const baseX = d.x, baseY = d.y;
+                  const cells = occupied(d);
+                  return (
+                    <div
+                      key={d.id}
+                      onDoubleClick={() => rotate(d.id)}
+                      onClick={() => setSelectedId(prev => prev === d.id ? null : d.id)}
+                      className="absolute cursor-pointer"
+                      style={{
+                        left: baseX * CELL,
+                        top: baseY * CELL,
+                        zIndex: selectedId === d.id ? 20 : 10,
+                        userSelect: 'none',
+                      }}
+                    >
+                      {cells.map((o, i) => (
+                        <div
+                          key={i}
+                          className="absolute bg-white dark:bg-slate-100 text-slate-900 flex items-center justify-center font-bold text-sm"
+                          style={{
+                            width: CELL - 4,
+                            height: CELL - 4,
+                            left: (o.x - baseX) * CELL + 2,
+                            top: (o.y - baseY) * CELL + 2,
+                            border: selectedId === d.id ? '2px solid #2563eb' : '2px solid #555',
+                            userSelect: 'none',
+                          }}
+                        >
+                          {d.sides[i]}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
               </div>
+            </div>
 
-              <div className="flex flex-col gap-4 w-64">
-
-                <div className="text-sm border p-3 bg-gray-50">
-                  <h2 className="font-bold mb-2">Region Code Key</h2>
-                  <p style={{ color: 'hsl(210,70%,50%)' }}><strong>Bo</strong> = Boyle's Law</p>
-                  <p style={{ color: 'hsl(0,70%,50%)' }}><strong>Ch</strong> = Charles's Law</p>
-                  <p style={{ color: 'hsl(120,60%,40%)' }}><strong>GL</strong> = Gay-Lussac's Law</p>
-                  <p style={{ color: 'hsl(280,60%,50%)' }}><strong>Av</strong> = Avogadro's Law</p>
-                  <p style={{ color: 'hsl(40,80%,50%)' }}><strong>IG</strong> = Ideal Gas Law</p>
-                  <hr className="my-2" />
-                  <p><strong>1</strong> = Initial state</p>
-                  <p><strong>2</strong> = Final state</p>
-                  <hr className="my-2" />
-                  <p className="italic">Example: Ch1 → V₁ · 1/T₁</p>
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-4 items-start flex-wrap">
+                <div
+                  className="border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 p-4 flex flex-wrap gap-4"
+                  style={{ width: 220, minHeight: 80 }}
+                  onClick={() => {
+                    if (selectedId !== null) {
+                      returnToTray(selectedId);
+                      setSelectedId(null);
+                    }
+                  }}
+                >
+                  {dominos.map(d => d.x === null && (
+                    <div
+                      key={d.id}
+                      onDoubleClick={() => rotate(d.id)}
+                      onClick={e => {
+                        e.stopPropagation();
+                        setSelectedId(prev => prev === d.id ? null : d.id);
+                      }}
+                      className={`bg-white dark:bg-slate-100 text-slate-900 flex cursor-pointer ${d.rotation % 2 === 1 ? 'flex-col w-12 h-24' : 'flex-row w-24 h-12'}`}
+                      style={{
+                        border: selectedId === d.id ? '2px solid #2563eb' : '2px solid #555',
+                        userSelect: 'none',
+                      }}
+                    >
+                      <div className="flex-1 flex items-center justify-center font-bold" style={{ userSelect: 'none' }}>
+                        {d.sides[0]}
+                      </div>
+                      <div
+                        className="flex-1 flex items-center justify-center font-bold border-l border-slate-400"
+                        style={{ userSelect: 'none' }}
+                      >
+                        {d.sides[1]}
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
-                <details className="border bg-gray-50 text-sm">
-                  <summary className="cursor-pointer font-bold px-3 py-2 bg-gray-200">
-                    Full Gas Law Reference
-                  </summary>
-                  <div className="p-3 space-y-3">
-                    <div style={{ color: 'hsl(210,70%,50%)' }}>
-                      <p className="font-semibold">Boyle's Law</p>
-                      <p>P₁V₁ = P₂V₂</p>
-                      <p className="italic">Constant Temperature</p>
-                    </div>
-                    <div style={{ color: 'hsl(0,70%,50%)' }}>
-                      <p className="font-semibold">Charles's Law</p>
-                      <p>V₁ / T₁ = V₂ / T₂</p>
-                      <p className="italic">Constant Pressure</p>
-                    </div>
-                    <div style={{ color: 'hsl(120,60%,40%)' }}>
-                      <p className="font-semibold">Gay-Lussac's Law</p>
-                      <p>P₁ / T₁ = P₂ / T₂</p>
-                      <p className="italic">Constant Volume</p>
-                    </div>
-                    <div style={{ color: 'hsl(280,60%,50%)' }}>
-                      <p className="font-semibold">Avogadro's Law</p>
-                      <p>V₁ / n₁ = V₂ / n₂</p>
-                      <p className="italic">Constant Pressure & Temperature</p>
-                    </div>
-                    <div style={{ color: 'hsl(40,80%,50%)' }}>
-                      <p className="font-semibold">Ideal Gas Law</p>
-                      <p>PV = nRT</p>
-                    </div>
+                <div className="flex flex-col gap-4 w-64">
+                  <div className="text-sm border border-slate-300 dark:border-slate-700 p-3 bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+                    <h2 className="font-bold mb-2">Region Code Key</h2>
+                    <p style={{ color: 'hsl(210,70%,50%)' }}><strong>Bo</strong> = Boyle&apos;s Law</p>
+                    <p style={{ color: 'hsl(0,70%,50%)' }}><strong>Ch</strong> = Charles&apos;s Law</p>
+                    <p style={{ color: 'hsl(120,60%,40%)' }}><strong>GL</strong> = Gay-Lussac&apos;s Law</p>
+                    <p style={{ color: 'hsl(280,60%,50%)' }}><strong>Av</strong> = Avogadro&apos;s Law</p>
+                    <p style={{ color: 'hsl(40,80%,50%)' }}><strong>IG</strong> = Ideal Gas Law</p>
+                    <hr className="my-2 border-slate-300 dark:border-slate-700" />
+                    <p><strong>1</strong> = Initial state</p>
+                    <p><strong>2</strong> = Final state</p>
+                    <hr className="my-2 border-slate-300 dark:border-slate-700" />
+                    <p className="italic">Example: Ch1 → V₁ · 1/T₁</p>
                   </div>
-                </details>
 
+                  <details className="border border-slate-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-sm text-slate-900 dark:text-slate-100">
+                    <summary className="cursor-pointer font-bold px-3 py-2 bg-gray-200 dark:bg-slate-800">
+                      Full Gas Law Reference
+                    </summary>
+                    <div className="p-3 space-y-3">
+                      <div style={{ color: 'hsl(210,70%,50%)' }}>
+                        <p className="font-semibold">Boyle&apos;s Law</p>
+                        <p>P₁V₁ = P₂V₂</p>
+                        <p className="italic">Constant Temperature</p>
+                      </div>
+                      <div style={{ color: 'hsl(0,70%,50%)' }}>
+                        <p className="font-semibold">Charles&apos;s Law</p>
+                        <p>V₁ / T₁ = V₂ / T₂</p>
+                        <p className="italic">Constant Pressure</p>
+                      </div>
+                      <div style={{ color: 'hsl(120,60%,40%)' }}>
+                        <p className="font-semibold">Gay-Lussac&apos;s Law</p>
+                        <p>P₁ / T₁ = P₂ / T₂</p>
+                        <p className="italic">Constant Volume</p>
+                      </div>
+                      <div style={{ color: 'hsl(280,60%,50%)' }}>
+                        <p className="font-semibold">Avogadro&apos;s Law</p>
+                        <p>V₁ / n₁ = V₂ / n₂</p>
+                        <p className="italic">Constant Pressure & Temperature</p>
+                      </div>
+                      <div style={{ color: 'hsl(40,80%,50%)' }}>
+                        <p className="font-semibold">Ideal Gas Law</p>
+                        <p>PV = nRT</p>
+                      </div>
+                    </div>
+                  </details>
+                </div>
               </div>
             </div>
           </div>
+        )}
+      </div>
 
+      {rewardPopupOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-950">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+              Reward Earned!
+            </h2>
+
+            <p className="mt-3 text-lg text-slate-700 dark:text-slate-300">
+              You earned <span className="font-bold">{rewardAmount}</span> coins.
+            </p>
+
+            <div className="mt-4 text-sm">
+              {rewardStatus === "loading" && (
+                <p className="text-slate-600 dark:text-slate-300">Updating coins...</p>
+              )}
+              {rewardStatus === "ok" && (
+                <p className="text-emerald-700 dark:text-emerald-300">{rewardMessage}</p>
+              )}
+              {rewardStatus === "error" && (
+                <p className="text-red-700 dark:text-red-300">{rewardMessage}</p>
+              )}
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setRewardPopupOpen(false)}
+                className="rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white hover:bg-sky-700 dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
