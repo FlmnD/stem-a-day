@@ -10,7 +10,7 @@
 - Docker
 - Python 12 (Needed for backend)
 
-- After downloading the folder, move into the frontend folder with `cd frontend`
+- After downloading the project, move into the frontend folder with `cd frontend`
 - Type and enter `npm install` in the terminal to install the required Node dependencies
 - You may have to type and enter `npm install lucide-react` to install our icon library if it is not installed via `npm install` or if you see errors after runnning the website
 - Go back to the parent folder with `cd ..`
