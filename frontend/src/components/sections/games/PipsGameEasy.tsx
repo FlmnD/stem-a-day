@@ -42,7 +42,7 @@ interface GameState {
 
 const GRID = 10;
 const CELL = 55;
-const COIN_REWARD = 15;
+const GLUCOSE_REWARD = 15;
 
 const VAR_POOL: [MolarVar, MolarVar][] = [
   ['n', '1/V'],
@@ -216,14 +216,14 @@ export default function EasyPips() {
     return [{ x: d.x, y: d.y }, { x: tx, y: ty }];
   };
 
-  async function awardCoins(amount: number) {
+  async function awardGlucose(amount: number) {
     setRewardAmount(amount);
     setRewardPopupOpen(true);
     setRewardStatus("loading");
     setRewardMessage("");
 
     try {
-      const r = await fetch("/api/coins/add", {
+      const r = await fetch("/api/glucose/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount }),
@@ -233,15 +233,15 @@ export default function EasyPips() {
 
       if (!r.ok) {
         setRewardStatus("error");
-        setRewardMessage(data?.message ?? data?.detail ?? "Failed to add coins.");
+        setRewardMessage(data?.message ?? data?.detail ?? "Failed to add glucose.");
         return;
       }
 
       setRewardStatus("ok");
-      setRewardMessage(`You earned ${amount} coins!`);
+      setRewardMessage(`You earned ${amount} glucose!`);
     } catch {
       setRewardStatus("error");
-      setRewardMessage("Network error. Could not update coins.");
+      setRewardMessage("Network error. Could not update glucose.");
     }
   }
 
@@ -267,7 +267,7 @@ export default function EasyPips() {
 
     if (correct && !rewardClaimed) {
       setRewardClaimed(true);
-      void awardCoins(COIN_REWARD);
+      void awardGlucose(GLUCOSE_REWARD);
     }
   };
 
@@ -646,12 +646,12 @@ export default function EasyPips() {
             </h2>
 
             <p className="mt-3 text-lg text-slate-700 dark:text-slate-300">
-              You earned <span className="font-bold">{rewardAmount}</span> coins.
+              You earned <span className="font-bold">{rewardAmount}</span> glucose.
             </p>
 
             <div className="mt-4 text-sm">
               {rewardStatus === "loading" && (
-                <p className="text-slate-600 dark:text-slate-300">Updating coins...</p>
+                <p className="text-slate-600 dark:text-slate-300">Updating glucose...</p>
               )}
               {rewardStatus === "ok" && (
                 <p className="text-emerald-700 dark:text-emerald-300">{rewardMessage}</p>

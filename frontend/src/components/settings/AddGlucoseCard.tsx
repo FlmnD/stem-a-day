@@ -3,11 +3,19 @@
 import { useState } from "react";
 
 export default function AddGlucoseCard() {
-    const [amount, setAmount] = useState<number>(50);
+    const [amountInput, setAmountInput] = useState<string>("50");
     const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
     const [message, setMessage] = useState<string>("");
 
+    const parsedAmount = Number(amountInput);
+    const isValidAmount =
+        amountInput.trim() !== "" &&
+        Number.isFinite(parsedAmount) &&
+        parsedAmount > 0;
+
     async function addGlucose() {
+        if (!isValidAmount) return;
+
         setStatus("loading");
         setMessage("");
 
@@ -15,7 +23,7 @@ export default function AddGlucoseCard() {
             const r = await fetch("/api/glucose/add", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount }),
+                body: JSON.stringify({ amount: parsedAmount }),
             });
 
             const data = await r.json().catch(() => ({}));
@@ -27,7 +35,7 @@ export default function AddGlucoseCard() {
             }
 
             setStatus("ok");
-            setMessage(`Added ${amount} glucose successfully.`);
+            setMessage(`Added ${parsedAmount} glucose successfully.`);
         } catch {
             setStatus("error");
             setMessage("Network error. Could not reach server.");
@@ -48,15 +56,15 @@ export default function AddGlucoseCard() {
                     type="number"
                     min={1}
                     step={1}
-                    value={amount}
-                    onChange={(e) => setAmount(parseInt(e.target.value || "0", 10))}
+                    value={amountInput}
+                    onChange={(e) => setAmountInput(e.target.value)}
                     className="w-full sm:w-40 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none
                      focus:border-sky-400 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100"
                 />
 
                 <button
                     onClick={addGlucose}
-                    disabled={status === "loading" || !Number.isFinite(amount) || amount <= 0}
+                    disabled={status === "loading" || !isValidAmount}
                     className="rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-50
                      dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400"
                 >
