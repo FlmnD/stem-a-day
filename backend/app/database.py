@@ -28,6 +28,22 @@ def bootstrap_database() -> None:
                 )
             )
 
+        if "daily_question_answered_on" not in user_columns:
+            connection.execute(
+                text(
+                    "ALTER TABLE users "
+                    "ADD COLUMN IF NOT EXISTS daily_question_answered_on DATE"
+                )
+            )
+
+        if "daily_debug_offset_days" not in user_columns:
+            connection.execute(
+                text(
+                    "ALTER TABLE users "
+                    "ADD COLUMN IF NOT EXISTS daily_debug_offset_days INTEGER NOT NULL DEFAULT 0"
+                )
+            )
+
 
 def get_db():
     db = SessionLocal()
