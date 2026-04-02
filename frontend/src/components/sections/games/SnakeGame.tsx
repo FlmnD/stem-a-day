@@ -60,38 +60,37 @@ interface Apple {
 
 const INTRO_STEPS = [
   {
-    image: "/snake1.png",
+    image: "/easysnake1.png",
     title: "Welcome to Snake Nomenclature!",
     body: "Use arrow keys or WASD to guide your snake around the board. Eat the correct chemical formula to grow. Eat the wrong one and shrink!",
     sub: "Click through to learn how to play.",
   },
   {
-    image: "/snake2.png",
+    image: "/easysnake2.png",
     title: "Read the Prompt",
     body: "A chemical name appears at the top. Find the apple labeled with its correct formula and eat it.",
     sub: "The prompt changes every time you eat an apple.",
   },
   {
-    image: "/snake3.png",
+    image: "/easysnake3.png",
     title: "Eat the Right Apple",
     body: "Eating the correct formula apple adds 2 to your snake length. Eating the wrong one subtracts 1.",
     sub: "Correct apple → +2 length. Wrong apple → −1 length.",
   },
   {
-    image: "/snake4.png",
+    image: "/easysnake4.png",
     title: "Formula Mode vs Name Mode",
     body: "Toggle between modes with the button at the top. Formula Mode shows names on apples. Name Mode shows formulas on apples.",
     sub: "Both modes test the same knowledge, just from different directions.",
   },
   {
-    image: "/snake5.png",
+    image: "/easysnake5.png",
     title: "How to Win and Lose",
     body: "Reach a snake length of 15 to win. You lose if your length drops below 3, you hit a wall, or you run into yourself.",
     sub: "Start length is 5. Win length is 15. Press Space anytime to restart.",
   },
 ];
 
-// Progress bar component
 function ProgressBar({ value, max, min }: { value: number; max: number; min: number }) {
   const pct = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
   const color = pct < 30 ? "#ef4444" : pct < 60 ? "#f59e0b" : "#2563eb";
@@ -278,7 +277,6 @@ export default function SnakeGame() {
     if (!ctx) return;
     ctx.clearRect(0, 0, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);
 
-    // Grid background
     ctx.fillStyle = "#d0f0f0";
     ctx.fillRect(0, 0, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);
     for (let gx = 0; gx < GRID_SIZE; gx++) {
@@ -288,7 +286,6 @@ export default function SnakeGame() {
       }
     }
 
-    // Snake
     snake.forEach((s, i) => {
       if (i === 0) {
         ctx.fillStyle = "#0a8";
@@ -301,13 +298,11 @@ export default function SnakeGame() {
       ctx.fill();
     });
 
-    // Apples
     apples.forEach((a) => {
       const cx = (a.x + a.size / 2) * CELL_SIZE;
       const cy = (a.y + a.size / 2) * CELL_SIZE;
       const r = (a.size / 2) * CELL_SIZE - 3;
 
-      // Glow
       ctx.shadowBlur = 18;
       ctx.shadowColor = "#f97316";
       ctx.fillStyle = "#dc2626";
@@ -316,13 +311,11 @@ export default function SnakeGame() {
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // Shine
       ctx.fillStyle = "rgba(255,255,255,0.18)";
       ctx.beginPath();
       ctx.ellipse(cx - r * 0.25, cy - r * 0.3, r * 0.35, r * 0.22, -0.5, 0, Math.PI * 2);
       ctx.fill();
 
-      // Label
       const text = reverseMode ? a.compound.name : a.compound.formula;
       ctx.fillStyle = "#fff";
       ctx.textAlign = "center";
@@ -385,7 +378,6 @@ export default function SnakeGame() {
   const canvasW = GRID_SIZE * CELL_SIZE;
   const canvasH = GRID_SIZE * CELL_SIZE;
 
-  // Type badge color
   const typeColor: Record<string, string> = {
     "ionic compound": "#2563eb",
     "molecular compound": "#7c3aed",
@@ -397,7 +389,6 @@ export default function SnakeGame() {
   return (
     <div className="dark:bg-slate-950 dark:text-slate-100" style={{ minHeight: "100vh", background: "#f8fafc", display: "flex", flexDirection: "column", alignItems: "center", padding: "20px 16px", fontFamily: "inherit" }}>
 
-      {/* ── TITLE BAR ── */}
       <div style={{ width: "100%", maxWidth: canvasW + 240, display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 22, fontWeight: 900, color: "#1d4ed8", letterSpacing: "-0.5px" }}>🧪 Snake</span>
@@ -423,7 +414,6 @@ export default function SnakeGame() {
         </div>
       </div>
 
-      {/* ── PROMPT BANNER ── */}
       <div
         className="dark:bg-slate-900 dark:border-slate-700"
         style={{
@@ -460,15 +450,13 @@ export default function SnakeGame() {
         )}
       </div>
 
-      {/* ── MAIN LAYOUT: canvas + sidebar ── */}
       <div style={{ display: "flex", gap: 16, alignItems: "flex-start", width: "100%", maxWidth: canvasW + 240 }}>
 
-        {/* ── CANVAS ── */}
         <div style={{ position: "relative", flexShrink: 0 }}>
           {showIntro && (
             <div style={{ position: "absolute", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.97)", borderRadius: 8 }}>
               <div style={{ width: 300, padding: 24, textAlign: "center", fontFamily: "inherit" }}>
-                <img src={step.image} alt={step.title} style={{ width: "100%", borderRadius: 8, marginBottom: 14, border: "1px solid #e2e8f0", maxHeight: 160, objectFit: "cover" }} />
+                <img src={step.image} alt={step.title} style={{ width: "100%", borderRadius: 8, marginBottom: 14, border: "1px solid #e2e8f0" }} />
                 <h2 style={{ margin: "0 0 10px", fontSize: 16, fontWeight: 800, color: "#0f172a" }}>{step.title}</h2>
                 <p style={{ fontSize: 13, color: "#475569", marginBottom: 6 }}>{step.body}</p>
                 <p style={{ fontSize: 11, color: "#94a3b8" }}>{step.sub}</p>
@@ -513,10 +501,8 @@ export default function SnakeGame() {
           )}
         </div>
 
-        {/* ── SIDEBAR ── */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 14, minWidth: 200 }}>
 
-          {/* Snake Length */}
           <div className="dark:bg-slate-900 dark:border-slate-700" style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, padding: "16px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>
               Snake Length
@@ -532,7 +518,6 @@ export default function SnakeGame() {
             </div>
           </div>
 
-          {/* Feedback */}
           <div
             className="dark:bg-slate-900 dark:border-slate-700"
             style={{
@@ -551,7 +536,6 @@ export default function SnakeGame() {
             )}
           </div>
 
-          {/* Stats */}
           <div className="dark:bg-slate-900 dark:border-slate-700" style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, padding: "16px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Progress</div>
             <div style={{ fontSize: 13, color: "#64748b", marginBottom: 4 }}>
@@ -562,7 +546,6 @@ export default function SnakeGame() {
             </div>
           </div>
 
-          {/* Controls reminder */}
           <div className="dark:bg-slate-900 dark:border-slate-700" style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, padding: "16px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Controls</div>
             {[["↑ ↓ ← →", "Move"], ["Space", "Restart"]].map(([key, action]) => (
@@ -573,7 +556,6 @@ export default function SnakeGame() {
             ))}
           </div>
 
-          {/* Mode indicator */}
           <div className="dark:bg-slate-900 dark:border-slate-700" style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, padding: "14px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>Current Mode</div>
             <div style={{ fontSize: 13, color: "#2563eb", fontWeight: 700 }}>
@@ -583,7 +565,6 @@ export default function SnakeGame() {
         </div>
       </div>
 
-      {/* Reward Popup */}
       {rewardPopupOpen && (
         <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.4)", padding: "0 16px" }}>
           <div style={{ width: "100%", maxWidth: 420, borderRadius: 20, border: "1px solid #e2e8f0", background: "#fff", padding: 28, boxShadow: "0 8px 40px rgba(0,0,0,0.15)" }}>

@@ -74,31 +74,31 @@ const IMF_COLORS: Record<IMFKey, string> = {
 
 const INTRO_STEPS = [
   {
-    image: "/snakeimf1.png",
+    image: "/hardsnake1.png",
     title: "Welcome to Snake IMF!",
     body: "Use arrow keys or WASD to guide your snake. Eat compounds that have the intermolecular force shown in the prompt.",
     sub: "Click through to learn how to play.",
   },
   {
-    image: "/snakeimf2.png",
+    image: "/hardsnake2.png",
     title: "Read the Prompt",
     body: "The prompt names an IMF type. Find an apple whose compound has that force and eat it.",
     sub: "The prompt changes every time you eat an apple.",
   },
   {
-    image: "/snakeimf3.png",
+    image: "/hardsnake3.png",
     title: "Eat the Right Apple",
     body: "Correct apple → +1 length. Wrong apple → −2 length.",
     sub: "Be careful because many compounds share IMF types!",
   },
   {
-    image: "/snakeimf4.png",
+    image: "/hardsnake4.png",
     title: "Formula / Name Mode",
     body: "Toggle the mode button to switch between seeing names or formulas on the apples.",
     sub: "Both modes test the same IMF knowledge.",
   },
   {
-    image: "/snakeimf5.png",
+    image: "/hardsnake5.png",
     title: "How to Win and Lose",
     body: "Reach a snake length of 15 to win. You lose if length drops below 3, you hit a wall, or run into yourself.",
     sub: "Start length is 5. Win length is 15. Press Space anytime to restart.",
@@ -138,8 +138,7 @@ export default function SnakeIMF() {
   const [rewardMessage, setRewardMessage] = useState("");
   const [rewardClaimed, setRewardClaimed] = useState(false);
 
-  // Refs for stale-closure-safe key handling
-  const dirRef       = useRef({ x: 1, y: 0 }); // initialized facing right
+  const dirRef       = useRef({ x: 1, y: 0 });
   const runningRef   = useRef(false);
   const gameReadyRef = useRef(false);
   const showIntroRef = useRef(true);
@@ -209,7 +208,6 @@ export default function SnakeIMF() {
 
   const startGameFresh = () => {
     setSnake(Array.from({ length: INITIAL_LENGTH }, (_, i) => ({ x: 5 - i, y: 5 })));
-    // Face right so opposite-direction guard correctly blocks left key on first press
     setDirSync({ x: 1, y: 0 });
     setApples([]); setUsed(new Set());
     setSnakeLength(INITIAL_LENGTH); setMsg(null); setRunningSync(false); setFeedback(null);
@@ -223,7 +221,6 @@ export default function SnakeIMF() {
     if (!isGameKey) return;
     e.preventDefault();
 
-    // Block all game keys while intro is showing
     if (showIntroRef.current) return;
 
     if (e.code === "Space") { startGameFresh(); return; }
@@ -242,7 +239,6 @@ export default function SnakeIMF() {
         setGameReadySync(false);
         setRunningSync(true);
       }
-      // Opposite key → do nothing, stay in gameReady
       return;
     }
 
@@ -260,7 +256,6 @@ export default function SnakeIMF() {
     return () => document.removeEventListener("keydown", handleKey);
   }, []);
 
-  // Keep showIntroRef in sync with state
   useEffect(() => { showIntroRef.current = showIntro; }, [showIntro]);
 
   useEffect(() => {
@@ -398,7 +393,6 @@ export default function SnakeIMF() {
   return (
     <div className="dark:bg-slate-950 dark:text-slate-100" style={{ minHeight: "100vh", background: "#f8fafc", display: "flex", flexDirection: "column", alignItems: "center", padding: "20px 16px", fontFamily: "inherit" }}>
 
-      {/* TITLE BAR */}
       <div style={{ width: "100%", maxWidth: canvasW + 240, display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 22, fontWeight: 900, color: "#1d4ed8", letterSpacing: "-0.5px" }}>⚗️ Snake</span>
@@ -424,7 +418,6 @@ export default function SnakeIMF() {
         </div>
       </div>
 
-      {/* PROMPT BANNER */}
       <div
         className="dark:bg-slate-900 dark:border-slate-700"
         style={{
@@ -454,17 +447,14 @@ export default function SnakeIMF() {
         )}
       </div>
 
-      {/* MAIN LAYOUT */}
       <div style={{ display: "flex", gap: 16, alignItems: "flex-start", width: "100%", maxWidth: canvasW + 240 }}>
 
-        {/* CANVAS + INTRO OVERLAY */}
         <div style={{ position: "relative", flexShrink: 0 }}>
 
-          {/* INTRO OVERLAY */}
           {showIntro && (
             <div style={{ position: "absolute", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.97)", borderRadius: 8 }}>
               <div style={{ width: 300, padding: 24, textAlign: "center", fontFamily: "inherit" }}>
-                <img src={step.image} alt={step.title} style={{ width: "100%", borderRadius: 8, marginBottom: 14, border: "1px solid #e2e8f0", maxHeight: 160, objectFit: "cover" }} />
+                <img src={step.image} alt={step.title} style={{ width: "100%", borderRadius: 8, marginBottom: 14, border: "1px solid #e2e8f0" }} />
                 <h2 style={{ margin: "0 0 10px", fontSize: 16, fontWeight: 800, color: "#0f172a" }}>{step.title}</h2>
                 <p style={{ fontSize: 13, color: "#475569", marginBottom: 6 }}>{step.body}</p>
                 <p style={{ fontSize: 11, color: "#94a3b8" }}>{step.sub}</p>
@@ -511,7 +501,6 @@ export default function SnakeIMF() {
           )}
         </div>
 
-        {/* SIDEBAR */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 14, minWidth: 200 }}>
 
           <div className="dark:bg-slate-900 dark:border-slate-700" style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, padding: "16px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
