@@ -148,37 +148,37 @@ const generateGame = (): GameState => {
 
 const INTRO_STEPS = [
   {
-    image: "/molaritypips1.png",
+    image: "/easypips1.png",
     title: 'Welcome to Molarity Pips',
     body: 'Match each domino to the molarity relationship it represents on the concept map.',
     sub: 'Click through to learn how to play.',
   },
   {
-    image: "/molaritypips2.png",
+    image: "/easypips2.png",
     title: 'Select a Domino',
     body: 'Click a domino in the tray to select it.',
     sub: 'The selected domino highlights in blue.',
   },
   {
-    image: "/molaritypips3.png",
+    image: "/easypips3.png",
     title: 'Place it on the Map',
     body: 'Click a colored cell on the map to place the domino. It will occupy that cell and the adjacent one based on its orientation.',
     sub: 'Each domino covers exactly two cells.',
   },
   {
-    image: "/molaritypips4.png",
+    image: "/easypips4.png",
     title: 'Rotate Dominos',
     body: 'Double-click any domino — in the tray or on the map — to rotate it 90° clockwise.',
     sub: 'Rotations that cause overlap or go out of bounds are ignored.',
   },
   {
-    image: "/molaritypips5.png",
+    image: "/easypips5.png",
     title: 'Read the Region Codes',
     body: 'Each region is labeled with a code like Mo, Di1, Mm, Mc. The letters = the relationship, the number = initial (1) or final (2) state.',
     sub: 'Use the Region Code Key and Full Reference panels on the right.',
   },
   {
-    image: "/molaritypips6.png",
+    image: "/easypips6.png",
     title: 'Check Your Solution',
     body: "Once all dominos are placed, press Check Solution to see if you're correct.",
     sub: 'Press New Game at any time to start a fresh puzzle.',

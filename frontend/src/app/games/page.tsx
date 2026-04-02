@@ -162,9 +162,7 @@ export default function Games() {
                 </div>
             </div>
 
-            {/* PIPS */}
             <div className="grid md:grid-cols-2 gap-9 mb-16">
-                {/* Pips Easy */}
                 <div
                     className="rounded-2xl p-6 shadow-md border border-sky-100 bg-white hover:shadow-lg transition-all duration-200
           dark:border-slate-700 dark:bg-slate-950/60 dark:shadow-black/30"
