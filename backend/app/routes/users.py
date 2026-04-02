@@ -1,17 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
-from sqlalchemy import update
 
 from app.database import get_db
+from app.deps import get_current_verified_user
+from app.email_verification import send_verification_email
 from app.models import User
-from app.schemas.user import UserRead, UserUpdate, PlantsAdd, GlucoseAdd
-from app.deps import get_current_user
+from app.schemas.user import GlucoseAdd, PlantsAdd, UserRead, UserUpdate
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/me", response_model=UserRead)
-def me(current_user: User = Depends(get_current_user)):
+def me(current_user: User = Depends(get_current_verified_user)):
     return current_user
 
 
@@ -19,20 +20,39 @@ def me(current_user: User = Depends(get_current_user)):
 def update_me(
     patch: UserUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_verified_user),
 ):
     data = patch.model_dump(exclude_unset=True)
+    should_send_verification_email = False
 
-    # Block changing of email verification
     if "is_email_verified" in data:
         raise HTTPException(
-            status_code=403, detail="Not allowed to change email verification")
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not allowed to change email verification",
+        )
 
     if "email" in data:
-        current_user.email = data["email"].lower().strip()
+        new_email = data["email"].lower().strip()
+        if new_email != current_user.email:
+            existing_email = db.execute(
+                select(User).where(
+                    User.email == new_email,
+                    User.id != current_user.id,
+                )
+            ).scalar_one_or_none()
+            if existing_email:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Email already in use",
+                )
+
+            current_user.email = new_email
+            current_user.is_email_verified = False
+            should_send_verification_email = True
 
     if "password" in data:
         from app.security import hash_password
+
         current_user.password = hash_password(data["password"])
 
     if "streak" in data:
@@ -43,6 +63,10 @@ def update_me(
 
     db.commit()
     db.refresh(current_user)
+
+    if should_send_verification_email:
+        send_verification_email(current_user)
+
     return current_user
 
 
@@ -50,7 +74,7 @@ def update_me(
 def add_plant_me(
     payload: PlantsAdd,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_verified_user),
 ):
     pid = payload.plant_id
 
@@ -66,7 +90,7 @@ def add_plant_me(
 def remove_plant_me(
     plant_id: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_verified_user),
 ):
     if plant_id in current_user.plants:
         current_user.plants.remove(plant_id)
@@ -80,7 +104,7 @@ def remove_plant_me(
 def add_coins_me(
     payload: GlucoseAdd,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_verified_user),
 ):
     stmt = (
         update(User)

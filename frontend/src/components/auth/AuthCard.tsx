@@ -10,10 +10,12 @@ interface AuthCardProps {
     variant: Variant;
     title: string;
     subtitle: string;
-    footerText: string;
-    footerLinkText: string;
-    footerHref: string;
+    footerText?: string;
+    footerLinkText?: string;
+    footerHref?: string;
     onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
+    submitLabel?: string;
+    showSocialButtons?: boolean;
     children: React.ReactNode;
 }
 
@@ -25,9 +27,13 @@ export default function AuthCard({
     footerLinkText,
     footerHref,
     onSubmit,
+    submitLabel,
+    showSocialButtons = true,
     children,
 }: AuthCardProps) {
     const isLogin = variant === "login";
+    const showPrimaryAction = typeof onSubmit === "function";
+    const shouldShowSocialButtons = showSocialButtons && showPrimaryAction;
 
     return (
         <section
@@ -102,34 +108,46 @@ export default function AuthCard({
                         <form onSubmit={onSubmit} className="space-y-4">
                             {children}
 
-                            <Button as="button" variant="primary" className="w-full">
-                                {isLogin ? "Log in" : "Sign up"}
-                            </Button>
-
-                            <div className="flex items-center gap-3 py-2">
-                                <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
-                                <span className="text-xs text-slate-500">or</span>
-                                <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
-                            </div>
-
-                            {/* Social buttons (placeholders) */}
-                            <Button as="button" variant="outline" className="w-full">
-                                Continue with Google
-                            </Button>
-
-                            <Button as="button" variant="outline" className="w-full">
-                                Continue with Apple
-                            </Button>
-
-                            <p className="pt-2 text-center text-sm text-slate-600 dark:text-slate-300">
-                                {footerText}{" "}
-                                <Link
-                                    href={footerHref}
-                                    className="font-semibold text-sky-700 hover:underline dark:text-teal-300"
+                            {showPrimaryAction && (
+                                <Button
+                                    as="button"
+                                    type="submit"
+                                    variant="primary"
+                                    className="w-full"
                                 >
-                                    {footerLinkText}
-                                </Link>
-                            </p>
+                                    {submitLabel ?? (isLogin ? "Log in" : "Sign up")}
+                                </Button>
+                            )}
+
+                            {shouldShowSocialButtons && (
+                                <>
+                                    <div className="flex items-center gap-3 py-2">
+                                        <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+                                        <span className="text-xs text-slate-500">or</span>
+                                        <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+                                    </div>
+
+                                    <Button as="button" variant="outline" className="w-full">
+                                        Continue with Google
+                                    </Button>
+
+                                    <Button as="button" variant="outline" className="w-full">
+                                        Continue with Apple
+                                    </Button>
+                                </>
+                            )}
+
+                            {footerText && footerLinkText && footerHref && (
+                                <p className="pt-2 text-center text-sm text-slate-600 dark:text-slate-300">
+                                    {footerText}{" "}
+                                    <Link
+                                        href={footerHref}
+                                        className="font-semibold text-sky-700 hover:underline dark:text-teal-300"
+                                    >
+                                        {footerLinkText}
+                                    </Link>
+                                </p>
+                            )}
                         </form>
 
                         <p className="mt-4 text-center text-xs text-slate-500 dark:text-slate-400">

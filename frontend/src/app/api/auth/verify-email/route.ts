@@ -17,7 +17,7 @@ function extractMessage(data: unknown, fallback: string) {
 export async function POST(req: Request) {
     const body = await req.json();
 
-    const response = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/auth/register`, {
+    const response = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/auth/verify-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -28,21 +28,22 @@ export async function POST(req: Request) {
 
     if (!response.ok) {
         return NextResponse.json(
-            { message: extractMessage(data, "Signup failed") },
+            { message: extractMessage(data, "Verification failed") },
             { status: response.status }
         );
     }
 
-    return NextResponse.json(
-        {
-            message: extractMessage(
-                data,
-                "Account created. Check your email for the verification link."
-            ),
-            email: asRecord(data)?.email ?? body?.email,
-            verification_email_sent: Boolean(asRecord(data)?.verification_email_sent),
-            dev_verification_url: asRecord(data)?.dev_verification_url ?? null,
-        },
-        { status: 201 }
-    );
+    const res = NextResponse.json({
+        ok: true,
+        message: extractMessage(data, "Email verified. You are now signed in."),
+    });
+
+    res.cookies.set("access_token", data.access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+    });
+
+    return res;
 }

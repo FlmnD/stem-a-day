@@ -7,6 +7,7 @@ type Props = {
     children: React.ReactNode;
     variant?: "primary" | "outline" | "ghost";
     className?: string;
+    type?: "button" | "submit" | "reset";
 };
 
 export default function Button({
@@ -15,6 +16,7 @@ export default function Button({
     children,
     variant = "primary",
     className = "",
+    type = "button",
 }: Props) {
     const base =
         "inline-flex items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold transition will-change-transform hover:scale-[1.02] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-300";
@@ -28,5 +30,5 @@ export default function Button({
 
     if (as === "link") return <Link href={href ?? "#"} className={cls}>{children}</Link>;
     if (as === "a") return <a href={href} className={cls}>{children}</a>;
-    return <button className={cls}>{children}</button>;
+    return <button type={type} className={cls}>{children}</button>;
 }
