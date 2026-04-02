@@ -1,8 +1,21 @@
-from sqlalchemy.sql import func
-from sqlalchemy import String, Integer, ForeignKey, TIMESTAMP, ARRAY, UniqueConstraint
-from datetime import datetime
-from sqlalchemy import ARRAY, TIMESTAMP, BigInteger, CheckConstraint, String, Boolean, Integer, func, text
+from datetime import date, datetime
+
+from sqlalchemy import (
+    ARRAY,
+    TIMESTAMP,
+    BigInteger,
+    Boolean,
+    CheckConstraint,
+    Date,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+    func,
+    text,
+)
 from sqlalchemy.orm import Mapped, mapped_column
+
 from app.database import Base
 
 
@@ -76,6 +89,18 @@ class User(Base):
         nullable=False,
         default=list,
         server_default=text("'{}'"),
+    )
+
+    daily_question_answered_on: Mapped[date | None] = mapped_column(
+        Date,
+        nullable=True,
+    )
+
+    daily_debug_offset_days: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default=text("0"),
     )
 
 

@@ -1,14 +1,15 @@
 # STEM A Day
 
 - Gamified learning done right
-- Learn chemistry concepts through games and our exciting reward system
+- Learn chemistry concepts through games and an engaging reward system
 - Game problems rotate daily
-- More STEM subjects added in the future
+- More STEM subjects are planned
 
 ## Install
-- Node JS LTS
+- Node.js LTS
 - Docker
-- Python 12 (Needed for backend)
+- Python 3.12 for the backend
+- Optional for real email delivery: SMTP credentials
 
 - After downloading the project, move into the frontend folder with `cd frontend`
 - Type and enter `npm install` in the terminal to install the required Node dependencies

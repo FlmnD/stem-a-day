@@ -1,8 +1,9 @@
 import app.schemas
 import app.models
-from app.database import Base, engine
+from app.database import bootstrap_database
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.routes.daily import router as daily_router
 from app.routes.auth import router as auth_router
 from app.routes.users import router as users_router
 from app.routes.plants import router as plants_router
@@ -10,7 +11,7 @@ from app.routes.plants import router as plants_router
 
 app = FastAPI()
 
-Base.metadata.create_all(bind=engine)
+bootstrap_database()
 
 origins = [
     "http://localhost:3000",
@@ -29,6 +30,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(plants_router)
+app.include_router(daily_router)
 
 
 @app.get("/")

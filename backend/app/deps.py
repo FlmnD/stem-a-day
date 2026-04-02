@@ -1,9 +1,9 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
+from jose import JWTError
 from sqlalchemy.orm import Session
 
-from app.settings import settings
+from app.jwt import decode_token
 from app.database import get_db
 from app.models import User
 
@@ -21,8 +21,7 @@ def get_current_user(
     )
 
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET_KEY,
-                             algorithms=[settings.JWT_ALGORITHM])
+        payload = decode_token(token)
         sub = payload.get("sub")
         if not sub:
             raise cred_exc
@@ -34,3 +33,15 @@ def get_current_user(
     if not user:
         raise cred_exc
     return user
+
+
+def get_current_verified_user(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    if not current_user.is_email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email verification is required for this action.",
+        )
+
+    return current_user

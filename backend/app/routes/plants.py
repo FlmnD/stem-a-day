@@ -3,7 +3,7 @@ from sqlalchemy import select, update, delete
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.deps import get_current_user
+from app.deps import get_current_verified_user
 from app.models import User, Plant, UserPlant
 
 router = APIRouter(prefix="/plants", tags=["plants"])
@@ -27,7 +27,7 @@ def catalog(db: Session = Depends(get_db)):
 @router.get("/inventory")
 def inventory(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_verified_user),
 ):
     rows = db.execute(
         select(UserPlant, Plant)
@@ -57,7 +57,7 @@ def inventory(
 def buy_plant(
     plant_id: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_verified_user),
 ):
     plant = db.get(Plant, plant_id)
     if not plant:
@@ -86,7 +86,7 @@ def buy_plant(
 def sell_plant(
     plant_id: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_verified_user),
 ):
     plant = db.get(Plant, plant_id)
     if not plant:
@@ -119,7 +119,7 @@ def upgrade_plant(
     plant_id: str,
     payload: dict, 
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_verified_user),
 ):
     spend = int(payload.get("spend", 0))
     if spend <= 0:

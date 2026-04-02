@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
+
 import SignOutButton from "@/components/auth/SignOutButton";
 import AddGlucoseCard from "@/components/settings/AddGlucoseCard";
-
 
 type UserRead = {
     id: number;
@@ -66,14 +66,14 @@ export default async function SettingsPage() {
     let fetchError: string | null = null;
 
     try {
-        const r = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/users/me`, {
+        const response = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/users/me`, {
             headers: { Authorization: `Bearer ${token}` },
             cache: "no-store",
         });
 
-        const data = await r.json().catch(() => ({}));
+        const data = await response.json().catch(() => ({}));
 
-        if (!r.ok) {
+        if (!response.ok) {
             fetchError = data?.detail ?? "Session expired. Please log in again.";
         } else {
             me = data as UserRead;
@@ -126,15 +126,19 @@ export default async function SettingsPage() {
                     Settings
                 </h1>
                 <p className="mt-2 text-slate-600 dark:text-slate-300">
-                    Account & progress overview.
+                    Account and progress overview.
                 </p>
 
                 <div
                     className="mt-6 grid gap-4 rounded-3xl border border-slate-200 bg-white/80 p-6 shadow-lg backdrop-blur
             dark:border-slate-700 dark:bg-slate-950/60"
                 >
-                    <Row label="Username" value={me.username ?? "—"} />
+                    <Row label="Username" value={me.username ?? "-"} />
                     <Row label="Email" value={me.email} />
+                    <Row
+                        label="Email verification"
+                        value={me.is_email_verified ? "Verified" : "Pending"}
+                    />
                     <Row label="Streak" value={`${me.streak}`} />
                     <Row label="Glucose" value={`${me.glucose}`} />
 
