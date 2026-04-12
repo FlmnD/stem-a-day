@@ -9,7 +9,9 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRES_MINUTES: int = 60
+    JWT_REFRESH_TOKEN_EXPIRES_DAYS: int = 30
     EMAIL_VERIFICATION_TOKEN_EXPIRES_MINUTES: int = 60 * 24
+    PASSWORD_RESET_TOKEN_EXPIRES_MINUTES: int = 60
 
     EMAIL_FROM: str = "STEM a Day <no-reply@stemaday.local>"
     SMTP_HOST: str | None = None

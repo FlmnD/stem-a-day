@@ -1,17 +1,26 @@
+from contextlib import asynccontextmanager
+
 import app.schemas
 import app.models
-from app.database import bootstrap_database
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
+
+from app.database import bootstrap_database
+from app.seed_plants import seed_plants
 from app.routes.daily import router as daily_router
 from app.routes.auth import router as auth_router
 from app.routes.users import router as users_router
 from app.routes.plants import router as plants_router
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    bootstrap_database()
+    seed_plants()
+    yield
 
-bootstrap_database()
+
+app = FastAPI(lifespan=lifespan)
 
 origins = [
     "http://localhost:3000",

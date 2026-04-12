@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { applySessionCookies } from "@/lib/server-session";
+
 function asRecord(data: unknown): Record<string, unknown> | null {
     return typeof data === "object" && data !== null ? (data as Record<string, unknown>) : null;
 }
@@ -40,13 +42,16 @@ export async function POST(req: Request) {
     }
 
     const res = NextResponse.json({ ok: true });
-
-    res.cookies.set("access_token", data.access_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-    });
+    const record = asRecord(data);
+    if (
+        typeof record?.access_token === "string" &&
+        typeof record?.refresh_token === "string"
+    ) {
+        applySessionCookies(res, {
+            access_token: record.access_token,
+            refresh_token: record.refresh_token,
+        });
+    }
 
     return res;
 }

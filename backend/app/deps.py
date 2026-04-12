@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from sqlalchemy.orm import Session
 
-from app.jwt import decode_token
+from app.jwt import ACCESS_TOKEN_TYPE, decode_typed_token
 from app.database import get_db
 from app.models import User
 
@@ -21,7 +21,7 @@ def get_current_user(
     )
 
     try:
-        payload = decode_token(token)
+        payload = decode_typed_token(token, ACCESS_TOKEN_TYPE)
         sub = payload.get("sub")
         if not sub:
             raise cred_exc

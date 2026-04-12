@@ -1,18 +1,28 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+import {
+    applySessionCookies,
+    clearSessionCookies,
+    fetchBackendWithSession,
+} from "@/lib/server-session";
+
 export async function GET() {
-    const token = (await cookies()).get("access_token")?.value;
-    if (!token) return NextResponse.json({ message: "Not logged in" }, { status: 401 });
+    const result = await fetchBackendWithSession("/users/me");
 
-    const r = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/users/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-        cache: "no-store",
-    });
+    if (!result.response) {
+        const res = NextResponse.json(result.data, { status: 401 });
+        if (result.refreshAttempted && !result.refreshedTokens) {
+            clearSessionCookies(res);
+        }
+        return res;
+    }
 
-    const text = await r.text();
-    let data: any = {};
-    try { data = text ? JSON.parse(text) : {}; } catch { data = { message: text }; }
+    const res = NextResponse.json(result.data, { status: result.response.status });
+    if (result.refreshedTokens) {
+        applySessionCookies(res, result.refreshedTokens);
+    } else if (result.response.status === 401) {
+        clearSessionCookies(res);
+    }
 
-    return NextResponse.json(data, { status: r.status });
+    return res;
 }

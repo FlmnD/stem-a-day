@@ -1,5 +1,6 @@
 'use client'
-import React, { useState, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useSnakeTheme, type SnakeTheme } from "@/components/sections/games/snakeTheme";
 
 const COMPOUNDS = [
   { formula: "NaCl", name: "sodium chloride", type: "ionic compound" },
@@ -91,11 +92,21 @@ const INTRO_STEPS = [
   },
 ];
 
-function ProgressBar({ value, max, min }: { value: number; max: number; min: number }) {
+function ProgressBar({
+  value,
+  max,
+  min,
+  theme,
+}: {
+  value: number;
+  max: number;
+  min: number;
+  theme: SnakeTheme;
+}) {
   const pct = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
   const color = pct < 30 ? "#ef4444" : pct < 60 ? "#f59e0b" : "#2563eb";
   return (
-    <div className="dark:border-slate-600" style={{ width: "100%", background: "#e2e8f0", borderRadius: 8, height: 12, overflow: "hidden", border: "1px solid #cbd5e1" }}>
+    <div style={{ width: "100%", background: theme.progressTrack, borderRadius: 8, height: 12, overflow: "hidden", border: `1px solid ${theme.progressTrackBorder}` }}>
       <div
         style={{
           width: `${pct}%`,
@@ -110,8 +121,9 @@ function ProgressBar({ value, max, min }: { value: number; max: number; min: num
 }
 
 export default function SnakeGame() {
+  const theme = useSnakeTheme();
   const [snake, setSnake] = useState<{ x: number; y: number }[]>([]);
-  const [dir, setDir] = useState({ x: 0, y: 0 });
+  const [, setDir] = useState({ x: 0, y: 0 });
   const [apples, setApples] = useState<Apple[]>([]);
   const [used, setUsed] = useState<Set<string>>(new Set());
   const [prompt, setPrompt] = useState<typeof COMPOUNDS[0] | null>(null);
@@ -195,7 +207,7 @@ export default function SnakeGame() {
     });
   };
 
-  async function awardGlucose(amount: number) {
+  const awardGlucose = useCallback(async (amount: number) => {
     setRewardAmount(amount); setRewardPopupOpen(true); setRewardStatus("loading"); setRewardMessage("");
     try {
       const r = await fetch("/api/glucose/add", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ amount }) });
@@ -203,7 +215,7 @@ export default function SnakeGame() {
       if (!r.ok) { setRewardStatus("error"); setRewardMessage(data?.message ?? data?.detail ?? "Failed to add glucose."); return; }
       setRewardStatus("ok"); setRewardMessage(`You earned ${amount} glucose!`);
     } catch { setRewardStatus("error"); setRewardMessage("Network error. Could not update glucose."); }
-  }
+  }, []);
 
   const startGameFresh = () => {
     setSnake(Array.from({ length: INITIAL_LENGTH }, (_, i) => ({ x: 5 - i, y: 5 })));
@@ -234,7 +246,7 @@ export default function SnakeGame() {
     if ((e.code === "ArrowRight" || e.code === "KeyD") && d.x === 0) setDirSync({ x: 1, y: 0 });
   };
 
-  useEffect(() => { document.addEventListener("keydown", handleKey); return () => document.removeEventListener("keydown", handleKey); }, []);
+  useEffect(() => { document.addEventListener("keydown", handleKey); return () => document.removeEventListener("keydown", handleKey); }, [handleKey]);
   useEffect(() => { showIntroRef.current = showIntro; }, [showIntro]);
 
   useEffect(() => {
@@ -268,7 +280,7 @@ export default function SnakeGame() {
       if (!rewardClaimed) { setRewardClaimed(true); void awardGlucose(GLUCOSE_REWARD); }
     }
     if (snakeLength < MIN_LENGTH) { setRunningSync(false); setMsg("You Lost!"); setPrompt(null); }
-  }, [snakeLength, rewardClaimed]);
+  }, [snakeLength, rewardClaimed, awardGlucose]);
 
   useEffect(() => {
     const c = canvasRef.current;
@@ -277,21 +289,21 @@ export default function SnakeGame() {
     if (!ctx) return;
     ctx.clearRect(0, 0, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);
 
-    ctx.fillStyle = "#d0f0f0";
+    ctx.fillStyle = theme.boardEven;
     ctx.fillRect(0, 0, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);
     for (let gx = 0; gx < GRID_SIZE; gx++) {
       for (let gy = 0; gy < GRID_SIZE; gy++) {
-        ctx.fillStyle = (gx + gy) % 2 === 0 ? "#d0f0f0" : "#c4eaea";
+        ctx.fillStyle = (gx + gy) % 2 === 0 ? theme.boardEven : theme.boardOdd;
         ctx.fillRect(gx * CELL_SIZE, gy * CELL_SIZE, CELL_SIZE, CELL_SIZE);
       }
     }
 
     snake.forEach((s, i) => {
       if (i === 0) {
-        ctx.fillStyle = "#0a8";
+        ctx.fillStyle = theme.snakeHead;
         ctx.shadowBlur = 0;
       } else {
-        ctx.fillStyle = "#0c6";
+        ctx.fillStyle = theme.snakeBody;
       }
       ctx.beginPath();
       ctx.roundRect(s.x * CELL_SIZE + 1, s.y * CELL_SIZE + 1, CELL_SIZE - 2, CELL_SIZE - 2, 4);
@@ -304,8 +316,8 @@ export default function SnakeGame() {
       const r = (a.size / 2) * CELL_SIZE - 3;
 
       ctx.shadowBlur = 18;
-      ctx.shadowColor = "#f97316";
-      ctx.fillStyle = "#dc2626";
+      ctx.shadowColor = theme.appleGlow;
+      ctx.fillStyle = theme.apple;
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.fill();
@@ -317,7 +329,7 @@ export default function SnakeGame() {
       ctx.fill();
 
       const text = reverseMode ? a.compound.name : a.compound.formula;
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = theme.appleText;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.font = "bold 11px monospace";
@@ -335,7 +347,7 @@ export default function SnakeGame() {
       const startY = cy - ((lines.length - 1) * lh) / 2;
       lines.forEach((line, idx) => ctx.fillText(line, cx, startY + idx * lh));
     });
-  }, [snake, apples, snakeLength, reverseMode]);
+  }, [snake, apples, snakeLength, reverseMode, theme]);
 
   useEffect(() => {
     if (!running) return;
@@ -384,12 +396,42 @@ export default function SnakeGame() {
     "acid": "#dc2626",
     "organic molecule": "#16a34a",
   };
-  const promptTypeColor = prompt ? (typeColor[prompt.type] ?? "#94a3b8") : "#94a3b8";
+  const promptTypeColor = prompt ? (typeColor[prompt.type] ?? theme.promptIdle) : theme.promptIdle;
+  const panelStyle: React.CSSProperties = {
+    background: theme.surface,
+    border: `1px solid ${theme.surfaceBorder}`,
+    borderRadius: 12,
+    boxShadow: theme.surfaceShadow,
+  };
+  const primaryButtonStyle: React.CSSProperties = {
+    padding: "8px 16px",
+    borderRadius: 8,
+    border: `1px solid ${theme.primaryButtonBorder}`,
+    background: theme.primaryButtonBg,
+    color: theme.primaryButtonText,
+    fontWeight: 700,
+    fontSize: 13,
+    cursor: "pointer",
+    fontFamily: "inherit",
+    transition: "all 0.15s ease",
+  };
+  const secondaryButtonStyle: React.CSSProperties = {
+    padding: "8px 16px",
+    borderRadius: 8,
+    border: `1px solid ${theme.secondaryButtonBorder}`,
+    background: theme.secondaryButtonBg,
+    color: theme.secondaryButtonText,
+    fontWeight: 700,
+    fontSize: 13,
+    cursor: "pointer",
+    fontFamily: "inherit",
+    transition: "all 0.15s ease",
+  };
 
   return (
-    <div className="dark:bg-slate-950 dark:text-slate-100" style={{ minHeight: "100vh", background: "#f8fafc", display: "flex", flexDirection: "column", alignItems: "center", padding: "20px 16px", fontFamily: "inherit" }}>
+    <div style={{ minHeight: "100vh", background: theme.pageBg, color: theme.pageText, display: "flex", flexDirection: "column", alignItems: "center", padding: "20px 16px", fontFamily: "inherit" }}>
 
-      <div style={{ width: "100%", maxWidth: canvasW + 240, display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+      <div className="snake-game-header" style={{ width: "100%", maxWidth: canvasW + 240, display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 22, fontWeight: 900, color: "#1d4ed8", letterSpacing: "-0.5px" }}>🧪 Snake</span>
           <span style={{ fontSize: 22, fontWeight: 900, color: "#0f172a", letterSpacing: "-0.5px" }}>Nomenclature</span>
@@ -397,7 +439,7 @@ export default function SnakeGame() {
         <div style={{ display: "flex", gap: 10 }}>
           <button
             onClick={() => setReverseMode((p) => !p)}
-            className="dark:bg-indigo-500 dark:border-indigo-400 dark:text-white dark:hover:bg-indigo-400"
+            className="snake-action-button snake-action-button-primary"
             style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #2563eb", background: "#eff6ff", color: "#1d4ed8", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s" }}
           >
             {reverseMode ? "📝 Name Mode" : "⚗️ Formula Mode"}
@@ -405,7 +447,7 @@ export default function SnakeGame() {
           {hasSeenIntro && (
             <button
               onClick={openIntro}
-              className="dark:bg-slate-800 dark:border-slate-600 dark:text-slate-300"
+              className="snake-action-button snake-action-button-secondary"
               style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#fff", color: "#475569", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}
             >
               ? How to Play
@@ -415,13 +457,18 @@ export default function SnakeGame() {
       </div>
 
       <div
-        className="dark:bg-slate-900 dark:border-slate-700"
         style={{
-          width: "100%", maxWidth: canvasW + 240, marginBottom: 14,
-          background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12,
-          padding: "14px 20px", display: "flex", alignItems: "center", gap: 12,
-          minHeight: 62, boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-        }}>
+          ...panelStyle,
+          width: "100%",
+          maxWidth: canvasW + 240,
+          marginBottom: 14,
+          padding: "14px 20px",
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          minHeight: 62,
+        }}
+      >
         {prompt ? (
           <>
             <span style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 1, whiteSpace: "nowrap" }}>
@@ -454,24 +501,24 @@ export default function SnakeGame() {
 
         <div style={{ position: "relative", flexShrink: 0 }}>
           {showIntro && (
-            <div style={{ position: "absolute", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.97)", borderRadius: 8 }}>
+            <div style={{ position: "absolute", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: theme.introOverlay, borderRadius: 8 }}>
               <div style={{ width: 300, padding: 24, textAlign: "center", fontFamily: "inherit" }}>
-                <img src={step.image} alt={step.title} style={{ width: "100%", borderRadius: 8, marginBottom: 14, border: "1px solid #e2e8f0" }} />
-                <h2 style={{ margin: "0 0 10px", fontSize: 16, fontWeight: 800, color: "#0f172a" }}>{step.title}</h2>
-                <p style={{ fontSize: 13, color: "#475569", marginBottom: 6 }}>{step.body}</p>
-                <p style={{ fontSize: 11, color: "#94a3b8" }}>{step.sub}</p>
+                <img src={step.image} alt={step.title} style={{ width: "100%", borderRadius: 8, marginBottom: 14, border: `1px solid ${theme.surfaceBorder}` }} />
+                <h2 style={{ margin: "0 0 10px", fontSize: 16, fontWeight: 800, color: theme.textStrong }}>{step.title}</h2>
+                <p style={{ fontSize: 13, color: theme.text, marginBottom: 6 }}>{step.body}</p>
+                <p style={{ fontSize: 11, color: theme.textMuted }}>{step.sub}</p>
                 <div style={{ display: "flex", justifyContent: "center", gap: 6, margin: "14px 0" }}>
                   {INTRO_STEPS.map((_, i) => (
-                    <div key={i} style={{ width: 7, height: 7, borderRadius: "50%", background: i === introStep ? "#2563eb" : "#e2e8f0", border: i === introStep ? "none" : "1px solid #cbd5e1" }} />
+                    <div key={i} style={{ width: 7, height: 7, borderRadius: "50%", background: i === introStep ? theme.titleAccent : theme.progressTrack, border: i === introStep ? "none" : `1px solid ${theme.progressTrackBorder}` }} />
                   ))}
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   {introStep > 0
-                    ? <button onClick={() => setIntroStep(s => s - 1)} style={{ padding: "8px 18px", borderRadius: 8, border: "1px solid #cbd5e1", background: "#f8fafc", color: "#475569", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Back</button>
+                    ? <button onClick={() => setIntroStep(s => s - 1)} style={secondaryButtonStyle}>Back</button>
                     : <div />}
                   {introStep < INTRO_STEPS.length - 1
-                    ? <button onClick={() => setIntroStep(s => s + 1)} style={{ padding: "8px 18px", borderRadius: 8, border: "none", background: "#2563eb", color: "#fff", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Next</button>
-                    : <button onClick={closeIntro} style={{ padding: "8px 18px", borderRadius: 8, border: "none", background: "#16a34a", color: "#fff", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{hasSeenIntro ? "Resume" : "Start Game"}</button>}
+                    ? <button onClick={() => setIntroStep(s => s + 1)} style={primaryButtonStyle}>Next</button>
+                    : <button onClick={closeIntro} style={{ ...primaryButtonStyle, background: "#166534", border: "1px solid #22c55e", color: "#f0fdf4" }}>{hasSeenIntro ? "Resume" : "Start Game"}</button>}
                 </div>
               </div>
             </div>
@@ -484,8 +531,8 @@ export default function SnakeGame() {
             style={{
               display: "block",
               borderRadius: 8,
-              border: "2px solid #cbd5e1",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+              border: `2px solid ${theme.canvasBorder}`,
+              boxShadow: theme.surfaceShadowStrong,
               opacity: (!running && msg && !showIntro) ? 0.35 : 1,
               transition: "opacity 0.3s",
             }}
@@ -493,9 +540,9 @@ export default function SnakeGame() {
 
           {!running && msg && !showIntro && (
             <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <div style={{ background: "rgba(255,255,255,0.95)", padding: "28px 44px", borderRadius: 16, textAlign: "center", border: "1px solid #e2e8f0", boxShadow: "0 4px 24px rgba(0,0,0,0.12)" }}>
+              <div style={{ background: theme.overlayCard, padding: "28px 44px", borderRadius: 16, textAlign: "center", border: `1px solid ${theme.surfaceBorder}`, boxShadow: theme.surfaceShadowStrong }}>
                 <div style={{ fontSize: 42, fontWeight: 900, color: msg.includes("Won") ? "#16a34a" : "#dc2626", marginBottom: 8 }}>{msg}</div>
-                <div style={{ fontSize: 14, color: "#64748b" }}>Press Space to Restart</div>
+                <div style={{ fontSize: 14, color: theme.textMuted }}>Press Space to Restart</div>
               </div>
             </div>
           )}
@@ -503,15 +550,15 @@ export default function SnakeGame() {
 
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 14, minWidth: 200 }}>
 
-          <div className="dark:bg-slate-900 dark:border-slate-700" style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, padding: "16px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>
+          <div style={{ ...panelStyle, padding: "16px 18px" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: theme.textSoft, textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>
               Snake Length
             </div>
-            <div style={{ fontSize: 40, fontWeight: 900, color: "#2563eb", lineHeight: 1, marginBottom: 10 }}>
+            <div style={{ fontSize: 40, fontWeight: 900, color: theme.titleAccent, lineHeight: 1, marginBottom: 10 }}>
               {Math.floor(snakeLength)}
-              <span style={{ fontSize: 16, color: "#94a3b8", fontWeight: 400, marginLeft: 6 }}>/ {WIN_LENGTH}</span>
+              <span style={{ fontSize: 16, color: theme.textSoft, fontWeight: 400, marginLeft: 6 }}>/ {WIN_LENGTH}</span>
             </div>
-            <ProgressBar value={snakeLength} max={WIN_LENGTH} min={MIN_LENGTH} />
+            <ProgressBar value={snakeLength} max={WIN_LENGTH} min={MIN_LENGTH} theme={theme} />
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
               <span style={{ fontSize: 10, color: "#ef4444" }}>☠ {MIN_LENGTH}</span>
               <span style={{ fontSize: 10, color: "#16a34a" }}>🏆 {WIN_LENGTH}</span>
@@ -566,15 +613,15 @@ export default function SnakeGame() {
       </div>
 
       {rewardPopupOpen && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.4)", padding: "0 16px" }}>
-          <div style={{ width: "100%", maxWidth: 420, borderRadius: 20, border: "1px solid #e2e8f0", background: "#fff", padding: 28, boxShadow: "0 8px 40px rgba(0,0,0,0.15)" }}>
+        <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: theme.modalBackdrop, padding: "0 16px" }}>
+          <div style={{ width: "100%", maxWidth: 420, borderRadius: 20, border: `1px solid ${theme.surfaceBorder}`, background: theme.surface, padding: 28, boxShadow: theme.surfaceShadowStrong }}>
             <h2 style={{ margin: "0 0 12px", fontSize: 22, fontWeight: 800, color: "#16a34a" }}>🏆 Reward Earned!</h2>
-            <p style={{ fontSize: 16, color: "#475569", marginBottom: 16 }}>You earned <strong style={{ color: "#0f172a" }}>{rewardAmount}</strong> glucose.</p>
-            {rewardStatus === "loading" && <p style={{ fontSize: 13, color: "#94a3b8" }}>Updating glucose...</p>}
+            <p style={{ fontSize: 16, color: theme.text, marginBottom: 16 }}>You earned <strong style={{ color: theme.textStrong }}>{rewardAmount}</strong> glucose.</p>
+            {rewardStatus === "loading" && <p style={{ fontSize: 13, color: theme.textSoft }}>Updating glucose...</p>}
             {rewardStatus === "ok" && <p style={{ fontSize: 13, color: "#16a34a" }}>{rewardMessage}</p>}
             {rewardStatus === "error" && <p style={{ fontSize: 13, color: "#dc2626" }}>{rewardMessage}</p>}
             <div style={{ marginTop: 20, display: "flex", justifyContent: "flex-end" }}>
-              <button onClick={() => setRewardPopupOpen(false)} style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#2563eb", color: "#fff", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", fontSize: 14 }}>Close</button>
+              <button onClick={() => setRewardPopupOpen(false)} style={primaryButtonStyle}>Close</button>
             </div>
           </div>
         </div>
@@ -582,6 +629,30 @@ export default function SnakeGame() {
 
       <style>{`
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+        .snake-game-header span:first-child {
+          color: ${theme.titleAccent} !important;
+        }
+
+        .snake-game-header span:last-child {
+          color: ${theme.titleText} !important;
+        }
+
+        .snake-action-button {
+          transition: all 0.15s ease;
+        }
+
+        .snake-action-button-primary {
+          background: ${theme.primaryButtonBg} !important;
+          border-color: ${theme.primaryButtonBorder} !important;
+          color: ${theme.primaryButtonText} !important;
+        }
+
+        .snake-action-button-secondary {
+          background: ${theme.secondaryButtonBg} !important;
+          border-color: ${theme.secondaryButtonBorder} !important;
+          color: ${theme.secondaryButtonText} !important;
+        }
       `}</style>
     </div>
   );

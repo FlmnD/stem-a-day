@@ -1,30 +1,42 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-export async function POST(req: Request) {
-    const token = (await cookies()).get("access_token")?.value;
-    if (!token) return NextResponse.json({ message: "Not logged in" }, { status: 401 });
+import {
+    applySessionCookies,
+    clearSessionCookies,
+    fetchBackendWithSession,
+} from "@/lib/server-session";
 
+export async function POST(req: Request) {
     const body = await req.json().catch(() => null);
     const amount = body?.amount;
 
     if (typeof amount !== "number" || !Number.isInteger(amount) || amount <= 0) {
-        return NextResponse.json({ message: "amount must be a positive integer" }, { status: 400 });
+        return NextResponse.json(
+            { message: "amount must be a positive integer" },
+            { status: 400 }
+        );
     }
 
-    const r = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/users/me/glucose/add`, {
+    const result = await fetchBackendWithSession("/users/me/glucose/add", {
         method: "POST",
-        headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount }),
-        cache: "no-store",
     });
 
-    const text = await r.text();
-    let data: any = {};
-    try { data = text ? JSON.parse(text) : {}; } catch { data = { message: text }; }
+    if (!result.response) {
+        const res = NextResponse.json(result.data, { status: 401 });
+        if (result.refreshAttempted && !result.refreshedTokens) {
+            clearSessionCookies(res);
+        }
+        return res;
+    }
 
-    return NextResponse.json(data, { status: r.status });
+    const res = NextResponse.json(result.data, { status: result.response.status });
+    if (result.refreshedTokens) {
+        applySessionCookies(res, result.refreshedTokens);
+    } else if (result.response.status === 401) {
+        clearSessionCookies(res);
+    }
+
+    return res;
 }

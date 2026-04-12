@@ -1,26 +1,34 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+
+import {
+    applySessionCookies,
+    clearSessionCookies,
+    fetchBackendWithSession,
+} from "@/lib/server-session";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET() {
-    const token = (await cookies()).get("access_token")?.value;
-    if (!token) {
-        return NextResponse.json({ message: "Not logged in" }, { status: 401 });
+    const result = await fetchBackendWithSession("/daily/question");
+
+    if (!result.response) {
+        const res = NextResponse.json(result.data, { status: 401 });
+        if (result.refreshAttempted && !result.refreshedTokens) {
+            clearSessionCookies(res);
+        }
+        return res;
     }
 
-    const response = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/daily/question`, {
-        cache: "no-store",
-        headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-        },
-    });
-
-    const data = await response.json().catch(() => ({}));
-    return NextResponse.json(data, {
-        status: response.status,
+    const res = NextResponse.json(result.data, {
+        status: result.response.status,
         headers: { "Cache-Control": "no-store" },
     });
+    if (result.refreshedTokens) {
+        applySessionCookies(res, result.refreshedTokens);
+    } else if (result.response.status === 401) {
+        clearSessionCookies(res);
+    }
+
+    return res;
 }

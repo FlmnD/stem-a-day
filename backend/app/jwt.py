@@ -1,9 +1,14 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from jose import jwt
+from jose import JWTError, jwt
 
 from app.settings import settings
+
+ACCESS_TOKEN_TYPE = "access"
+REFRESH_TOKEN_TYPE = "refresh"
+EMAIL_VERIFICATION_TOKEN_TYPE = "email_verification"
+PASSWORD_RESET_TOKEN_TYPE = "password_reset"
 
 
 def create_token(
@@ -30,7 +35,16 @@ def create_access_token(subject: str) -> str:
     return create_token(
         subject=subject,
         expires_minutes=settings.JWT_ACCESS_TOKEN_EXPIRES_MINUTES,
-        token_type="access",
+        token_type=ACCESS_TOKEN_TYPE,
+    )
+
+
+def create_refresh_token(subject: str, refresh_token_version: int) -> str:
+    return create_token(
+        subject=subject,
+        expires_minutes=settings.JWT_REFRESH_TOKEN_EXPIRES_DAYS * 24 * 60,
+        token_type=REFRESH_TOKEN_TYPE,
+        extra_claims={"refresh_token_version": refresh_token_version},
     )
 
 
@@ -38,7 +52,16 @@ def create_email_verification_token(subject: str, email: str) -> str:
     return create_token(
         subject=subject,
         expires_minutes=settings.EMAIL_VERIFICATION_TOKEN_EXPIRES_MINUTES,
-        token_type="email_verification",
+        token_type=EMAIL_VERIFICATION_TOKEN_TYPE,
+        extra_claims={"email": email},
+    )
+
+
+def create_password_reset_token(subject: str, email: str) -> str:
+    return create_token(
+        subject=subject,
+        expires_minutes=settings.PASSWORD_RESET_TOKEN_EXPIRES_MINUTES,
+        token_type=PASSWORD_RESET_TOKEN_TYPE,
         extra_claims={"email": email},
     )
 
@@ -49,3 +72,10 @@ def decode_token(token: str) -> dict[str, Any]:
         settings.JWT_SECRET_KEY,
         algorithms=[settings.JWT_ALGORITHM],
     )
+
+
+def decode_typed_token(token: str, expected_token_type: str) -> dict[str, Any]:
+    payload = decode_token(token)
+    if payload.get("token_type") != expected_token_type:
+        raise JWTError("Unexpected token type")
+    return payload

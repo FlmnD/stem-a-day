@@ -1,4 +1,6 @@
 import Navbar from "@/components/navbar";
+import { asSessionUser, type SessionUser } from "@/lib/session-user";
+import { fetchBackendWithSession } from "@/lib/server-session";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
@@ -21,7 +23,16 @@ const themeInit = `
 })();
 `;
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  let initialUser: SessionUser | null = null;
+
+  try {
+    const result = await fetchBackendWithSession("/users/me");
+    if (result.response?.ok) {
+      initialUser = asSessionUser(result.data);
+    }
+  } catch {}
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -32,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           bg-white text-gray-900
           dark:bg-black dark:text-gray-100`}
       >
-        <Navbar />
+        <Navbar initialUser={initialUser} />
         {children}
       </body>
     </html>

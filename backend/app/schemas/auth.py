@@ -41,18 +41,40 @@ class ResendVerificationIn(BaseModel):
 
 class ResendVerificationOut(BaseModel):
     message: str
+    dev_verification_url: str | None = None
 
 
 class VerifyEmailIn(BaseModel):
     token: str = Field(min_length=1)
 
 
-class VerifyEmailOut(BaseModel):
+class ForgotPasswordIn(BaseModel):
+    email: EmailStr
+
+
+class ForgotPasswordOut(BaseModel):
     message: str
-    access_token: str
-    token_type: str = "bearer"
+    dev_reset_url: str | None = None
+
+
+class RefreshTokenIn(BaseModel):
+    refresh_token: str = Field(min_length=1)
+
+
+class ResetPasswordIn(BaseModel):
+    token: str = Field(min_length=1)
+    password: str = Field(min_length=8)
 
 
 class TokenOut(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
+
+
+class VerifyEmailOut(TokenOut):
+    message: str
+
+
+class ResetPasswordOut(TokenOut):
+    message: str

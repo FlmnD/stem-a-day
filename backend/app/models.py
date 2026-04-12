@@ -65,6 +65,10 @@ class User(Base):
         Boolean, nullable=False, default=False, server_default=text("false")
     )
 
+    refresh_token_version: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default=text("0")
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
         nullable=False,
@@ -96,7 +100,35 @@ class User(Base):
         nullable=True,
     )
 
-    daily_debug_offset_days: Mapped[int] = mapped_column(
+
+class DailyQuestionState(Base):
+    __tablename__ = "daily_question_state"
+
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        default=1,
+        server_default=text("1"),
+    )
+
+    effective_date: Mapped[date | None] = mapped_column(
+        Date,
+        nullable=True,
+    )
+
+    current_question_index: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    recent_question_indexes: Mapped[list[int]] = mapped_column(
+        ARRAY(Integer),
+        nullable=False,
+        default=list,
+        server_default=text("'{}'"),
+    )
+
+    debug_offset_days: Mapped[int] = mapped_column(
         Integer,
         nullable=False,
         default=0,

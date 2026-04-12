@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+
+import {
+    applySessionCookies,
+    clearSessionCookies,
+    fetchBackendWithSession,
+} from "@/lib/server-session";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -9,26 +14,28 @@ type Ctx = { params: Promise<{ plantId: string }> };
 export async function POST(_req: Request, ctx: Ctx) {
     const { plantId } = await ctx.params;
 
-    const token = (await cookies()).get("access_token")?.value;
-    if (!token) {
-        return NextResponse.json({ message: "Not logged in" }, { status: 401 });
+    const result = await fetchBackendWithSession(`/plants/buy/${encodeURIComponent(plantId)}`, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+    });
+
+    if (!result.response) {
+        const res = NextResponse.json(result.data, { status: 401 });
+        if (result.refreshAttempted && !result.refreshedTokens) {
+            clearSessionCookies(res);
+        }
+        return res;
     }
 
-    const r = await fetch(
-        `${process.env.FASTAPI_INTERNAL_URL}/plants/buy/${encodeURIComponent(plantId)}`,
-        {
-            method: "POST",
-            cache: "no-store",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                Accept: "application/json",
-            },
-        }
-    );
-
-    const data = await r.json().catch(() => ({}));
-    return NextResponse.json(data, {
-        status: r.status,
+    const res = NextResponse.json(result.data, {
+        status: result.response.status,
         headers: { "Cache-Control": "no-store" },
     });
+    if (result.refreshedTokens) {
+        applySessionCookies(res, result.refreshedTokens);
+    } else if (result.response.status === 401) {
+        clearSessionCookies(res);
+    }
+
+    return res;
 }

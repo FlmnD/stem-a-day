@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { requestSessionUserRefresh } from "@/lib/session-events";
 
 type DailyQuestion = {
     question_number: number;
@@ -37,18 +38,6 @@ type ApiError = {
 
 function readErrorMessage(data: ApiError, fallback: string) {
     return data.message ?? data.detail ?? fallback;
-}
-
-function formatDate(value: string) {
-    const parsed = new Date(`${value}T00:00:00`);
-    return Number.isNaN(parsed.getTime())
-        ? value
-        : parsed.toLocaleDateString(undefined, {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-        });
 }
 
 export default function DailyPage() {
@@ -132,6 +121,7 @@ export default function DailyPage() {
                 answered_today: data.answered_today,
                 glucose_balance: data.glucose_balance,
             });
+            requestSessionUserRefresh();
             setMessage(
                 data.correct
                     ? `Correct! You earned ${data.glucose_earned} glucose.`
@@ -181,28 +171,14 @@ export default function DailyPage() {
         dark:from-black dark:via-[#0b0b0b] dark:to-[#0b0b0b]"
         >
             <div className="mx-auto max-w-4xl">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold text-sky-800 dark:text-slate-100">
-                            Daily
-                        </h1>
-                        <p className="mt-2 max-w-2xl text-gray-600 dark:text-slate-300">
-                            Answer one chemistry question each day. A correct answer earns 25
-                            glucose.
-                        </p>
-                    </div>
-
-                    <div
-                        className="rounded-2xl border border-sky-100 bg-white/80 px-4 py-3 shadow-sm backdrop-blur
-                        dark:border-slate-700 dark:bg-slate-950/60"
-                    >
-                        <div className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-                            Glucose
-                        </div>
-                        <div className="mt-1 text-2xl font-semibold text-sky-700 dark:text-slate-100">
-                            {daily ? daily.glucose_balance : "-"}
-                        </div>
-                    </div>
+                <div>
+                    <h1 className="text-3xl font-bold text-sky-800 dark:text-slate-100">
+                        Daily
+                    </h1>
+                    <p className="mt-2 max-w-2xl text-gray-600 dark:text-slate-300">
+                        Answer one global chemistry question each day. A correct answer earns
+                        25 glucose, and the selector skips the 10 most recently used questions.
+                    </p>
                 </div>
 
                 {message && (
@@ -268,7 +244,7 @@ export default function DailyPage() {
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <p className="text-sm font-medium text-sky-700 dark:text-teal-300">
-                                    Question {daily.question_number} of {daily.total_questions}
+                                    Daily chemistry challenge
                                 </p>
                                 <h2 className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">
                                     {daily.prompt}
@@ -276,10 +252,7 @@ export default function DailyPage() {
                             </div>
 
                             <div className="rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-900 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100">
-                                <div>{formatDate(daily.effective_date)}</div>
-                                <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                    Reward: {daily.reward_glucose} glucose
-                                </div>
+                                Reward: {daily.reward_glucose} glucose
                             </div>
                         </div>
 
@@ -364,7 +337,7 @@ export default function DailyPage() {
                         )}
 
                         <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
-                            Debug offset: {daily.debug_offset_days} day
+                            Global debug offset: {daily.debug_offset_days} day
                             {daily.debug_offset_days === 1 ? "" : "s"}
                         </div>
                     </div>

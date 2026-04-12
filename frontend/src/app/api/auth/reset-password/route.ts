@@ -19,7 +19,7 @@ function extractMessage(data: unknown, fallback: string) {
 export async function POST(req: Request) {
     const body = await req.json();
 
-    const response = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/auth/verify-email`, {
+    const response = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -30,14 +30,14 @@ export async function POST(req: Request) {
 
     if (!response.ok) {
         return NextResponse.json(
-            { message: extractMessage(data, "Verification failed") },
+            { message: extractMessage(data, "Password reset failed") },
             { status: response.status }
         );
     }
 
     const res = NextResponse.json({
         ok: true,
-        message: extractMessage(data, "Email verified. You are now signed in."),
+        message: extractMessage(data, "Password reset complete. You are now signed in."),
     });
     const record = asRecord(data);
     if (

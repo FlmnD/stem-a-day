@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 
-import { applySessionCookies } from "@/lib/server-session";
-
 function asRecord(data: unknown): Record<string, unknown> | null {
     return typeof data === "object" && data !== null ? (data as Record<string, unknown>) : null;
 }
@@ -19,7 +17,7 @@ function extractMessage(data: unknown, fallback: string) {
 export async function POST(req: Request) {
     const body = await req.json();
 
-    const response = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/auth/verify-email`, {
+    const response = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -28,27 +26,14 @@ export async function POST(req: Request) {
 
     const data = await response.json().catch(() => ({}));
 
-    if (!response.ok) {
-        return NextResponse.json(
-            { message: extractMessage(data, "Verification failed") },
-            { status: response.status }
-        );
-    }
-
-    const res = NextResponse.json({
-        ok: true,
-        message: extractMessage(data, "Email verified. You are now signed in."),
-    });
-    const record = asRecord(data);
-    if (
-        typeof record?.access_token === "string" &&
-        typeof record?.refresh_token === "string"
-    ) {
-        applySessionCookies(res, {
-            access_token: record.access_token,
-            refresh_token: record.refresh_token,
-        });
-    }
-
-    return res;
+    return NextResponse.json(
+        {
+            message: extractMessage(
+                data,
+                "If that account exists, a password reset email has been sent."
+            ),
+            dev_reset_url: asRecord(data)?.dev_reset_url ?? null,
+        },
+        { status: response.status }
+    );
 }

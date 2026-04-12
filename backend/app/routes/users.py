@@ -48,12 +48,14 @@ def update_me(
 
             current_user.email = new_email
             current_user.is_email_verified = False
+            current_user.refresh_token_version += 1
             should_send_verification_email = True
 
     if "password" in data:
         from app.security import hash_password
 
         current_user.password = hash_password(data["password"])
+        current_user.refresh_token_version += 1
 
     if "streak" in data:
         current_user.streak = data["streak"]

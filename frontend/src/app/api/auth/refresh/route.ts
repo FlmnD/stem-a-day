@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
-import { applySessionCookies } from "@/lib/server-session";
+import { applySessionCookies, clearSessionCookies } from "@/lib/server-session";
 
 function asRecord(data: unknown): Record<string, unknown> | null {
     return typeof data === "object" && data !== null ? (data as Record<string, unknown>) : null;
@@ -16,29 +17,33 @@ function extractMessage(data: unknown, fallback: string) {
     return fallback;
 }
 
-export async function POST(req: Request) {
-    const body = await req.json();
+export async function POST() {
+    const refreshToken = (await cookies()).get("refresh_token")?.value;
+    if (!refreshToken) {
+        const res = NextResponse.json({ message: "Not logged in" }, { status: 401 });
+        clearSessionCookies(res);
+        return res;
+    }
 
-    const response = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/auth/verify-email`, {
+    const response = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/auth/refresh`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ refresh_token: refreshToken }),
         cache: "no-store",
     });
 
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-        return NextResponse.json(
-            { message: extractMessage(data, "Verification failed") },
+        const res = NextResponse.json(
+            { message: extractMessage(data, "Session refresh failed") },
             { status: response.status }
         );
+        clearSessionCookies(res);
+        return res;
     }
 
-    const res = NextResponse.json({
-        ok: true,
-        message: extractMessage(data, "Email verified. You are now signed in."),
-    });
+    const res = NextResponse.json({ ok: true });
     const record = asRecord(data);
     if (
         typeof record?.access_token === "string" &&
