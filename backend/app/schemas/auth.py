@@ -1,4 +1,5 @@
 import re
+
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
@@ -16,11 +17,10 @@ class RegisterIn(BaseModel):
         v = v.strip()
         if not USERNAME_RE.fullmatch(v):
             raise ValueError(
-                "Username must be 5–20 chars, use letters/numbers/_/-, "
+                "Username must be 5-20 chars, use letters/numbers/_/-, "
                 "and cannot start or end with _ or -."
             )
         return v
-
 
 
 class LoginIn(BaseModel):
@@ -28,6 +28,53 @@ class LoginIn(BaseModel):
     password: str
 
 
+class RegisterOut(BaseModel):
+    message: str
+    email: EmailStr
+    verification_email_sent: bool
+    dev_verification_url: str | None = None
+
+
+class ResendVerificationIn(BaseModel):
+    email: EmailStr
+
+
+class ResendVerificationOut(BaseModel):
+    message: str
+    dev_verification_url: str | None = None
+
+
+class VerifyEmailIn(BaseModel):
+    token: str = Field(min_length=1)
+
+
+class ForgotPasswordIn(BaseModel):
+    email: EmailStr
+
+
+class ForgotPasswordOut(BaseModel):
+    message: str
+    dev_reset_url: str | None = None
+
+
+class RefreshTokenIn(BaseModel):
+    refresh_token: str = Field(min_length=1)
+
+
+class ResetPasswordIn(BaseModel):
+    token: str = Field(min_length=1)
+    password: str = Field(min_length=8)
+
+
 class TokenOut(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
+
+
+class VerifyEmailOut(TokenOut):
+    message: str
+
+
+class ResetPasswordOut(TokenOut):
+    message: str

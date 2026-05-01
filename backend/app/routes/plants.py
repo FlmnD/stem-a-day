@@ -3,18 +3,22 @@ from sqlalchemy import select, update, delete
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.deps import get_current_user
+from app.deps import get_current_verified_user
 from app.models import User, Plant, UserPlant
 
 router = APIRouter(prefix="/plants", tags=["plants"])
 
 
 def xp_needed_for_level(level: int) -> int:
-    return 100 + (level - 1) * 50
+    # Keep early levels reachable with the current 15 / 25 / 35 glucose rewards
+    # while still leaving plenty of room for longer-term plant progression.
+    return 25 + (level - 1) * 10
 
 
 def xp_cost_per_point(level: int) -> int:
-    return 1 + (level - 1) // 3 
+    # A flat early-game conversion makes rewards feel intuitive: 1 glucose = 1 XP.
+    # We only increase the cost much later so high levels can still grow more slowly.
+    return 1 + (level - 1) // 20
 
 
 @router.get("/catalog")
@@ -27,7 +31,7 @@ def catalog(db: Session = Depends(get_db)):
 @router.get("/inventory")
 def inventory(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_verified_user),
 ):
     rows = db.execute(
         select(UserPlant, Plant)
@@ -57,7 +61,7 @@ def inventory(
 def buy_plant(
     plant_id: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_verified_user),
 ):
     plant = db.get(Plant, plant_id)
     if not plant:
@@ -77,6 +81,9 @@ def buy_plant(
         .values(glucose=User.glucose - plant.price)
     )
 
+    if plant_id not in current_user.plants:
+        current_user.plants.append(plant_id)
+
     db.add(UserPlant(user_id=current_user.id, plant_id=plant_id))
     db.commit()
     return {"ok": True}
@@ -86,7 +93,7 @@ def buy_plant(
 def sell_plant(
     plant_id: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_verified_user),
 ):
     plant = db.get(Plant, plant_id)
     if not plant:
@@ -110,6 +117,9 @@ def sell_plant(
         .values(glucose=User.glucose + plant.price)
     )
 
+    if plant_id in current_user.plants:
+        current_user.plants.remove(plant_id)
+
     db.commit()
     return {"ok": True, "refund": plant.price}
 
@@ -119,7 +129,7 @@ def upgrade_plant(
     plant_id: str,
     payload: dict, 
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_verified_user),
 ):
     spend = int(payload.get("spend", 0))
     if spend <= 0:

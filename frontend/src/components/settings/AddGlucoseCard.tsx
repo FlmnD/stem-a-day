@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { requestSessionUserRefresh } from "@/lib/session-events";
 
 export default function AddGlucoseCard() {
     const [amountInput, setAmountInput] = useState<string>("50");
@@ -36,6 +37,7 @@ export default function AddGlucoseCard() {
 
             setStatus("ok");
             setMessage(`Added ${parsedAmount} glucose successfully.`);
+            requestSessionUserRefresh();
         } catch {
             setStatus("error");
             setMessage("Network error. Could not reach server.");

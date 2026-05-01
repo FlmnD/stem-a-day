@@ -1,31 +1,160 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { LogOut, User } from "lucide-react";
+
 import cn from "@/components/lib/cn";
+import { SESSION_USER_REFRESH_EVENT } from "@/lib/session-events";
+import { asSessionUser, type SessionUser } from "@/lib/session-user";
 import ThemeToggle from "@/components/ui/ThemeToggle";
-import { User } from "lucide-react";
 
 type NavItem = { href: string; label: string };
 
 const NAV_ITEMS: NavItem[] = [
     { href: "/", label: "Home" },
+    { href: "/daily", label: "Daily" },
     { href: "/games", label: "Games" },
     { href: "/plants", label: "Plants" },
     { href: "/about", label: "About" },
 ];
 
-export default function Navbar() {
+type NavbarProps = {
+    initialUser: SessionUser | null;
+};
+
+export default function Navbar({ initialUser }: NavbarProps) {
     const [open, setOpen] = useState(false);
+    const [sessionUser, setSessionUser] = useState<SessionUser | null>(initialUser);
+    const [signingOut, setSigningOut] = useState(false);
     const pathname = usePathname();
+    const router = useRouter();
 
     const linkBase =
-        "block px-3 py-2 rounded-lg text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-300 dark:focus-visible:ring-teal-500 dark:focus-visible:ring-offset-0";
+        "block rounded-lg px-3 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-300 dark:focus-visible:ring-teal-500 dark:focus-visible:ring-offset-0";
     const linkInactive =
-        "text-gray-600 hover:text-sky-900 hover:bg-sky-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800/70";
+        "text-gray-600 hover:bg-sky-50 hover:text-sky-900 dark:text-gray-300 dark:hover:bg-gray-800/70 dark:hover:text-white";
     const linkActive =
-        "text-sky-800 bg-sky-100 ring-1 ring-inset ring-sky-200 dark:text-teal-200 dark:bg-teal-900/30 dark:ring-teal-800/50";
+        "bg-sky-100 text-sky-800 ring-1 ring-inset ring-sky-200 dark:bg-teal-900/30 dark:text-teal-200 dark:ring-teal-800/50";
+
+    useEffect(() => {
+        setSessionUser(initialUser);
+    }, [initialUser]);
+
+    useEffect(() => {
+        setOpen(false);
+    }, [pathname]);
+
+    useEffect(() => {
+        let ignore = false;
+
+        async function loadSessionUser() {
+            try {
+                const response = await fetch("/api/me", {
+                    cache: "no-store",
+                    credentials: "include",
+                });
+                const data = await response.json().catch(() => null);
+
+                if (ignore) return;
+
+                if (response.status === 401) {
+                    setSessionUser(null);
+                    return;
+                }
+
+                if (!response.ok) {
+                    return;
+                }
+
+                setSessionUser(asSessionUser(data));
+            } catch {
+                if (ignore) return;
+            }
+        }
+
+        function handleSessionRefresh() {
+            void loadSessionUser();
+        }
+
+        void loadSessionUser();
+        window.addEventListener(SESSION_USER_REFRESH_EVENT, handleSessionRefresh);
+        window.addEventListener("focus", handleSessionRefresh);
+
+        return () => {
+            ignore = true;
+            window.removeEventListener(SESSION_USER_REFRESH_EVENT, handleSessionRefresh);
+            window.removeEventListener("focus", handleSessionRefresh);
+        };
+    }, [pathname]);
+
+    async function handleSignOut() {
+        if (signingOut) return;
+
+        setSigningOut(true);
+        try {
+            await fetch("/api/auth/logout", { method: "POST" });
+        } finally {
+            setSessionUser(null);
+            setOpen(false);
+            setSigningOut(false);
+            router.push("/login");
+            router.refresh();
+        }
+    }
+
+    function renderSignedInControls(isMobile = false) {
+        if (!sessionUser) return null;
+
+        return (
+            <>
+                <Link
+                    href="/daily"
+                    className={cn(
+                        "inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-medium text-sky-800 transition hover:bg-sky-100",
+                        "dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:bg-slate-900",
+                        isMobile && "w-full justify-between rounded-2xl"
+                    )}
+                >
+                    <span className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                        🧪
+                    </span>
+                    <span className="font-semibold">{sessionUser.glucose}</span>
+                </Link>
+
+                <button
+                    type="button"
+                    onClick={() => void handleSignOut()}
+                    disabled={signingOut}
+                    className={cn(
+                        "inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60",
+                        "dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900/60",
+                        isMobile && "w-full"
+                    )}
+                >
+                    <LogOut className="h-4 w-4" />
+                    {signingOut ? "Signing out..." : "Sign out"}
+                </button>
+
+                <Link
+                    href="/settings"
+                    className={cn(
+                        "inline-flex items-center justify-center rounded-lg p-2 text-sky-800 transition hover:bg-sky-50 hover:text-sky-900",
+                        "dark:text-gray-200 dark:hover:bg-gray-800/70 dark:hover:text-white",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-300",
+                        "dark:focus-visible:ring-teal-500 dark:focus-visible:ring-offset-0",
+                        isMobile && "w-full justify-start gap-2 rounded-2xl px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200"
+                    )}
+                    aria-label="Account"
+                    title="Account"
+                >
+                    <User className="h-5 w-5" />
+                    {isMobile && <span>Settings</span>}
+                </Link>
+            </>
+        );
+    }
 
     return (
         <header
@@ -63,34 +192,27 @@ export default function Navbar() {
                 </ul>
 
                 <div className="hidden items-center gap-2 md:flex">
-                    <Link
-                        href="/login"
-                        className="rounded-lg px-3 py-2 text-sm font-medium text-sky-800 hover:text-sky-900 hover:bg-sky-50 dark:text-gray-200 dark:hover:text-white dark:hover:bg-gray-800/70"
-                    >
-                        Log in
-                    </Link>
+                    {sessionUser ? (
+                        renderSignedInControls()
+                    ) : (
+                        <>
+                            <Link
+                                href="/login"
+                                className="rounded-lg px-3 py-2 text-sm font-medium text-sky-800 hover:bg-sky-50 hover:text-sky-900 dark:text-gray-200 dark:hover:bg-gray-800/70 dark:hover:text-white"
+                            >
+                                Log in
+                            </Link>
 
-                    <Link
-                        href="/signup"
-                        className="rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-300 dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400 dark:focus-visible:ring-teal-500 dark:focus-visible:ring-offset-0"
-                    >
-                        Sign up
-                    </Link>
+                            <Link
+                                href="/signup"
+                                className="rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-300 dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400 dark:focus-visible:ring-teal-500 dark:focus-visible:ring-offset-0"
+                            >
+                                Sign up
+                            </Link>
+                        </>
+                    )}
 
                     <ThemeToggle />
-
-                    <Link
-                        href="/settings"
-                        className="inline-flex items-center justify-center rounded-lg p-2
-              text-sky-800 hover:text-sky-900 hover:bg-sky-50
-              dark:text-gray-200 dark:hover:text-white dark:hover:bg-gray-800/70
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-300
-              dark:focus-visible:ring-teal-500 dark:focus-visible:ring-offset-0"
-                        aria-label="Account"
-                        title="Account"
-                    >
-                        <User className="h-5 w-5" />
-                    </Link>
                 </div>
 
                 <button
@@ -134,7 +256,7 @@ export default function Navbar() {
                                         className={cn(
                                             "block rounded-lg px-3 py-2 text-base transition",
                                             active
-                                                ? "text-sky-800 bg-sky-100 ring-1 ring-inset ring-sky-200 dark:text-teal-200 dark:bg-teal-900/30 dark:ring-teal-800/50"
+                                                ? "bg-sky-100 text-sky-800 ring-1 ring-inset ring-sky-200 dark:bg-teal-900/30 dark:text-teal-200 dark:ring-teal-800/50"
                                                 : "text-sky-900 hover:bg-sky-50 dark:text-gray-200 dark:hover:bg-gray-800/70"
                                         )}
                                         aria-current={active ? "page" : undefined}
@@ -146,37 +268,28 @@ export default function Navbar() {
                             );
                         })}
 
-                        <li className="mt-2 flex gap-2 px-2">
-                            <Link
-                                href="/login"
-                                className="flex-1 rounded-lg px-3 py-2 text-center text-sm font-medium text-sky-900 hover:bg-sky-50 dark:text-gray-200 dark:hover:bg-gray-800/70"
-                                onClick={() => setOpen(false)}
-                            >
-                                Log in
-                            </Link>
-                            <Link
-                                href="/signup"
-                                className="flex-1 rounded-lg bg-sky-600 px-3 py-2 text-center text-sm font-medium text-white hover:bg-sky-700 dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400"
-                                onClick={() => setOpen(false)}
-                            >
-                                Sign up
-                            </Link>
-                        </li>
-
-                        <li className="mt-2 px-2">
-                            <Link
-                                href="/settings"
-                                className="block rounded-lg px-3 py-2 text-base transition
-                  text-sky-900 hover:bg-sky-50
-                  dark:text-gray-200 dark:hover:bg-gray-800/70"
-                                onClick={() => setOpen(false)}
-                            >
-                                <span className="inline-flex items-center gap-2">
-                                    <User className="h-5 w-5" />
-                                    Settings
-                                </span>
-                            </Link>
-                        </li>
+                        {sessionUser ? (
+                            <li className="mt-2 flex flex-col gap-2 px-2">
+                                {renderSignedInControls(true)}
+                            </li>
+                        ) : (
+                            <li className="mt-2 flex gap-2 px-2">
+                                <Link
+                                    href="/login"
+                                    className="flex-1 rounded-lg px-3 py-2 text-center text-sm font-medium text-sky-900 hover:bg-sky-50 dark:text-gray-200 dark:hover:bg-gray-800/70"
+                                    onClick={() => setOpen(false)}
+                                >
+                                    Log in
+                                </Link>
+                                <Link
+                                    href="/signup"
+                                    className="flex-1 rounded-lg bg-sky-600 px-3 py-2 text-center text-sm font-medium text-white hover:bg-sky-700 dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400"
+                                    onClick={() => setOpen(false)}
+                                >
+                                    Sign up
+                                </Link>
+                            </li>
+                        )}
 
                         <li className="mt-2 px-2">
                             <ThemeToggle />

@@ -1,4 +1,16 @@
-export default function About() {
+import { asSessionUser, type SessionUser } from "@/lib/session-user";
+import { fetchBackendWithSession } from "@/lib/server-session";
+
+export default async function About() {
+    let sessionUser: SessionUser | null = null;
+
+    try {
+        const result = await fetchBackendWithSession("/users/me");
+        if (result.response?.ok) {
+            sessionUser = asSessionUser(result.data);
+        }
+    } catch {}
+
     return (
         <section
             className="relative min-h-[calc(100dvh-3.5rem)] overflow-hidden
@@ -66,13 +78,15 @@ export default function About() {
                         </div>
 
                         <div className="flex flex-col gap-2 sm:flex-row">
-                            <a
-                                href="/signup"
-                                className="inline-flex items-center justify-center rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white hover:bg-sky-700
+                            {!sessionUser && (
+                                <a
+                                    href="/signup"
+                                    className="inline-flex items-center justify-center rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white hover:bg-sky-700
                            dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400"
-                            >
-                                Create account
-                            </a>
+                                >
+                                    Create account
+                                </a>
+                            )}
                             <a
                                 href="/games"
                                 className="inline-flex items-center justify-center rounded-2xl border border-sky-200 px-5 py-3 text-sm font-semibold text-sky-700 hover:bg-sky-50

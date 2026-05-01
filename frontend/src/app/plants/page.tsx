@@ -1,6 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import PlantIllustration from "@/components/plants/PlantIllustration";
+import { requestSessionUserRefresh } from "@/lib/session-events";
+import {
+    getNextPlantGrowthStage,
+    getPlantGrowthStage,
+} from "@/lib/plant-growth";
 
 type Me = { glucose: number };
 
@@ -23,6 +29,33 @@ type OwnedPlant = {
     acquired_at: string;
 };
 
+type NonJsonPayload = {
+    __nonJson: true;
+    text: string;
+};
+
+function asRecord(data: unknown): Record<string, unknown> | null {
+    return typeof data === "object" && data !== null ? (data as Record<string, unknown>) : null;
+}
+
+function isNonJsonPayload(data: unknown): data is NonJsonPayload {
+    const record = asRecord(data);
+    return Boolean(record?.__nonJson) && typeof record?.text === "string";
+}
+
+function readMessage(data: unknown, fallback: string) {
+    const record = asRecord(data);
+    if (typeof record?.detail === "string") return record.detail;
+    if (typeof record?.message === "string") return record.message;
+    return fallback;
+}
+
+function readNumber(data: unknown, key: string): number | null {
+    const record = asRecord(data);
+    const value = record?.[key];
+    return typeof value === "number" ? value : null;
+}
+
 async function readJsonOrText(r: Response) {
     const ct = r.headers.get("content-type") || "";
     if (ct.includes("application/json")) return await r.json().catch(() => ({}));
@@ -39,11 +72,11 @@ export default function PlantsPage() {
     const [msg, setMsg] = useState<string>("");
 
     const [isAuthed, setIsAuthed] = useState<boolean>(false);
+    const [authResolved, setAuthResolved] = useState<boolean>(false);
 
     const [buyingId, setBuyingId] = useState<string | null>(null);
     const [sellingId, setSellingId] = useState<string | null>(null);
     const [upgradingId, setUpgradingId] = useState<string | null>(null);
-
     async function refreshAll() {
         try {
             const catP = fetch("/api/plants/catalog", { cache: "no-store", credentials: "include" });
@@ -59,6 +92,7 @@ export default function PlantsPage() {
                 setIsAuthed(false);
                 setMe(null);
                 setInv([]);
+                setAuthResolved(true);
                 return;
             }
 
@@ -67,6 +101,7 @@ export default function PlantsPage() {
                 setIsAuthed(false);
                 setMe(null);
                 setInv([]);
+                setAuthResolved(true);
                 return;
             }
 
@@ -76,7 +111,9 @@ export default function PlantsPage() {
             const invR = await fetch("/api/plants/inventory", { cache: "no-store", credentials: "include" });
             if (invR.ok) setInv(await invR.json().catch(() => []));
             else console.error("GET /api/plants/inventory failed", invR.status);
+            setAuthResolved(true);
         } catch (e) {
+            setAuthResolved(true);
             console.error("refreshAll failed:", e);
         }
     }
@@ -113,22 +150,24 @@ export default function PlantsPage() {
                 return;
             }
 
-            const data: any = await readJsonOrText(r);
+            const data = await readJsonOrText(r);
+            const record = asRecord(data);
 
-            if (data?.__nonJson) {
+            if (isNonJsonPayload(data)) {
                 setMsg(`Buy failed (non-JSON response). First chars: ${String(data.text).slice(0, 120)}`);
                 return;
             }
 
-            if (!r.ok || data?.success === false || data?.ok === false) {
-                setMsg(data?.detail ?? data?.message ?? "Buy failed");
+            if (!r.ok || record?.success === false || record?.ok === false) {
+                setMsg(readMessage(data, "Buy failed"));
                 return;
             }
 
-            setMsg(data?.message ?? "Bought!");
+            setMsg(readMessage(data, "Bought!"));
             await refreshAll();
-        } catch (e: any) {
-            setMsg(`Buy failed: ${e?.message ?? String(e)}`);
+            requestSessionUserRefresh();
+        } catch (e: unknown) {
+            setMsg(`Buy failed: ${e instanceof Error ? e.message : String(e)}`);
         } finally {
             setBuyingId(null);
         }
@@ -165,22 +204,24 @@ export default function PlantsPage() {
                 return;
             }
 
-            const data: any = await readJsonOrText(r);
+            const data = await readJsonOrText(r);
+            const record = asRecord(data);
 
-            if (data?.__nonJson) {
+            if (isNonJsonPayload(data)) {
                 setMsg(`Sell failed (non-JSON response). First chars: ${String(data.text).slice(0, 120)}`);
                 return;
             }
 
-            if (!r.ok || data?.success === false || data?.ok === false) {
-                setMsg(data?.detail ?? data?.message ?? "Sell failed");
+            if (!r.ok || record?.success === false || record?.ok === false) {
+                setMsg(readMessage(data, "Sell failed"));
                 return;
             }
 
-            setMsg(data?.message ?? `Sold! Refunded ${data?.refund ?? basePrice} glucose.`);
+            setMsg(`${readMessage(data, "Sold!")} ${readNumber(data, "refund") ?? basePrice} glucose refunded.`.trim());
             await refreshAll();
-        } catch (e: any) {
-            setMsg(`Sell failed: ${e?.message ?? String(e)}`);
+            requestSessionUserRefresh();
+        } catch (e: unknown) {
+            setMsg(`Sell failed: ${e instanceof Error ? e.message : String(e)}`);
         } finally {
             setSellingId(null);
         }
@@ -194,7 +235,7 @@ export default function PlantsPage() {
         if (upgradingId) return;
 
         const raw = upgradeSpend[plantId];
-        const spend = raw == null ? 50 : Math.trunc(Number(raw));
+        const spend = raw == null ? 25 : Math.trunc(Number(raw));
 
         if (!Number.isFinite(spend) || spend <= 0) {
             setMsg("Enter a spend amount > 0.");
@@ -221,15 +262,16 @@ export default function PlantsPage() {
                 return;
             }
 
-            const data: any = await readJsonOrText(r);
+            const data = await readJsonOrText(r);
+            const record = asRecord(data);
 
-            if (data?.__nonJson) {
+            if (isNonJsonPayload(data)) {
                 setMsg(`Upgrade failed (non-JSON response). First chars: ${String(data.text).slice(0, 120)}`);
                 return;
             }
 
-            if (!r.ok || data?.success === false || data?.ok === false) {
-                setMsg(data?.detail ?? data?.message ?? "Upgrade failed");
+            if (!r.ok || record?.success === false || record?.ok === false) {
+                setMsg(readMessage(data, "Upgrade failed"));
                 return;
             }
 
@@ -240,8 +282,9 @@ export default function PlantsPage() {
             }
 
             await refreshAll();
-        } catch (e: any) {
-            setMsg(`Upgrade failed: ${e?.message ?? String(e)}`);
+            requestSessionUserRefresh();
+        } catch (e: unknown) {
+            setMsg(`Upgrade failed: ${e instanceof Error ? e.message : String(e)}`);
         } finally {
             setUpgradingId(null);
         }
@@ -263,12 +306,12 @@ export default function PlantsPage() {
                         dark:bg-slate-950/60 dark:border-slate-700">
                     <span className="text-2xl">🧪</span>
                     <span className="text-lg font-semibold text-sky-700 dark:text-slate-100">
-                        {isAuthed && me ? me.glucose : "—"}
+                        {!authResolved ? "..." : isAuthed && me ? me.glucose : "—"}
                     </span>
                 </div>
             </div>
 
-            {!isAuthed && (
+            {!isAuthed && authResolved && (
                 <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900
                         dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-200">
                     You’re not logged in. You can browse the shop, but you must log in to buy, sell, or upgrade.
@@ -297,10 +340,20 @@ export default function PlantsPage() {
                                 className="rounded-2xl p-6 border border-sky-100 bg-white shadow-md
                            dark:border-slate-700 dark:bg-slate-950/60 dark:shadow-black/30"
                             >
-                                <div className="h-32 rounded-lg flex items-center justify-center mb-4 text-4xl
+                                <div className="hidden h-32 rounded-lg flex items-center justify-center mb-4 text-4xl
                                 bg-sky-50 text-sky-300
                                 dark:bg-slate-900/60 dark:text-teal-200/80">
                                     🌱
+                                </div>
+
+                                <div className="mb-4 h-32 overflow-hidden rounded-2xl border border-sky-100 bg-sky-50/80
+                                dark:border-slate-700 dark:bg-slate-900/60">
+                                    <PlantIllustration
+                                        plantId={p.id}
+                                        level={15}
+                                        name={p.name}
+                                        className="h-full w-full"
+                                    />
                                 </div>
 
                                 <h3 className="text-lg font-semibold text-sky-800 dark:text-slate-100">{p.name}</h3>
@@ -315,9 +368,17 @@ export default function PlantsPage() {
                                         className="rounded-2xl px-4 py-2 text-sm font-semibold
                                bg-sky-600 text-white hover:bg-sky-700 disabled:opacity-50
                                dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400"
-                                        title={!isAuthed ? "Log in to buy" : owned ? "Already owned" : ""}
+                                        title={!authResolved || isAuthed ? owned ? "Already owned" : "" : "Log in to buy"}
                                     >
-                                        {!isAuthed ? "Log in" : owned ? "Owned" : isBuyingThis ? "Buying..." : "Buy"}
+                                        {!authResolved
+                                            ? "Checking..."
+                                            : !isAuthed
+                                                ? "Log in"
+                                                : owned
+                                                    ? "Owned"
+                                                    : isBuyingThis
+                                                        ? "Buying..."
+                                                        : "Buy"}
                                     </button>
                                 </div>
                             </div>
@@ -329,7 +390,12 @@ export default function PlantsPage() {
             <div className="mt-16">
                 <h2 className="text-2xl font-semibold text-sky-700 dark:text-slate-100 mb-6">Your Inventory</h2>
 
-                {!isAuthed ? (
+                {!authResolved ? (
+                    <div className="rounded-2xl border border-sky-100 bg-white p-6 shadow-sm text-gray-500
+                          dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-300">
+                        Loading your garden...
+                    </div>
+                ) : !isAuthed ? (
                     <div className="rounded-2xl border border-sky-100 bg-white p-6 shadow-sm text-gray-500
                           dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-300">
                         Log in to view your inventory.
@@ -347,6 +413,17 @@ export default function PlantsPage() {
 
                             const isSellingThis = sellingId === p.plant_id;
                             const isUpgradingThis = upgradingId === p.plant_id;
+                            const currentGrowthStage = getPlantGrowthStage(p.level);
+                            const nextGrowthStage = getNextPlantGrowthStage(p.level);
+                            const currentImageStage = currentGrowthStage;
+                            const inventoryImageSrc: string | null = null;
+                            const inventoryImageStateKey = "";
+                            const inventoryImageIndex = 0;
+                            const setInventoryImageIndexes = (
+                                updater: (prev: Record<string, number>) => Record<string, number>
+                            ) => {
+                                updater({});
+                            };
 
                             return (
                                 <div
@@ -374,6 +451,50 @@ export default function PlantsPage() {
                                         </button>
                                     </div>
 
+                                    <div className="mt-4 overflow-hidden rounded-2xl border border-sky-100 bg-sky-50/80
+                                        dark:border-slate-700 dark:bg-slate-900/60">
+                                        <PlantIllustration
+                                            plantId={p.plant_id}
+                                            level={p.level}
+                                            name={p.name}
+                                            className="h-36 w-full px-3 py-2"
+                                        />
+                                    </div>
+
+                                    <div className="hidden mt-4 overflow-hidden rounded-2xl border border-sky-100 bg-sky-50/80
+                                        dark:border-slate-700 dark:bg-slate-900/60">
+                                        {inventoryImageSrc ? (
+                                            /* eslint-disable-next-line @next/next/no-img-element */
+                                            <img
+                                                src={inventoryImageSrc}
+                                                alt={`${p.name} stage ${currentImageStage}`}
+                                                className="h-36 w-36 object-contain p-5"
+                                                onError={() => {
+                                                    setInventoryImageIndexes((prev) => ({
+                                                        ...prev,
+                                                        [inventoryImageStateKey]: inventoryImageIndex + 1,
+                                                    }));
+                                                }}
+                                            />
+                                        ) : (
+                                            <div className="flex h-36 items-center justify-center text-6xl text-sky-300 dark:text-teal-200/80">
+                                                ðŸŒ±
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                                        <span className="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 font-semibold text-sky-700
+                                            dark:border-slate-700 dark:bg-slate-900/60 dark:text-teal-200">
+                                            Growth stage {currentGrowthStage}
+                                        </span>
+                                        <span className="text-gray-500 dark:text-slate-400">
+                                            {nextGrowthStage === null
+                                                ? "Final appearance unlocked."
+                                                : `Next growth stage unlocks at level ${nextGrowthStage}.`}
+                                        </span>
+                                    </div>
+
                                     <div className="mt-4">
                                         <div className="h-2 w-full rounded-full overflow-hidden bg-slate-100 dark:bg-slate-900/60">
                                             <div
@@ -391,7 +512,7 @@ export default function PlantsPage() {
                                             type="number"
                                             min={1}
                                             step={1}
-                                            value={upgradeSpend[p.plant_id] ?? "50"}
+                                            value={upgradeSpend[p.plant_id] ?? "25"}
                                             onChange={(e) => {
                                                 const v = e.target.value; // "" or numeric string
                                                 if (v === "" || /^\d+$/.test(v)) {
