@@ -2,7 +2,7 @@ import Navbar from "@/components/navbar";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
-
+import Script from "next/script";
 export const metadata: Metadata = {
   title: "STEM a Day",
   description: "Learn STEM with daily byte-sized lessons",
@@ -25,7 +25,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased
@@ -34,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <Navbar />
         {children}
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </body>
     </html>
   );
