@@ -6,6 +6,8 @@ import type { SessionUser } from "@/lib/session-user";
 
 type SignedInHomeProps = {
     user: SessionUser;
+    totalPlantCount: number;
+    growingPlantCount: number;
 };
 
 const quickLinks = [
@@ -26,9 +28,12 @@ const quickLinks = [
     },
 ];
 
-export default function SignedInHome({ user }: SignedInHomeProps) {
+export default function SignedInHome({
+    user,
+    totalPlantCount,
+    growingPlantCount,
+}: SignedInHomeProps) {
     const displayName = user.username?.trim() || "Scientist";
-    const plantCount = user.plants.length;
 
     return (
         <section
@@ -117,15 +122,19 @@ export default function SignedInHome({ user }: SignedInHomeProps) {
 
                             <Card className="border-sky-100 bg-white/85 p-5 dark:border-slate-700 dark:bg-slate-950/70">
                                 <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                                    Garden
+                                    Growing
                                 </div>
                                 <div className="mt-3 text-3xl font-bold text-sky-800 dark:text-slate-100">
-                                    {plantCount}
+                                    {growingPlantCount}
                                 </div>
                                 <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                                    {plantCount === 1
-                                        ? "You already have 1 plant growing."
-                                        : `You already have ${plantCount} plants growing.`}
+                                    {totalPlantCount === 0
+                                        ? "Your garden is ready for its first plant."
+                                        : growingPlantCount === 0
+                                            ? `All ${totalPlantCount} of your plants have reached full growth.`
+                                            : growingPlantCount === 1
+                                                ? `1 of your ${totalPlantCount} plants is still growing.`
+                                                : `${growingPlantCount} of your ${totalPlantCount} plants are still growing.`}
                                 </p>
                             </Card>
                         </div>

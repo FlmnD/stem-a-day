@@ -14,7 +14,6 @@ type DailyQuestion = {
     can_answer_today: boolean;
     answered_today: boolean;
     glucose_balance: number;
-    debug_offset_days: number;
 };
 
 type DailyAnswerResult = {
@@ -47,7 +46,6 @@ export default function DailyPage() {
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const [advancing, setAdvancing] = useState(false);
     const [statusCode, setStatusCode] = useState<number | null>(null);
 
     async function loadDailyQuestion() {
@@ -131,36 +129,6 @@ export default function DailyPage() {
             setMessage("Network error while submitting your answer.");
         } finally {
             setSubmitting(false);
-        }
-    }
-
-    async function advanceDebugDay() {
-        if (advancing) return;
-
-        setAdvancing(true);
-        setMessage("");
-
-        try {
-            const response = await fetch("/api/daily/debug/advance", {
-                method: "POST",
-                credentials: "include",
-            });
-            const data = (await response.json().catch(() => ({}))) as DailyQuestion & ApiError;
-
-            if (!response.ok) {
-                setMessage(readErrorMessage(data, "Could not advance the debug day."));
-                return;
-            }
-
-            setDaily(data);
-            setResult(null);
-            setSelectedOptionIndex(null);
-            setStatusCode(response.status);
-            setMessage("Debug day advanced. You now have the next daily question.");
-        } catch {
-            setMessage("Network error while advancing the debug day.");
-        } finally {
-            setAdvancing(false);
         }
     }
 
@@ -303,15 +271,6 @@ export default function DailyPage() {
                             >
                                 {submitting ? "Checking answer..." : "Submit answer"}
                             </button>
-
-                            <button
-                                type="button"
-                                disabled={advancing}
-                                onClick={() => void advanceDebugDay()}
-                                className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900/60"
-                            >
-                                {advancing ? "Advancing..." : "Advance day (debug)"}
-                            </button>
                         </div>
 
                         <div className="mt-4 text-sm text-slate-500 dark:text-slate-400">
@@ -335,11 +294,6 @@ export default function DailyPage() {
                                 <p className="mt-2 text-sm">{result.explanation}</p>
                             </div>
                         )}
-
-                        <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
-                            Global debug offset: {daily.debug_offset_days} day
-                            {daily.debug_offset_days === 1 ? "" : "s"}
-                        </div>
                     </div>
                 )}
             </div>

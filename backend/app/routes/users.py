@@ -5,15 +5,30 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.deps import get_current_verified_user
 from app.email_verification import send_verification_email
-from app.models import User
+from app.models import User, UserPlant
 from app.schemas.user import GlucoseAdd, PlantsAdd, UserRead, UserUpdate
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
+def build_user_read(db: Session, user: User) -> UserRead:
+    plant_ids = db.execute(
+        select(UserPlant.plant_id)
+        .where(UserPlant.user_id == user.id)
+        .order_by(UserPlant.acquired_at.asc())
+    ).scalars().all()
+
+    payload = UserRead.model_validate(user).model_dump()
+    payload["plants"] = list(plant_ids)
+    return UserRead(**payload)
+
+
 @router.get("/me", response_model=UserRead)
-def me(current_user: User = Depends(get_current_verified_user)):
-    return current_user
+def me(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_verified_user),
+):
+    return build_user_read(db, current_user)
 
 
 @router.patch("/me", response_model=UserRead)
@@ -69,7 +84,7 @@ def update_me(
     if should_send_verification_email:
         send_verification_email(current_user)
 
-    return current_user
+    return build_user_read(db, current_user)
 
 
 @router.post("/me/plants", response_model=UserRead)
@@ -112,8 +127,8 @@ def add_coins_me(
         update(User)
         .where(User.id == current_user.id)
         .values(glucose=User.glucose + payload.amount)
-        .returning(User)
     )
-    updated_user = db.execute(stmt).scalar_one()
+    db.execute(stmt)
     db.commit()
-    return updated_user
+    db.refresh(current_user)
+    return build_user_read(db, current_user)

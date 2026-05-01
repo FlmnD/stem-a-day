@@ -72,6 +72,7 @@ export default function PlantsPage() {
     const [msg, setMsg] = useState<string>("");
 
     const [isAuthed, setIsAuthed] = useState<boolean>(false);
+    const [authResolved, setAuthResolved] = useState<boolean>(false);
 
     const [buyingId, setBuyingId] = useState<string | null>(null);
     const [sellingId, setSellingId] = useState<string | null>(null);
@@ -91,6 +92,7 @@ export default function PlantsPage() {
                 setIsAuthed(false);
                 setMe(null);
                 setInv([]);
+                setAuthResolved(true);
                 return;
             }
 
@@ -99,6 +101,7 @@ export default function PlantsPage() {
                 setIsAuthed(false);
                 setMe(null);
                 setInv([]);
+                setAuthResolved(true);
                 return;
             }
 
@@ -108,7 +111,9 @@ export default function PlantsPage() {
             const invR = await fetch("/api/plants/inventory", { cache: "no-store", credentials: "include" });
             if (invR.ok) setInv(await invR.json().catch(() => []));
             else console.error("GET /api/plants/inventory failed", invR.status);
+            setAuthResolved(true);
         } catch (e) {
+            setAuthResolved(true);
             console.error("refreshAll failed:", e);
         }
     }
@@ -301,12 +306,12 @@ export default function PlantsPage() {
                         dark:bg-slate-950/60 dark:border-slate-700">
                     <span className="text-2xl">🧪</span>
                     <span className="text-lg font-semibold text-sky-700 dark:text-slate-100">
-                        {isAuthed && me ? me.glucose : "—"}
+                        {!authResolved ? "..." : isAuthed && me ? me.glucose : "—"}
                     </span>
                 </div>
             </div>
 
-            {!isAuthed && (
+            {!isAuthed && authResolved && (
                 <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900
                         dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-200">
                     You’re not logged in. You can browse the shop, but you must log in to buy, sell, or upgrade.
@@ -363,9 +368,17 @@ export default function PlantsPage() {
                                         className="rounded-2xl px-4 py-2 text-sm font-semibold
                                bg-sky-600 text-white hover:bg-sky-700 disabled:opacity-50
                                dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400"
-                                        title={!isAuthed ? "Log in to buy" : owned ? "Already owned" : ""}
+                                        title={!authResolved || isAuthed ? owned ? "Already owned" : "" : "Log in to buy"}
                                     >
-                                        {!isAuthed ? "Log in" : owned ? "Owned" : isBuyingThis ? "Buying..." : "Buy"}
+                                        {!authResolved
+                                            ? "Checking..."
+                                            : !isAuthed
+                                                ? "Log in"
+                                                : owned
+                                                    ? "Owned"
+                                                    : isBuyingThis
+                                                        ? "Buying..."
+                                                        : "Buy"}
                                     </button>
                                 </div>
                             </div>
@@ -377,7 +390,12 @@ export default function PlantsPage() {
             <div className="mt-16">
                 <h2 className="text-2xl font-semibold text-sky-700 dark:text-slate-100 mb-6">Your Inventory</h2>
 
-                {!isAuthed ? (
+                {!authResolved ? (
+                    <div className="rounded-2xl border border-sky-100 bg-white p-6 shadow-sm text-gray-500
+                          dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-300">
+                        Loading your garden...
+                    </div>
+                ) : !isAuthed ? (
                     <div className="rounded-2xl border border-sky-100 bg-white p-6 shadow-sm text-gray-500
                           dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-300">
                         Log in to view your inventory.

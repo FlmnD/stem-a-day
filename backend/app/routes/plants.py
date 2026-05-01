@@ -81,6 +81,9 @@ def buy_plant(
         .values(glucose=User.glucose - plant.price)
     )
 
+    if plant_id not in current_user.plants:
+        current_user.plants.append(plant_id)
+
     db.add(UserPlant(user_id=current_user.id, plant_id=plant_id))
     db.commit()
     return {"ok": True}
@@ -113,6 +116,9 @@ def sell_plant(
         .where(User.id == current_user.id)
         .values(glucose=User.glucose + plant.price)
     )
+
+    if plant_id in current_user.plants:
+        current_user.plants.remove(plant_id)
 
     db.commit()
     return {"ok": True, "refund": plant.price}
