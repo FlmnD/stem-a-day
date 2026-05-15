@@ -144,8 +144,7 @@ export default function DailyPage() {
                         Daily
                     </h1>
                     <p className="mt-2 max-w-2xl text-gray-600 dark:text-slate-300">
-                        Answer one global chemistry question each day. A correct answer earns
-                        25 glucose, and the selector skips the 10 most recently used questions.
+                        Answer the daily chemistry question for 25 glucose!
                     </p>
                 </div>
 

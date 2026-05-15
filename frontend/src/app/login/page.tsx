@@ -2,6 +2,7 @@
 
 import AuthCard from "@/components/auth/AuthCard";
 import ResendVerificationButton from "@/components/auth/ResendVerificationButton";
+import PasswordField from "@/components/ui/PasswordField";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -90,10 +91,9 @@ export default function Login() {
                 <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
                     Password
                 </label>
-                <input
+                <PasswordField
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    type="password"
                     autoComplete="current-password"
                     placeholder="********"
                     className="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-teal-700/40 dark:focus:ring-offset-[#0b0b0b]"

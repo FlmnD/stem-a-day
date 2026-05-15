@@ -2,6 +2,7 @@
 
 import AuthCard from "@/components/auth/AuthCard";
 import ResendVerificationButton from "@/components/auth/ResendVerificationButton";
+import PasswordField from "@/components/ui/PasswordField";
 import React, { useState } from "react";
 
 const USERNAME_REGEX = /^[A-Za-z0-9](?:[A-Za-z0-9_-]{3,18})[A-Za-z0-9]$/;
@@ -195,10 +196,9 @@ export default function Signup() {
                 <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
                     Password
                 </label>
-                <input
+                <PasswordField
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    type="password"
                     autoComplete="new-password"
                     placeholder="At least 8 characters"
                     className="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-teal-700/40 dark:focus:ring-offset-[#0b0b0b]"
@@ -211,10 +211,9 @@ export default function Signup() {
                 <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
                     Confirm password
                 </label>
-                <input
+                <PasswordField
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    type="password"
                     autoComplete="new-password"
                     placeholder="Repeat password"
                     className="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-teal-700/40 dark:focus:ring-offset-[#0b0b0b]"

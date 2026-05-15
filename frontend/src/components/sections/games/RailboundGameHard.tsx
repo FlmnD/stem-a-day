@@ -936,8 +936,9 @@ export default function RailboundHard() {
         </div>
 
         {scenario && (
-          <div className="flex gap-6 items-start flex-wrap">
-            <div className="flex flex-col gap-3">
+          <div className="w-full overflow-x-auto pb-2">
+            <div className="mx-auto flex min-w-max gap-6 items-start">
+            <div className="shrink-0 flex flex-col gap-3">
 
               {/* Problem text — hidden during intro */}
               {!showIntro && (
@@ -1033,7 +1034,7 @@ export default function RailboundHard() {
             </div>
 
             {/* Card Tray */}
-            <div className="flex flex-col gap-4">
+            <div className="shrink-0 flex flex-col gap-4">
               <div
                 className="border-2 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-4 flex flex-col gap-3 rounded-lg"
                 style={{ width: 230, minHeight: 120 }}
@@ -1086,6 +1087,7 @@ export default function RailboundHard() {
                 )}
               </div>
             </div>
+          </div>
           </div>
         )}
       </div>

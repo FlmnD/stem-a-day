@@ -276,7 +276,7 @@ export default function PlantsPage() {
             }
 
             if (typeof data?.used === "number" && typeof data?.gained_xp === "number") {
-                setMsg(`Upgraded! Used ${data.used} glucose → +${data.gained_xp} XP`);
+                setMsg(`Upgraded! Used ${data.used} glucose for +${data.gained_xp} glucose`);
             } else {
                 setMsg(data?.message ?? "Upgraded!");
             }
@@ -503,7 +503,7 @@ export default function PlantsPage() {
                                             />
                                         </div>
                                         <div className="mt-2 text-xs text-gray-500 dark:text-slate-400">
-                                            XP: {p.level_xp} / {p.xp_needed}
+                                            Glucose: {p.level_xp} / {p.xp_needed}
                                         </div>
                                     </div>
 
@@ -532,7 +532,7 @@ export default function PlantsPage() {
                                  bg-sky-600 hover:bg-sky-700
                                  dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400"
                                         >
-                                            {isUpgradingThis ? "Upgrading..." : "Spend glucose → XP"}
+                                            {isUpgradingThis ? "Upgrading..." : "Spend glucose"}
                                         </button>
                                     </div>
 

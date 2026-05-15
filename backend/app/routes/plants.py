@@ -148,7 +148,7 @@ def upgrade_plant(
     if gained_xp <= 0:
         raise HTTPException(
             400,
-            f"Spend too small. At level {up.level}, 1 XP costs {cost_per_xp} glucose."
+            f"Spend too small. At level {up.level}, you need {cost_per_xp} glucose to gain 1 glucose."
         )
 
     used = gained_xp * cost_per_xp
