@@ -1,19 +1,18 @@
 'use client'
 import React, { useEffect, useState, useRef } from "react";
 
-// ─── TYPES ────────────────────────────────────────────────────────────────────
 
 type StoichUnit =
-  | 'mol_A'        // moles of reactant A
-  | 'mol_B'        // moles of reactant B
-  | 'mol_P'        // moles of product
-  | 'g_A'          // grams of reactant A
-  | 'g_B'          // grams of reactant B
-  | 'g_P'          // grams of product
-  | 'g_excess'     // grams of excess reactant
-  | 'mol_excess'   // moles of excess reactant
-  | 'mol_needed'   // moles of limiting reagent needed
-  | 'theoretical'; // theoretical yield in grams
+  | 'mol_A'
+  | 'mol_B'
+  | 'mol_P'
+  | 'g_A'
+  | 'g_B'
+  | 'g_P'
+  | 'g_excess'
+  | 'mol_excess'
+  | 'mol_needed'
+  | 'theoretical';
 
 interface TrackCard {
   id: number;
@@ -61,16 +60,14 @@ interface Scenario {
   decoyCards: TrackCard[];
   stationValues: number[];
   tier: 1 | 2 | 3;
-  subProblem?: string; // for tier 2: which sub-problem this is
+  subProblem?: string;
 }
-
-// ─── RAW REACTION DATA ────────────────────────────────────────────────────────
 
 interface Reactant { symbol: string; coeff: number; mm: number; name: string; }
 interface Product  { symbol: string; coeff: number; mm: number; name: string; }
 
 interface RawReaction {
-  label: string;          // e.g. "2H₂ + O₂ → 2H₂O"
+  label: string;
   reactantA: Reactant;
   reactantB: Reactant;
   product: Product;
@@ -127,8 +124,6 @@ const REACTIONS: RawReaction[] = [
   },
 ];
 
-// ─── CONSTANTS ────────────────────────────────────────────────────────────────
-
 const GLUCOSE_REWARD = 20;
 const MAP_W = 1100;
 const MAP_H = 520;
@@ -136,8 +131,6 @@ const ST_W = 138;
 const ST_H = 106;
 const SL_W = 215;
 const SL_H = 134;
-
-// ─── BLUEPRINTS ───────────────────────────────────────────────────────────────
 
 const BLUEPRINTS: Record<number, { stations: { fx: number; fy: number }[]; dirs: ('h'|'v')[] }[]> = {
   2: [
@@ -159,8 +152,6 @@ const BLUEPRINTS: Record<number, { stations: { fx: number; fy: number }[]; dirs:
     { stations: [{ fx: 0.10, fy: 0.20 }, { fx: 0.35, fy: 0.20 }, { fx: 0.35, fy: 0.80 }, { fx: 0.65, fy: 0.80 }, { fx: 0.90, fy: 0.20 }], dirs: ['h','v','h','v'] },
   ],
 };
-
-// ─── FORMAT ───────────────────────────────────────────────────────────────────
 
 function fmtNum(v: number): string {
   if (!isFinite(v) || isNaN(v)) return '?';
@@ -212,7 +203,6 @@ function compoundForUnit(u: StoichUnit, rxn: RawReaction): string {
   return m[u] ?? '?';
 }
 
-// ─── CARD ID ─────────────────────────────────────────────────────────────────
 let _cid = 1;
 const nid = () => _cid++;
 
@@ -224,7 +214,6 @@ function pickBP(n: number) {
 
 function buildTier1(rxn: RawReaction, givenMolA: number): Scenario {
   const { reactantA: A, product: P, label } = rxn;
-  // Given: grams of A → mol A → mol P → grams P
   const gA = r(givenMolA * A.mm);
   const molA = givenMolA;
   const molP = r(molA * P.coeff / A.coeff);
@@ -256,14 +245,12 @@ function buildTier1(rxn: RawReaction, givenMolA: number): Scenario {
     segments.push({ x1: s1.px, y1: s1.py, x2: s2.px, y2: s2.py });
   }
 
-  // Correct cards
   const correct: TrackCard[] = [
     { id: nid(), numerator: `1 mol ${A.symbol}`, denominator: `${A.mm} g`, inUnit: 'g_A', outUnit: 'mol_A', isDecoy: false, slotIndex: null },
     { id: nid(), numerator: `${P.coeff} mol ${P.symbol}`, denominator: `${A.coeff} mol ${A.symbol}`, inUnit: 'mol_A', outUnit: 'mol_P', isDecoy: false, slotIndex: null },
     { id: nid(), numerator: `${P.mm} g`, denominator: `1 mol ${P.symbol}`, inUnit: 'mol_P', outUnit: 'g_P', isDecoy: false, slotIndex: null },
   ];
 
-  // Decoys: flipped mole ratio, wrong MM, inverted g→mol
   const wrongMolRatio = `${A.coeff} mol ${P.symbol}`;
   const decoys: TrackCard[] = [
     { id: nid(), numerator: `${A.coeff} mol ${A.symbol}`, denominator: `${P.coeff} mol ${P.symbol}`, inUnit: 'mol_P', outUnit: 'mol_A', isDecoy: true, slotIndex: null },
@@ -283,9 +270,6 @@ function buildTier1(rxn: RawReaction, givenMolA: number): Scenario {
     stationValues: values,
   };
 }
-
-// ─── TIER 2a: g_A → mol_A → mol_P (reactant A stoich, 3-station) ─────────────
-// ─── TIER 2b: g_B → mol_B → mol_P (reactant B stoich, 3-station) ─────────────
 
 function buildTier2(rxn: RawReaction, givenMolA: number, subProblem: 'A' | 'B'): Scenario {
   const { reactantA: A, reactantB: B, product: P, label } = rxn;
@@ -351,23 +335,9 @@ function buildTier2(rxn: RawReaction, givenMolA: number, subProblem: 'A' | 'B'):
   };
 }
 
-// ─── TIER 3: Limiting Reagent + Theoretical Yield + Excess ───────────────────
-// Chain: mol_A → mol_P (theoretical) → g_P, then excess calc
-// Full chain: g_A → mol_A → mol_P → g_P  (then separately excess)
-// We encode as 5-station chain:
-// g_A → mol_A → mol_P(from A) [limiting path] → g_P → g_excess
-// Slots:
-//   0: g_A → mol_A  (÷ MM_A)
-//   1: mol_A → mol_P  (mole ratio A→P)
-//   2: mol_P → g_P  (× MM_P = theoretical yield)
-//   3: g_P → g_excess  (uses mol_B needed = mol_A × B.coeff/A.coeff, then excess = given_B - mol_needed × MM_B)
-// But excess is a bit special — let's encode it as:
-//   Station 4 = "g_excess" with label of the excess reactant
-
 function buildTier3(rxn: RawReaction, givenMolA: number, givenMolB: number): Scenario {
   const { reactantA: A, reactantB: B, product: P, label } = rxn;
 
-  // Determine limiting reagent
   const molPfromA = r(givenMolA * P.coeff / A.coeff);
   const molPfromB = r(givenMolB * P.coeff / B.coeff);
 
@@ -387,12 +357,11 @@ function buildTier3(rxn: RawReaction, givenMolA: number, givenMolB: number): Sce
   const limStartUnit: StoichUnit = limitingIsA ? 'g_A' : 'g_B';
   const limMidUnit: StoichUnit   = limitingIsA ? 'mol_A' : 'mol_B';
 
-  // ✅ Correct chain
   const units: StoichUnit[] = [
     'g_P',
     'mol_P',
-    limMidUnit,   // mol_A or mol_B
-    limStartUnit  // g_A or g_B
+    limMidUnit,
+    limStartUnit
   ];
 
   const values = [
@@ -444,7 +413,6 @@ function buildTier3(rxn: RawReaction, givenMolA: number, givenMolB: number): Sce
     segments.push({ x1: s1.px, y1: s1.py, x2: s2.px, y2: s2.py });
   }
 
-  // ✅ Correct cards
   const correct: TrackCard[] = [
     {
       id: nid(),
@@ -519,8 +487,6 @@ function gExcessUsed(limitingMol: number, excessR: Reactant, limitingR: Reactant
   return r(limitingMol * excessR.coeff / limitingR.coeff * excessR.mm);
 }
 
-// ─── SCENARIO FACTORY ─────────────────────────────────────────────────────────
-
 function pickReaction(): RawReaction {
   return REACTIONS[Math.floor(Math.random() * REACTIONS.length)];
 }
@@ -549,7 +515,6 @@ function dedupeCards(cards: TrackCard[]): TrackCard[] {
 function buildScenarioForTier(tier: 1 | 2 | 3, subStep?: number): Scenario {
   const rxn = pickReaction();
 
-  // Pick nice round-ish mol amounts
   const niceAmounts = [1, 1.5, 2, 2.5, 3, 0.5, 4, 0.75];
   const molA = niceAmounts[Math.floor(Math.random() * niceAmounts.length)];
   const molB = niceAmounts[Math.floor(Math.random() * niceAmounts.length)];
@@ -558,8 +523,6 @@ function buildScenarioForTier(tier: 1 | 2 | 3, subStep?: number): Scenario {
   if (tier === 2) return buildTier2(rxn, molA, subStep === 1 ? 'B' : 'A');
   return buildTier3(rxn, molA, molB);
 }
-
-// ─── SVG COMPONENTS ───────────────────────────────────────────────────────────
 
 function SvgTrack({ x1, y1, x2, y2 }: TrackSegment) {
   const dx = x2 - x1, dy = y2 - y1;
@@ -663,8 +626,6 @@ function SvgSlot({ slot, card, anySelected, isWrong, isCorrectRevealed, onClick 
   );
 }
 
-// ─── INTRO ────────────────────────────────────────────────────────────────────
-
 const INTRO_STEPS = [
   { title: "Welcome to Railbound: Hard!", body: "You are a stoichiometry engineer. Chemical reactions need to travel from reactant stations to product stations — but the mole ratio cards are missing!", sub: "Click through to learn the rules." },
   { title: "Stoichiometry Tiers", body: "Tier 1: Convert grams of one reactant to grams of product (3 conversion steps). Tier 2: Convert grams of each reactant to moles of product separately. Tier 3: Full limiting reagent — find theoretical yield AND grams of excess reactant.", sub: "Master each tier to unlock the next." },
@@ -672,8 +633,6 @@ const INTRO_STEPS = [
   { title: "Limiting Reagent (Tier 3)", body: "The limiting reagent runs out first. You'll be told which reactant is limiting. Use its moles to find theoretical yield. Then calculate how many grams of the excess reactant remain.", sub: "The last slot card shows grams of excess remaining per grams of product." },
   { title: "Place & Check", body: "Select a card from the tray, then click a slot on the map to place it. When all slots are filled, press Check Solution. The train animates from START to DEST — stopping at the first wrong card.", sub: "Hints cost you your streak!" },
 ];
-
-// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
 export default function RailboundHard() {
   const [scenario, setScenario] = useState<Scenario | null>(null);
@@ -699,8 +658,7 @@ export default function RailboundHard() {
   const [tier, setTier] = useState<1|2|3>(1);
   const [streak, setStreak] = useState(0);
   const [demoted, setDemoted] = useState(false);
-  // Tier 2 alternates between sub-problems A and B
-  const [tier2Sub, setTier2Sub] = useState(0); // 0=A, 1=B
+  const [tier2Sub, setTier2Sub] = useState(0);
   const [scenarioKey, setScenarioKey] = useState(0);
 
   const animRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -789,13 +747,10 @@ export default function RailboundHard() {
       } else if (tier === 1 && newStreak >= 3) {
         nextTier = 2; nextStreak = 0; nextSub = 0;
       } else if (tier === 2) {
-        // Must do both sub A and sub B correctly
         if (tier2Sub === 0) {
-          // Completed A, now do B
           nextSub = 1;
-          nextStreak = 1; // halfway
+          nextStreak = 1;
         } else if (tier2Sub === 1 && newStreak >= 2) {
-          // Completed both A and B
           nextTier = 3; nextStreak = 0; nextSub = 0;
         }
       }
@@ -940,10 +895,8 @@ export default function RailboundHard() {
             <div className="mx-auto flex min-w-max gap-6 items-start">
             <div className="shrink-0 flex flex-col gap-3">
 
-              {/* Problem text — hidden during intro */}
               {!showIntro && (
                 <div className="border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded px-6 py-4 text-center" style={{ width: MAP_W }}>
-                  {/* Reaction equation */}
                   <div className="text-base font-mono font-bold text-slate-500 dark:text-slate-400 mb-2 tracking-wide">
                     {scenario.reactionLabel}
                   </div>
@@ -959,7 +912,6 @@ export default function RailboundHard() {
                 </div>
               )}
 
-              {/* SVG Map */}
               <div className="relative" style={{ width: MAP_W, height: MAP_H }}>
                 {showIntro && (
                   <div className="absolute inset-0 z-50 flex items-center justify-center rounded bg-white/95 dark:bg-slate-950/95" style={{ width: MAP_W, height: MAP_H }}>
@@ -991,7 +943,6 @@ export default function RailboundHard() {
                     </pattern>
                   </defs>
                   <rect width={MAP_W} height={MAP_H} fill="url(#steel)" />
-                  {/* Subtle industrial glow lines */}
                   <line x1={0} y1={MAP_H/2} x2={MAP_W} y2={MAP_H/2} stroke="#cbd5e1" strokeWidth={1} opacity={0.2} />
 
                   {scenario.segments.map((seg, i) => <SvgTrack key={i} {...seg} />)}
@@ -1025,7 +976,6 @@ export default function RailboundHard() {
                 </svg>
               </div>
 
-              {/* Legend */}
               <div className="flex gap-4 text-xs text-slate-500 dark:text-slate-400">
                 <span className="flex items-center gap-1"><span style={{ display:'inline-block', width:12, height:12, borderRadius:2, background:'#dbeafe', border:'2px solid #2563eb' }} />Start</span>
                 <span className="flex items-center gap-1"><span style={{ display:'inline-block', width:12, height:12, borderRadius:2, background:'#fce7f3', border:'2px solid #be185d' }} />Destination</span>
@@ -1033,7 +983,6 @@ export default function RailboundHard() {
               </div>
             </div>
 
-            {/* Card Tray */}
             <div className="shrink-0 flex flex-col gap-4">
               <div
                 className="border-2 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-4 flex flex-col gap-3 rounded-lg"
@@ -1092,7 +1041,6 @@ export default function RailboundHard() {
         )}
       </div>
 
-      {/* Reward popup */}
       {rewardPopupOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-950">

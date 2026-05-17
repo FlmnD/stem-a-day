@@ -1,8 +1,6 @@
 'use client'
 import React, { useEffect, useState, useRef } from "react";
 
-// ─── TYPES ────────────────────────────────────────────────────────────────────
-
 type Unit = 'g' | 'mol' | 'molecules' | 'atoms' | 'L_STP' | 'mL' | 'g_element' | 'mol_element';
 
 interface TrackCard {
@@ -57,8 +55,6 @@ interface Scenario {
   stationValues: number[];
 }
 
-// ─── CONSTANTS ────────────────────────────────────────────────────────────────
-
 const AVOGADRO = 6.022e23;
 const MOLAR_VOL_STP = 22.4;
 const GLUCOSE_REWARD = 20;
@@ -68,8 +64,6 @@ const ST_W = 130;
 const ST_H = 100;
 const SL_W = 210;
 const SL_H = 130;
-
-// ─── LAYOUT BLUEPRINTS ────────────────────────────────────────────────────────
 
 const BLUEPRINTS: Record<number, { stations: { fx: number; fy: number }[]; dirs: ('h'|'v')[] }[]> = {
   2: [
@@ -89,8 +83,6 @@ const BLUEPRINTS: Record<number, { stations: { fx: number; fy: number }[]; dirs:
     { stations: [{ fx: 0.88, fy: 0.20 }, { fx: 0.45, fy: 0.20 }, { fx: 0.45, fy: 0.80 }, { fx: 0.10, fy: 0.80 }], dirs: ['h', 'v', 'h'] },
   ],
 };
-
-// ─── FORMAT ───────────────────────────────────────────────────────────────────
 
 function fmtNum(v: number): string {
   if (!isFinite(v)) return '?';
@@ -115,8 +107,6 @@ function unitLabel(u: Unit): string {
   return m[u] ?? u;
 }
 
-// ─── RAW SCENARIO DATA (no empirical formula questions) ───────────────────────
-
 interface RawScenario {
   title: string; substanceName: string; formula: string; molarMass: number;
   givenAmount: number; givenUnit: Unit; targetUnit: Unit;
@@ -126,7 +116,6 @@ interface RawScenario {
 }
 
 const RAW_SCENARIOS: RawScenario[] = [
-  // ── g ↔ mol (1-step) ─────────────────────────────────────────────────────
   { title: "Grams → Moles", substanceName: "water", formula: "H₂O", molarMass: 18.02, givenAmount: 36.04, givenUnit: 'g', targetUnit: 'mol', problemText: "Convert 36.04 g of H₂O (MM = 18.02 g/mol) to moles.", hint: "Divide grams by molar mass (18.02 g/mol).", stationCompounds: ['H₂O', 'H₂O'] },
   { title: "Moles → Grams", substanceName: "sodium chloride", formula: "NaCl", molarMass: 58.44, givenAmount: 0.500, givenUnit: 'mol', targetUnit: 'g', problemText: "Convert 0.500 mol of NaCl (MM = 58.44 g/mol) to grams.", hint: "Multiply moles by molar mass (58.44 g/mol).", stationCompounds: ['NaCl', 'NaCl'] },
   { title: "Grams → Moles", substanceName: "glucose", formula: "C₆H₁₂O₆", molarMass: 180.16, givenAmount: 360.32, givenUnit: 'g', targetUnit: 'mol', problemText: "Convert 360.32 g of C₆H₁₂O₆ (MM = 180.16 g/mol) to moles.", hint: "MM of glucose = 180.16 g/mol.", stationCompounds: ['C₆H₁₂O₆', 'C₆H₁₂O₆'] },
@@ -136,7 +125,7 @@ const RAW_SCENARIOS: RawScenario[] = [
   { title: "Moles → Liters (STP)", substanceName: "hydrogen gas", formula: "H₂", molarMass: 2.016, givenAmount: 3.00, givenUnit: 'mol', targetUnit: 'L_STP', problemText: "Convert 3.00 mol of H₂ to liters at STP.", hint: "Multiply moles × 22.4 L/mol.", stationCompounds: ['H₂', 'H₂'] },
   { title: "Grams → Moles", substanceName: "carbon dioxide", formula: "CO₂", molarMass: 44.01, givenAmount: 44.01, givenUnit: 'g', targetUnit: 'mol', problemText: "Convert 44.01 g of CO₂ (MM = 44.01 g/mol) to moles.", hint: "Divide by 44.01 g/mol.", stationCompounds: ['CO₂', 'CO₂'] },
   { title: "Moles → Grams", substanceName: "iron", formula: "Fe", molarMass: 55.85, givenAmount: 2.00, givenUnit: 'mol', targetUnit: 'g', problemText: "Convert 2.00 mol of Fe (MM = 55.85 g/mol) to grams.", hint: "Multiply moles × 55.85 g/mol.", stationCompounds: ['Fe', 'Fe'] },
-  // ── 2-step ────────────────────────────────────────────────────────────────
+
   { title: "Grams → Molecules", substanceName: "carbon dioxide", formula: "CO₂", molarMass: 44.01, givenAmount: 88.02, givenUnit: 'g', targetUnit: 'molecules', problemText: "Convert 88.02 g of CO₂ (MM = 44.01 g/mol) to molecules.", hint: "g → mol (÷ 44.01), then mol → molecules (× 6.022×10²³).", stationCompounds: ['CO₂', 'CO₂', 'CO₂'] },
   { title: "Grams → Molecules", substanceName: "sulfuric acid", formula: "H₂SO₄", molarMass: 98.08, givenAmount: 196.16, givenUnit: 'g', targetUnit: 'molecules', problemText: "Convert 196.16 g of H₂SO₄ (MM = 98.08 g/mol) to molecules.", hint: "Two steps: g → mol → molecules.", stationCompounds: ['H₂SO₄', 'H₂SO₄', 'H₂SO₄'] },
   { title: "Grams → Molecules", substanceName: "methane", formula: "CH₄", molarMass: 16.04, givenAmount: 32.08, givenUnit: 'g', targetUnit: 'molecules', problemText: "Convert 32.08 g of CH₄ (MM = 16.04 g/mol) to molecules.", hint: "g → mol (÷ 16.04), then × Avogadro.", stationCompounds: ['CH₄', 'CH₄', 'CH₄'] },
@@ -146,15 +135,13 @@ const RAW_SCENARIOS: RawScenario[] = [
   { title: "Volume → Moles (density)", substanceName: "ethanol", formula: "C₂H₅OH", molarMass: 46.07, givenAmount: 50.0, givenUnit: 'mL', targetUnit: 'mol', problemText: "Convert 50.0 mL of ethanol (d = 0.789 g/mL, MM = 46.07 g/mol) to moles.", hint: "mL → g (× density), then g → mol.", stationCompounds: ['C₂H₅OH', 'C₂H₅OH', 'C₂H₅OH'], extra: { density: 0.789 } },
   { title: "Volume → Moles (density)", substanceName: "water", formula: "H₂O", molarMass: 18.02, givenAmount: 36.0, givenUnit: 'mL', targetUnit: 'mol', problemText: "Convert 36.0 mL of water (d = 1.00 g/mL, MM = 18.02 g/mol) to moles.", hint: "mL × 1.00 g/mL = g, then g ÷ MM.", stationCompounds: ['H₂O', 'H₂O', 'H₂O'], extra: { density: 1.00 } },
   { title: "Grams → Molecules", substanceName: "water", formula: "H₂O", molarMass: 18.02, givenAmount: 36.04, givenUnit: 'g', targetUnit: 'molecules', problemText: "Convert 36.04 g of H₂O (MM = 18.02 g/mol) to molecules.", hint: "g → mol (÷18.02), then mol → molecules (×6.022×10²³).", stationCompounds: ['H₂O', 'H₂O', 'H₂O'] },
-  // ── 3-step ────────────────────────────────────────────────────────────────
+
   { title: "Grams → Atoms of Element", substanceName: "water", formula: "H₂O", molarMass: 18.02, givenAmount: 18.02, givenUnit: 'g', targetUnit: 'atoms', problemText: "How many H atoms are in 18.02 g of H₂O (MM = 18.02 g/mol)?", hint: "g H₂O → mol H₂O → mol H (×2) → atoms H.", stationCompounds: ['H₂O', 'H₂O', 'H', 'H'], extra: { elementSymbol: 'H', elementMM: 1.008, subscript: 2 } },
   { title: "Grams → Atoms of Element", substanceName: "carbon dioxide", formula: "CO₂", molarMass: 44.01, givenAmount: 44.01, givenUnit: 'g', targetUnit: 'atoms', problemText: "How many O atoms are in 44.01 g of CO₂ (MM = 44.01 g/mol)?", hint: "g CO₂ → mol CO₂ → mol O (×2) → atoms O.", stationCompounds: ['CO₂', 'CO₂', 'O', 'O'], extra: { elementSymbol: 'O', elementMM: 16.00, subscript: 2 } },
   { title: "Grams → Atoms of Element", substanceName: "methane", formula: "CH₄", molarMass: 16.04, givenAmount: 16.04, givenUnit: 'g', targetUnit: 'atoms', problemText: "How many H atoms are in 16.04 g of CH₄ (MM = 16.04 g/mol)?", hint: "g → mol CH₄ → mol H (×4) → atoms H.", stationCompounds: ['CH₄', 'CH₄', 'H', 'H'], extra: { elementSymbol: 'H', elementMM: 1.008, subscript: 4 } },
   { title: "Grams of Element", substanceName: "iron(III) oxide", formula: "Fe₂O₃", molarMass: 159.69, givenAmount: 50.0, givenUnit: 'g', targetUnit: 'g_element', problemText: "How many grams of Fe are in 50.0 g of Fe₂O₃ (MM = 159.69 g/mol)?", hint: "g → mol Fe₂O₃ → mol Fe (×2) → g Fe (× 55.85).", stationCompounds: ['Fe₂O₃', 'Fe₂O₃', 'Fe', 'Fe'], extra: { elementSymbol: 'Fe', elementMM: 55.85, subscript: 2 } },
   { title: "Grams of Element", substanceName: "glucose", formula: "C₆H₁₂O₆", molarMass: 180.16, givenAmount: 90.0, givenUnit: 'g', targetUnit: 'g_element', problemText: "How many grams of C are in 90.0 g of C₆H₁₂O₆ (MM = 180.16 g/mol)?", hint: "g → mol glucose → mol C (×6) → g C (× 12.01).", stationCompounds: ['C₆H₁₂O₆', 'C₆H₁₂O₆', 'C', 'C'], extra: { elementSymbol: 'C', elementMM: 12.01, subscript: 6 } },
 ];
-
-// ─── SCENARIO BUILDER ─────────────────────────────────────────────────────────
 
 let _cardId = 1;
 const nextId = () => _cardId++;
@@ -268,8 +255,6 @@ function buildScenario(raw: RawScenario, idx: number): Scenario {
 
 function shuffle<T>(arr: T[]): T[] { return [...arr].sort(() => Math.random() - 0.5); }
 
-// ─── SVG COMPONENTS ───────────────────────────────────────────────────────────
-
 function SvgTrack({ x1, y1, x2, y2 }: TrackSegment) {
   const dx = x2 - x1, dy = y2 - y1;
   const len = Math.sqrt(dx * dx + dy * dy);
@@ -381,8 +366,6 @@ function SvgSlot({ slot, card, anySelected, isWrong, isCorrectRevealed, onClick 
   );
 }
 
-// ─── INTRO STEPS ─────────────────────────────────────────────────────────────
-
 const INTRO_STEPS = [
   { title: "Welcome to Railbound!", body: "You are a train dispatcher. A substance needs to travel from its starting station to the destination — but the conversion track cards are missing!", sub: "Click through to learn how to play." },
   { title: "Read the Problem", body: "A chemistry problem appears above the map. The blue START station shows what you have. The green DEST station shows the target unit. Yellow stations are intermediate steps.", sub: "Molar mass is always shown in the problem text." },
@@ -405,16 +388,12 @@ function getScenarioForTier(tier: number): RawScenario {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
-
 export default function RailboundEasy() {
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [cards, setCards] = useState<TrackCard[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [result, setResult] = useState<'correct' | 'wrong' | null>(null);
-  // wrongSlots: set of slot indices that are wrong
   const [wrongSlots, setWrongSlots] = useState<Set<number>>(new Set());
-  // correctRevealedSlots: set of slot indices whose ✓ has been revealed (train passed them)
   const [correctRevealedSlots, setCorrectRevealedSlots] = useState<Set<number>>(new Set());
   const [trainPx, setTrainPx] = useState<{ x: number; y: number; dir: 'h' | 'v' } | null>(null);
   const [trainStationIdx, setTrainStationIdx] = useState(-1);
@@ -430,11 +409,8 @@ export default function RailboundEasy() {
   const [rewardStatus, setRewardStatus] = useState<"idle"|"loading"|"ok"|"error">("idle");
   const [rewardMessage, setRewardMessage] = useState("");
   const [rewardClaimed, setRewardClaimed] = useState(false);
-  // tier: 1=single, 2=double, 3=triple
   const [tier, setTier] = useState(1);
-  // streak: consecutive correct within current tier
   const [streak, setStreak] = useState(0);
-  // demoted: after a wrong answer, must get 1 correct at lower tier before returning
   const [demoted, setDemoted] = useState(false);
   const [scenarioKey, setScenarioKey] = useState(0);
 
@@ -488,7 +464,6 @@ export default function RailboundEasy() {
   const checkSolution = () => {
     if (!scenario || animating) return;
 
-    // Find first wrong slot
     let firstWrongSlotIndex = -1;
     const wrong = new Set<number>();
     for (const slot of scenario.slots) {
@@ -500,11 +475,8 @@ export default function RailboundEasy() {
     }
 
     if (wrong.size > 0) {
-      // Wrong: animate train to first wrong slot, then stop and show ✗
       setResult('wrong');
-      // Don't show wrong slots yet — reveal after animation
       runAnimation(firstWrongSlotIndex, wrong, false);
-      // Tier demotion
       setTier(prev => {
         const next = prev > 1 ? prev - 1 : 1;
         return next;
@@ -512,7 +484,6 @@ export default function RailboundEasy() {
       setDemoted(true);
       setStreak(0);
     } else {
-      // Correct: animate train all the way through
       setResult('correct');
       setWrongSlots(new Set());
       setSolvedCount(s => s + 1);
@@ -523,12 +494,10 @@ export default function RailboundEasy() {
       let nextDemoted = demoted;
 
       if (demoted) {
-        // After demotion, 1 correct returns to the tier above
         nextTier = Math.min(tier + 1, 3);
         nextDemoted = false;
         nextStreak = 0;
       } else {
-        // Normal progression
         if (tier === 1 && newStreak >= 3) { nextTier = 2; nextStreak = 0; }
         else if (tier === 2 && newStreak >= 2) { nextTier = 3; nextStreak = 0; }
       }
@@ -537,7 +506,6 @@ export default function RailboundEasy() {
       setStreak(nextStreak);
       setDemoted(nextDemoted);
 
-      // Award after first correct triple-step
       if ((nextTier === 3 || tier === 3) && !rewardClaimed) {
         const wasTriple = getStepsForTier(tier) === 3;
         if (wasTriple) {
@@ -550,15 +518,10 @@ export default function RailboundEasy() {
     }
   };
 
-  // runAnimation: animate train through all steps
-  // stopAtSlot: if >= 0, stop at that slot index and show wrong highlight
-  // isCorrect: if true, reveal ✓ as train passes each slot; auto-advance at end
   const runAnimation = (stopAtSlot: number, wrongSet: Set<number>, isCorrect: boolean) => {
     if (!scenario) return;
     setAnimating(true);
 
-    // Build ordered steps: [station0, slot0, station1, slot1, ..., stationN]
-    // If stopAtSlot >= 0, we stop at that slot
     const steps: { x: number; y: number; dir: 'h' | 'v'; type: 'station' | 'slot'; index: number }[] = [];
     for (let i = 0; i < scenario.stations.length; i++) {
       const st = scenario.stations[i];
@@ -570,7 +533,6 @@ export default function RailboundEasy() {
       }
     }
 
-    // Labels for stations
     const labels = scenario.stationValues.map((v, i) => `${fmtNum(v)} ${unitLabel(scenario.stations[i].unit)}`);
     setDynLabels(labels);
 
@@ -584,7 +546,6 @@ export default function RailboundEasy() {
       if (stepIdx >= steps.length) {
         clearInterval(animRef.current!);
         setAnimating(false);
-        // Auto-advance after 2s if correct
         if (isCorrect) {
           autoAdvRef.current = setTimeout(() => {
             setScenarioKey(k => k + 1);
@@ -603,17 +564,13 @@ export default function RailboundEasy() {
 
       if (step.type === 'slot') {
         if (isCorrect) {
-          // Reveal ✓ as train reaches the slot
           setCorrectRevealedSlots(prev => new Set([...prev, step.index]));
         }
-        // If this is the wrong slot, stop here
         if (!isCorrect && step.index === stopAtSlot) {
           stoppedAt = step.index;
           clearInterval(animRef.current!);
           setAnimating(false);
-          // Show wrong highlight now
           setWrongSlots(wrongSet);
-          // Auto-advance after 2s
           autoAdvRef.current = setTimeout(() => {
             setScenarioKey(k => k + 1);
           }, 2000);
@@ -633,7 +590,6 @@ export default function RailboundEasy() {
 
   const handleHint = () => {
     if (showIntro) return;
-    // Penalty: lose streak (counts as wrong)
     setStreak(0);
     setDemoted(true);
     setShowHint(h => !h);
@@ -693,10 +649,8 @@ export default function RailboundEasy() {
         {scenario && (
           <div className="w-full overflow-x-auto pb-2">
             <div className="mx-auto flex min-w-max gap-6 items-start">
-            {/* Map column */}
             <div className="shrink-0 flex flex-col gap-3">
 
-              {/* Problem text — hidden during intro */}
               {!showIntro && (
                 <div className="border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded px-6 py-4 text-center" style={{ width: MAP_W }}>
                   <div className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -710,9 +664,7 @@ export default function RailboundEasy() {
                 </div>
               )}
 
-              {/* SVG map */}
-              <div className="relative" style={{ width: MAP_W, height: MAP_H }}>
-                {/* Intro overlay */}
+=              <div className="relative" style={{ width: MAP_W, height: MAP_H }}>
                 {showIntro && (
                   <div className="absolute inset-0 z-50 flex items-center justify-center rounded bg-white/95 dark:bg-slate-950/95" style={{ width: MAP_W, height: MAP_H }}>
                     <div className="w-96 p-8 text-center">
@@ -794,7 +746,6 @@ export default function RailboundEasy() {
                 </svg>
               </div>
 
-              {/* Legend */}
               <div className="flex gap-4 text-xs text-slate-500 dark:text-slate-400">
                 <span className="flex items-center gap-1"><span style={{ display: 'inline-block', width: 12, height: 12, borderRadius: 2, background: '#dbeafe', border: '2px solid #2563eb' }} />Start</span>
                 <span className="flex items-center gap-1"><span style={{ display: 'inline-block', width: 12, height: 12, borderRadius: 2, background: '#dcfce7', border: '2px solid #16a34a' }} />Destination</span>
@@ -804,7 +755,6 @@ export default function RailboundEasy() {
               </div>
             </div>
 
-            {/* Right column — card tray */}
             <div className="shrink-0 flex flex-col gap-4">
               <div
                 className="border-2 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-4 flex flex-col gap-3 rounded-lg"
@@ -865,7 +815,6 @@ export default function RailboundEasy() {
         )}
       </div>
 
-      {/* Reward popup */}
       {rewardPopupOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-950">
