@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     PASSWORD_RESET_TOKEN_EXPIRES_MINUTES: int = 60
 
     EMAIL_FROM: str = "STEM a Day <no-reply@stemaday.local>"
+    BREVO_API_KEY: str | None = None
     SMTP_HOST: str | None = None
     SMTP_PORT: int = 587
     SMTP_USERNAME: str | None = None

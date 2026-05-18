@@ -1,8 +1,12 @@
+import json
 import logging
 import smtplib
 from dataclasses import dataclass
+from email.utils import parseaddr
 from email.message import EmailMessage
+from urllib.error import HTTPError, URLError
 from urllib.parse import quote
+from urllib.request import Request, urlopen
 
 from jose import JWTError
 
@@ -17,6 +21,7 @@ from app.models import User
 from app.settings import settings
 
 logger = logging.getLogger(__name__)
+BREVO_SEND_EMAIL_URL = "https://api.brevo.com/v3/smtp/email"
 
 
 @dataclass(slots=True)
@@ -148,9 +153,17 @@ def send_auth_email(
     dev_action_url: str,
     dev_log_label: str,
 ) -> AuthEmailDispatch:
+    if settings.BREVO_API_KEY:
+        return send_auth_email_via_brevo(
+            recipient=recipient,
+            subject=subject,
+            text_body=text_body,
+            html_body=html_body,
+        )
+
     if not settings.SMTP_HOST:
         logger.info(
-            "SMTP is not configured. %s link for %s: %s",
+            "Email delivery is not configured. %s link for %s: %s",
             dev_log_label,
             recipient,
             dev_action_url,
@@ -198,6 +211,79 @@ def send_auth_email(
         )
 
     return AuthEmailDispatch(email_sent=True)
+
+
+def send_auth_email_via_brevo(
+    recipient: str,
+    subject: str,
+    text_body: str,
+    html_body: str,
+) -> AuthEmailDispatch:
+    sender_name, sender_email = parse_sender_email(settings.EMAIL_FROM)
+    if not sender_email:
+        logger.error("EMAIL_FROM is invalid: %s", settings.EMAIL_FROM)
+        return AuthEmailDispatch(email_sent=False, error="invalid_email_from")
+
+    payload: dict[str, object] = {
+        "sender": {"email": sender_email},
+        "to": [{"email": recipient}],
+        "subject": subject,
+        "htmlContent": html_body,
+        "textContent": text_body,
+    }
+    if sender_name:
+        payload["sender"] = {"name": sender_name, "email": sender_email}
+
+    request = Request(
+        BREVO_SEND_EMAIL_URL,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "accept": "application/json",
+            "api-key": settings.BREVO_API_KEY or "",
+            "content-type": "application/json",
+        },
+        method="POST",
+    )
+
+    try:
+        with urlopen(request, timeout=settings.SMTP_TIMEOUT_SECONDS) as response:
+            status = getattr(response, "status", 200)
+            body = response.read().decode("utf-8", errors="replace")
+            if not 200 <= status < 300:
+                logger.error(
+                    "Brevo email API failed for %s with status %s: %s",
+                    recipient,
+                    status,
+                    body,
+                )
+                return AuthEmailDispatch(email_sent=False, error=f"brevo_status_{status}")
+    except HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        logger.error(
+            "Brevo email API rejected email to %s with status %s: %s",
+            recipient,
+            exc.code,
+            body,
+        )
+        return AuthEmailDispatch(email_sent=False, error=f"brevo_status_{exc.code}")
+    except URLError as exc:
+        logger.exception("Brevo email API network error for %s", recipient)
+        return AuthEmailDispatch(email_sent=False, error=type(exc.reason).__name__)
+    except Exception as exc:
+        logger.exception("Failed to send auth email to %s through Brevo API", recipient)
+        return AuthEmailDispatch(email_sent=False, error=type(exc).__name__)
+
+    return AuthEmailDispatch(email_sent=True)
+
+
+def parse_sender_email(sender: str) -> tuple[str | None, str | None]:
+    name, email = parseaddr(sender)
+    email = email.strip()
+    if not email or "@" not in email:
+        return None, None
+
+    cleaned_name = name.strip() or None
+    return cleaned_name, email
 
 
 def parse_email_verification_token(token: str) -> tuple[int, str]:

@@ -9,8 +9,8 @@
 - Node.js LTS
 - Docker
 - Python 3.12 for the backend
-- Optional for real email delivery: SMTP credentials
-- Optional for forgot-password and email verification: `APP_BASE_URL`, `EMAIL_FROM`, and SMTP settings
+- Optional for real email delivery: a `BREVO_API_KEY` or SMTP credentials
+- Optional for forgot-password and email verification: `APP_BASE_URL`, `EMAIL_FROM`, and email delivery settings
 
 - After downloading the project, move into the frontend folder with `cd frontend`
 - Type and enter `npm install` in the terminal to install the required Node dependencies
@@ -24,4 +24,5 @@
 - Wait for Docker to finish building
 - In a new terminal window type `docker exec -it stem-a-day-api python -m app.seed_plants` to populate the shop with plant data (one time thing and will make this automatic in the future)
 - Ctrl+Click the localhost link that is present in the terminal to open in in the browser or copy and paste the link into your browser to use the website
-- If you want real password-reset and email-verification emails, fill in the SMTP values in `.env` and restart Docker
+- If you want real password-reset and email-verification emails on Railway Hobby/Free, set `BREVO_API_KEY` in your environment and restart/redeploy
+- SMTP also works locally or on platforms that allow outbound SMTP, but Railway Hobby/Free requires the HTTPS API approach instead

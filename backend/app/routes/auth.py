@@ -83,7 +83,7 @@ def register(payload: RegisterIn, db: Session = Depends(get_db)):
         message = "Account created. Check your email for the verification link."
     elif dispatch.dev_action_url:
         message = (
-            "Account created. SMTP is not configured, so you can use the local "
+            "Account created. Email delivery is not configured, so you can use the local "
             "verification link shown below."
         )
     else:
@@ -220,7 +220,7 @@ def forgot_password(payload: ForgotPasswordIn, db: Session = Depends(get_db)):
     if dispatch and dispatch.dev_action_url:
         message = (
             "If that account exists, a password reset email has been sent. "
-            "Use the reset link below if you are testing locally."
+            "Email delivery is not configured, so use the reset link below if you are testing locally."
         )
 
     return ForgotPasswordOut(
