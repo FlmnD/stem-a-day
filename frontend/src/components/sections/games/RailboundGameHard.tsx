@@ -860,7 +860,7 @@ export default function RailboundHard() {
 
   return (
     <>
-      <div className="flex flex-col items-center p-6 bg-white text-slate-900 min-h-screen dark:bg-black dark:text-slate-100">
+      <div className="flex min-h-screen w-full flex-col items-center bg-white px-4 py-6 text-slate-900 dark:bg-black dark:text-slate-100 sm:px-6">
         <h1 className="text-xl font-bold mb-1">Railbound: Stoichiometry</h1>
         <div className="mb-3 text-sm flex gap-4 flex-wrap items-center justify-center text-slate-500 dark:text-slate-400">
           <span>Tier: <span className="font-bold" style={{ color: tierColor }}>{tierLabel}</span></span>
@@ -891,12 +891,12 @@ export default function RailboundHard() {
         </div>
 
         {scenario && (
-          <div className="w-full overflow-x-auto pb-2">
-            <div className="mx-auto flex min-w-max gap-6 items-start">
-            <div className="shrink-0 flex flex-col gap-3">
+          <div className="w-full pb-2">
+            <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-6 xl:flex-row xl:items-start">
+            <div className="flex min-w-0 flex-1 flex-col gap-3">
 
               {!showIntro && (
-                <div className="border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded px-6 py-4 text-center" style={{ width: MAP_W }}>
+                <div className="w-full rounded border border-slate-300 bg-white px-4 py-4 text-center dark:border-slate-700 dark:bg-slate-900 sm:px-6">
                   <div className="text-base font-mono font-bold text-slate-500 dark:text-slate-400 mb-2 tracking-wide">
                     {scenario.reactionLabel}
                   </div>
@@ -912,10 +912,13 @@ export default function RailboundHard() {
                 </div>
               )}
 
-              <div className="relative" style={{ width: MAP_W, height: MAP_H }}>
+              <div
+                className="relative w-full overflow-hidden rounded-[10px]"
+                style={{ aspectRatio: `${MAP_W} / ${MAP_H}` }}
+              >
                 {showIntro && (
-                  <div className="absolute inset-0 z-50 flex items-center justify-center rounded bg-white/95 dark:bg-slate-950/95" style={{ width: MAP_W, height: MAP_H }}>
-                    <div className="w-105 p-8 text-center">
+                  <div className="absolute inset-0 z-50 flex h-full w-full items-center justify-center rounded bg-white/95 p-4 dark:bg-slate-950/95">
+                    <div className="w-full max-w-xl p-6 text-center sm:p-8">
                       <h2 className="text-2xl font-bold mb-3 text-slate-900 dark:text-slate-100">{INTRO_STEPS[introStep].title}</h2>
                       <p className="text-gray-700 dark:text-slate-300 mb-3 text-base leading-relaxed">{INTRO_STEPS[introStep].body}</p>
                       <p className="text-sm text-gray-400 dark:text-slate-500 italic">{INTRO_STEPS[introStep].sub}</p>
@@ -934,7 +937,12 @@ export default function RailboundHard() {
                   </div>
                 )}
 
-                <svg width={MAP_W} height={MAP_H} style={{ display: 'block', borderRadius: 10, border: '3px solid #78716c' }}>
+                <svg
+                  viewBox={`0 0 ${MAP_W} ${MAP_H}`}
+                  preserveAspectRatio="xMidYMid meet"
+                  className="block h-full w-full"
+                  style={{ display: 'block', borderRadius: 10, border: '3px solid #78716c' }}
+                >
                   <defs>
                     <pattern id="steel" patternUnits="userSpaceOnUse" width={30} height={30}>
                       <rect width={30} height={30} fill="#94a3b8" />
@@ -976,17 +984,16 @@ export default function RailboundHard() {
                 </svg>
               </div>
 
-              <div className="flex gap-4 text-xs text-slate-500 dark:text-slate-400">
+              <div className="flex flex-wrap gap-3 text-xs text-slate-500 dark:text-slate-400">
                 <span className="flex items-center gap-1"><span style={{ display:'inline-block', width:12, height:12, borderRadius:2, background:'#dbeafe', border:'2px solid #2563eb' }} />Start</span>
                 <span className="flex items-center gap-1"><span style={{ display:'inline-block', width:12, height:12, borderRadius:2, background:'#fce7f3', border:'2px solid #be185d' }} />Destination</span>
                 <span className="flex items-center gap-1"><span style={{ display:'inline-block', width:12, height:12, borderRadius:2, background:'#fef9c3', border:'2px solid #d97706' }} />Intermediate</span>
               </div>
             </div>
 
-            <div className="shrink-0 flex flex-col gap-4">
+            <div className="flex w-full shrink-0 flex-col gap-4 xl:w-[230px]">
               <div
-                className="border-2 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-4 flex flex-col gap-3 rounded-lg"
-                style={{ width: 230, minHeight: 120 }}
+                className="flex min-h-[120px] w-full flex-col gap-3 rounded-lg border-2 border-slate-300 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950"
                 onClick={() => {
                   if (selectedId !== null) {
                     setCards(p => p.map(c => c.id === selectedId ? { ...c, slotIndex: null } : c));
