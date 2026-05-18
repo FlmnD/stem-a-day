@@ -23,7 +23,7 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV HOSTNAME=0.0.0.0
+ENV HOSTNAME=::
 ENV PORT=3000
 
 COPY --from=builder /app/.next/standalone ./
@@ -32,4 +32,4 @@ COPY --from=builder /app/public ./public
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "PORT=${PORT:-3000} HOSTNAME=${HOSTNAME:-0.0.0.0} node server.js"]
+CMD ["sh", "-c", "PORT=${PORT:-3000} HOSTNAME=${HOSTNAME:-::} node server.js"]
