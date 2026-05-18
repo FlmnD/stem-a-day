@@ -10,14 +10,10 @@ router = APIRouter(prefix="/plants", tags=["plants"])
 
 
 def xp_needed_for_level(level: int) -> int:
-    # Keep early levels reachable with the current 15 / 25 / 35 glucose rewards
-    # while still leaving plenty of room for longer-term plant progression.
     return 25 + (level - 1) * 10
 
 
 def xp_cost_per_point(level: int) -> int:
-    # A flat early-game conversion makes rewards feel intuitive: 1 glucose = 1 XP.
-    # We only increase the cost much later so high levels can still grow more slowly.
     return 1 + (level - 1) // 20
 
 

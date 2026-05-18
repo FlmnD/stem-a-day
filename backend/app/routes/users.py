@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
@@ -7,6 +9,7 @@ from app.deps import get_current_verified_user
 from app.email_verification import send_verification_email
 from app.models import User, UserPlant
 from app.schemas.user import GlucoseAdd, PlantsAdd, UserRead, UserUpdate
+from app.streaks import get_effective_streak
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -19,6 +22,10 @@ def build_user_read(db: Session, user: User) -> UserRead:
     ).scalars().all()
 
     payload = UserRead.model_validate(user).model_dump()
+    payload["streak"] = get_effective_streak(
+        user,
+        datetime.now(timezone.utc).date(),
+    )
     payload["plants"] = list(plant_ids)
     return UserRead(**payload)
 
@@ -72,11 +79,11 @@ def update_me(
         current_user.password = hash_password(data["password"])
         current_user.refresh_token_version += 1
 
-    if "streak" in data:
-        current_user.streak = data["streak"]
-
-    if "glucose" in data:
-        current_user.glucose = data["glucose"]
+    if "streak" in data or "glucose" in data:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not allowed to change streak or glucose directly",
+        )
 
     db.commit()
     db.refresh(current_user)
