@@ -161,14 +161,14 @@ def send_auth_email(
             error="smtp_not_configured",
         )
 
-    message = EmailMessage()
-    message["Subject"] = subject
-    message["From"] = settings.EMAIL_FROM
-    message["To"] = recipient
-    message.set_content(text_body)
-    message.add_alternative(html_body, subtype="html")
-
     try:
+        message = EmailMessage()
+        message["Subject"] = subject
+        message["From"] = settings.EMAIL_FROM
+        message["To"] = recipient
+        message.set_content(text_body)
+        message.add_alternative(html_body, subtype="html")
+
         if settings.SMTP_USE_SSL:
             server: smtplib.SMTP | smtplib.SMTP_SSL = smtplib.SMTP_SSL(
                 settings.SMTP_HOST,
