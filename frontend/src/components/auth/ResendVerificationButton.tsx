@@ -13,6 +13,7 @@ export default function ResendVerificationButton({
 }: ResendVerificationButtonProps) {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
+    const [messageTone, setMessageTone] = useState<"success" | "error">("success");
 
     async function handleResend() {
         setLoading(true);
@@ -26,6 +27,7 @@ export default function ResendVerificationButton({
             });
 
             const data = await response.json().catch(() => ({}));
+            setMessageTone(response.ok ? "success" : "error");
             setMessage(
                 data?.message ??
                     (response.ok
@@ -33,6 +35,7 @@ export default function ResendVerificationButton({
                         : "Could not resend the verification email.")
             );
         } catch {
+            setMessageTone("error");
             setMessage("Network error. Please try again.");
         } finally {
             setLoading(false);
@@ -51,7 +54,15 @@ export default function ResendVerificationButton({
             </button>
 
             {message && (
-                <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">{message}</p>
+                <div
+                    className={
+                        messageTone === "success"
+                            ? "mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200"
+                            : "mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-950/60 dark:bg-red-950/40 dark:text-red-200"
+                    }
+                >
+                    {message}
+                </div>
             )}
         </div>
     );
