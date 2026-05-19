@@ -283,6 +283,65 @@ export default function Games() {
                     </Link>
                 </div>
             </div>
+
+
+            <div className="grid md:grid-cols-2 gap-9 mb-16">
+                <div
+                    className="rounded-2xl p-6 shadow-md border border-sky-100 bg-white hover:shadow-lg transition-all duration-200
+          dark:border-slate-700 dark:bg-slate-950/60 dark:shadow-black/30"
+                >
+                    <div className="flex items-center gap-3 mb-2">
+                        <FlaskConical className="text-sky-500 dark:text-teal-300" size={24} />
+                        <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100">
+                            Where's My Water?: Electron Configuration
+                        </h2>
+                    </div>
+
+                    <p className="text-sm text-gray-500 dark:text-slate-300 mb-4">
+                        Difficulty: <span className="font-medium text-green-600 dark:text-emerald-300">Easy</span>
+                    </p>
+
+                    <p className="text-gray-700 dark:text-slate-200 mb-6">
+                        short description
+                    </p>
+
+                    <Link
+                        href="/games/wheresmywater-easy"
+                        className="inline-block rounded-2xl bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 transition-all
+            dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400"
+                    >
+                        Play Easy Version
+                    </Link>
+                </div>
+
+                <div
+                    className="rounded-2xl p-6 shadow-md border border-red-100 bg-white hover:shadow-lg transition-all duration-200
+          dark:border-slate-700 dark:bg-slate-950/60 dark:shadow-black/30"
+                >
+                    <div className="flex items-center gap-3 mb-2">
+                        <Atom className="text-red-500 dark:text-rose-300" size={24} />
+                        <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100">
+                            Where's My Water?: Solubility
+                        </h2>
+                    </div>
+
+                    <p className="text-sm text-gray-500 dark:text-slate-300 mb-4">
+                        Difficulty: <span className="font-medium text-red-600 dark:text-rose-300">Hard</span>
+                    </p>
+
+                    <p className="text-gray-700 dark:text-slate-200 mb-6">
+                        short description
+                    </p>
+
+                    <Link
+                        href="/games/wheresmywater-hard"
+                        className="inline-block rounded-2xl bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-4 transition-all
+            dark:bg-rose-500 dark:hover:bg-rose-400"
+                    >
+                        Play Hard Version
+                    </Link>
+                </div>
+            </div>
         </section>
     );
 }
