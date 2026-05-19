@@ -15,7 +15,7 @@ export default function Games() {
                 Chemistry Games
             </h1>
             <p className="text-gray-600 dark:text-slate-300 mb-10">
-                Test your periodic table skills with our Carble and Snake challenges!
+                Practice chemistry through quick puzzles, logic games, reaction challenges, and visual simulations.
             </p>
 
             <div className="grid md:grid-cols-2 gap-9 mb-16">
@@ -293,7 +293,7 @@ export default function Games() {
                     <div className="flex items-center gap-3 mb-2">
                         <FlaskConical className="text-sky-500 dark:text-teal-300" size={24} />
                         <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100">
-                            Where's My Water?: Electron Configuration
+                            Where&apos;s My Water?: Electron Configuration
                         </h2>
                     </div>
 
@@ -302,7 +302,8 @@ export default function Games() {
                     </p>
 
                     <p className="text-gray-700 dark:text-slate-200 mb-6">
-                        short description
+                        Dig through natural dirt, collect orbital ducks in exact Aufbau order, and send enough
+                        electron droplets into the alligator tub to finish each element.
                     </p>
 
                     <Link
@@ -321,7 +322,7 @@ export default function Games() {
                     <div className="flex items-center gap-3 mb-2">
                         <Atom className="text-red-500 dark:text-rose-300" size={24} />
                         <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100">
-                            Where's My Water?: Solubility
+                            Where&apos;s My Water?: Solubility
                         </h2>
                     </div>
 
@@ -330,7 +331,8 @@ export default function Games() {
                     </p>
 
                     <p className="text-gray-700 dark:text-slate-200 mb-6">
-                        short description
+                        Track dissolved ions, spot the spectator ions, and reveal the correct precipitate and net
+                        ionic equation in this solubility challenge.
                     </p>
 
                     <Link
