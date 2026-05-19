@@ -214,7 +214,7 @@ export default function CarbleGame({
 
     return (
         <>
-            <div className="min-h-screen flex flex-col items-center justify-start py-10 bg-gray-100 dark:bg-black dark:text-slate-100">
+            <div className="min-h-screen flex flex-col items-center justify-start px-4 py-10 bg-gray-100 dark:bg-black dark:text-slate-100 sm:px-6">
                 {guessFormat == Guess.EasyGuess && (
                     <h1 className="text-3xl font-bold mb-6">Carble: Common Characteristics</h1>
                 )}
@@ -234,7 +234,7 @@ export default function CarbleGame({
                     classNameArgs={getTableArgs}
                 />
 
-                <div className="relative w-96 mt-6 mb-4">
+                <div className="relative mt-6 mb-4 w-full max-w-md">
                     <input
                         type="text"
                         className="w-full px-4 py-2 border rounded shadow focus:outline-none

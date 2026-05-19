@@ -13,6 +13,7 @@ class DailyQuestionOut(BaseModel):
     can_answer_today: bool
     answered_today: bool
     glucose_balance: int
+    streak: int
     debug_offset_days: int
 
 
@@ -30,6 +31,7 @@ class DailyAnswerOut(BaseModel):
     reward_glucose: int
     glucose_earned: int
     glucose_balance: int
+    streak: int
     can_answer_today: bool
     answered_today: bool
 

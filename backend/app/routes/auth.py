@@ -83,7 +83,7 @@ def register(payload: RegisterIn, db: Session = Depends(get_db)):
         message = "Account created. Check your email for the verification link."
     elif dispatch.dev_action_url:
         message = (
-            "Account created. SMTP is not configured, so you can use the local "
+            "Account created. Email delivery is not configured, so you can use the local "
             "verification link shown below."
         )
     else:
@@ -172,9 +172,8 @@ def resend_verification(
 
     return ResendVerificationOut(
         message=(
-            "If that account exists and still needs verification, a fresh "
-            "verification link has been generated. If SMTP is not configured "
-            "locally, check the backend log."
+            "If that account exists and still needs verification, we sent "
+            "a fresh verification email."
         ),
         dev_verification_url=dispatch.dev_action_url if dispatch else None,
     )
@@ -217,14 +216,11 @@ def forgot_password(payload: ForgotPasswordIn, db: Session = Depends(get_db)):
     user = db.execute(select(User).where(User.email == email)).scalar_one_or_none()
 
     dispatch = send_password_reset_email(user) if user else None
-    message = (
-        "If that account exists, a password reset email has been sent. "
-        "If SMTP is not configured locally, check the backend log."
-    )
+    message = "If that account exists, a password reset email has been sent."
     if dispatch and dispatch.dev_action_url:
         message = (
             "If that account exists, a password reset email has been sent. "
-            "SMTP is not configured, so you can use the local reset link shown below."
+            "Email delivery is not configured, so use the reset link below if you are testing locally."
         )
 
     return ForgotPasswordOut(

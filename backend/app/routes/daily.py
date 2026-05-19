@@ -10,6 +10,7 @@ from app.database import get_db
 from app.deps import get_current_verified_user
 from app.models import DailyQuestionState, User
 from app.schemas.daily import DailyAnswerIn, DailyAnswerOut, DailyQuestionOut
+from app.streaks import get_effective_streak, get_next_streak_after_daily_answer
 
 router = APIRouter(prefix="/daily", tags=["daily"])
 
@@ -81,6 +82,7 @@ def build_daily_question_out(user: User, state: DailyQuestionState) -> DailyQues
 
     question = DAILY_QUESTIONS[state.current_question_index]
     answered_today = user.daily_question_answered_on == state.effective_date
+    current_streak = get_effective_streak(user, state.effective_date)
 
     return DailyQuestionOut(
         question_number=state.current_question_index + 1,
@@ -92,6 +94,7 @@ def build_daily_question_out(user: User, state: DailyQuestionState) -> DailyQues
         can_answer_today=not answered_today,
         answered_today=answered_today,
         glucose_balance=user.glucose,
+        streak=current_streak,
         debug_offset_days=state.debug_offset_days,
     )
 
@@ -133,8 +136,12 @@ def answer_daily_question(
 
     correct = payload.selected_option_index == question["correct_option_index"]
     glucose_earned = DAILY_GLUCOSE_REWARD if correct else 0
+    next_streak = get_next_streak_after_daily_answer(current_user, state.effective_date)
 
-    values = {"daily_question_answered_on": state.effective_date}
+    values = {
+        "daily_question_answered_on": state.effective_date,
+        "streak": next_streak,
+    }
     if correct:
         values["glucose"] = User.glucose + DAILY_GLUCOSE_REWARD
 
@@ -170,6 +177,7 @@ def answer_daily_question(
         reward_glucose=DAILY_GLUCOSE_REWARD,
         glucose_earned=glucose_earned,
         glucose_balance=updated_glucose,
+        streak=next_streak,
         can_answer_today=False,
         answered_today=True,
     )

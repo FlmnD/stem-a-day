@@ -2,7 +2,18 @@ from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from app.settings import settings
 
-engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
+
+def normalize_database_url(database_url: str) -> str:
+    if database_url.startswith("postgresql+"):
+        return database_url
+    if database_url.startswith("postgresql://"):
+        return "postgresql+psycopg://" + database_url[len("postgresql://"):]
+    if database_url.startswith("postgres://"):
+        return "postgresql+psycopg://" + database_url[len("postgres://"):]
+    return database_url
+
+
+engine = create_engine(normalize_database_url(settings.DATABASE_URL), pool_pre_ping=True)
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 

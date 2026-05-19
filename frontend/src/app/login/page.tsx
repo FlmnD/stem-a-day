@@ -57,14 +57,14 @@ export default function Login() {
             onSubmit={handleSubmit}
         >
             {error && (
-                <div className="rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-950/60 dark:bg-red-950/40 dark:text-red-200">
                     {error}
                 </div>
             )}
 
             {requiresEmailVerification && email.trim() && (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3">
-                    <p className="text-sm text-amber-900">
+                <div className="rounded-2xl border border-amber-200 bg-amber-50/90 p-4 dark:border-amber-900/50 dark:bg-amber-950/30">
+                    <p className="text-sm font-medium text-amber-900 dark:text-amber-100">
                         Your account still needs email verification.
                     </p>
                     <ResendVerificationButton className="mt-3" email={email.trim()} />

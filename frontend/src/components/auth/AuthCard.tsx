@@ -54,7 +54,7 @@ export default function AuthCard({
                 />
             </div>
 
-            <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 px-6 py-12 lg:grid-cols-2">
+            <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-2">
                 {/* Left */}
                 <div className="space-y-4">
                     <div
@@ -65,7 +65,7 @@ export default function AuthCard({
                         STEM-a-Day
                     </div>
 
-                    <h1 className="text-4xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+                    <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
                         {title}
                     </h1>
 
@@ -73,7 +73,7 @@ export default function AuthCard({
                         {subtitle}
                     </p>
 
-                    <div className="grid max-w-md grid-cols-2 gap-3 pt-2 text-sm text-slate-600 dark:text-slate-300">
+                    <div className="grid max-w-md grid-cols-1 gap-3 pt-2 text-sm text-slate-600 dark:text-slate-300 sm:grid-cols-2">
                         <div className="rounded-2xl border border-slate-200 bg-white/70 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
                             <div className="font-medium text-slate-900 dark:text-slate-100">
                                 Daily games
@@ -91,7 +91,7 @@ export default function AuthCard({
 
                 <div className="mx-auto w-full max-w-md">
                     <div
-                        className="rounded-3xl border border-slate-200 bg-white/80 p-6 shadow-lg backdrop-blur
+                        className="rounded-3xl border border-slate-200 bg-white/80 p-5 shadow-lg backdrop-blur sm:p-6
               dark:border-slate-700 dark:bg-slate-950/60"
                     >
                         <div className="mb-6">

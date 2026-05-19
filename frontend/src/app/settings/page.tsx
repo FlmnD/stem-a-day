@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import SignOutButton from "@/components/auth/SignOutButton";
-import AddGlucoseCard from "@/components/settings/AddGlucoseCard";
+// import AddGlucoseCard from "@/components/settings/AddGlucoseCard";
 import { fetchBackendWithSession } from "@/lib/server-session";
 
 type UserRead = {
@@ -129,7 +129,7 @@ export default async function SettingsPage() {
                     <Row label="Glucose" value={`${me.glucose}`} />
 
                     <SignOutButton />
-                    <AddGlucoseCard />
+                    {/* <AddGlucoseCard /> */}
                 </div>
             </div>
         </section>

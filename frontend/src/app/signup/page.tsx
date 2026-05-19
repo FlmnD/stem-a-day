@@ -96,7 +96,7 @@ export default function Signup() {
                 footerHref="/login"
                 showSocialButtons={false}
             >
-                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200">
                     {success.message}
                 </div>
 
@@ -116,13 +116,6 @@ export default function Signup() {
                     >
                         Open local verification link
                     </a>
-                )}
-
-                {!success.verification_email_sent && !success.dev_verification_url && (
-                    <p className="text-sm text-slate-600 dark:text-slate-300">
-                        If email delivery is not configured yet, you can resend the link below
-                        after setup.
-                    </p>
                 )}
 
                 <ResendVerificationButton email={success.email} />
@@ -152,7 +145,7 @@ export default function Signup() {
             onSubmit={handleSubmit}
         >
             {error && (
-                <div className="rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-950/60 dark:bg-red-950/40 dark:text-red-200">
                     {error}
                 </div>
             )}

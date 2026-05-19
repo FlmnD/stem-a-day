@@ -7,7 +7,7 @@ import { Star, FlaskConical, Atom } from "lucide-react";
 export default function Games() {
     return (
         <section
-            className="min-h-[calc(100dvh-3.5rem)] px-6 py-10
+            className="min-h-[calc(100dvh-3.5rem)] px-4 py-10 sm:px-6
       bg-linear-to-b from-sky-50 via-white to-white
       dark:from-black dark:via-[#0b0b0b] dark:to-[#0b0b0b]"
         >

@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { fetchApiJson } from "@/lib/api-proxy";
+
 function asRecord(data: unknown): Record<string, unknown> | null {
     return typeof data === "object" && data !== null ? (data as Record<string, unknown>) : null;
 }
@@ -17,8 +19,8 @@ function extractMessage(data: unknown, fallback: string) {
 export async function POST(req: Request) {
     const body = await req.json();
 
-    const response = await fetch(
-        `${process.env.FASTAPI_INTERNAL_URL}/auth/resend-verification`,
+    const { response, data, errorMessage } = await fetchApiJson(
+        "/auth/resend-verification",
         {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -27,7 +29,12 @@ export async function POST(req: Request) {
         }
     );
 
-    const data = await response.json().catch(() => ({}));
+    if (!response) {
+        return NextResponse.json(
+            { message: errorMessage ?? "Resend verification failed" },
+            { status: 503 }
+        );
+    }
 
     return NextResponse.json(
         {

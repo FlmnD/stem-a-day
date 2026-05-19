@@ -14,6 +14,7 @@ type DailyQuestion = {
     can_answer_today: boolean;
     answered_today: boolean;
     glucose_balance: number;
+    streak: number;
 };
 
 type DailyAnswerResult = {
@@ -26,6 +27,7 @@ type DailyAnswerResult = {
     reward_glucose: number;
     glucose_earned: number;
     glucose_balance: number;
+    streak: number;
     can_answer_today: boolean;
     answered_today: boolean;
 };
@@ -118,6 +120,7 @@ export default function DailyPage() {
                 can_answer_today: data.can_answer_today,
                 answered_today: data.answered_today,
                 glucose_balance: data.glucose_balance,
+                streak: data.streak,
             });
             requestSessionUserRefresh();
             setMessage(
@@ -144,7 +147,7 @@ export default function DailyPage() {
                         Daily
                     </h1>
                     <p className="mt-2 max-w-2xl text-gray-600 dark:text-slate-300">
-                        Answer the daily chemistry question for 25 glucose!
+                        Answer the daily chemistry question for 25 glucose and to keep your streak going.
                     </p>
                 </div>
 
@@ -218,8 +221,13 @@ export default function DailyPage() {
                                 </h2>
                             </div>
 
-                            <div className="rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-900 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100">
-                                Reward: {daily.reward_glucose} glucose
+                            <div className="flex flex-col gap-3 sm:items-end">
+                                <div className="rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-900 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100">
+                                    Reward: {daily.reward_glucose} glucose
+                                </div>
+                                <div className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                                    Current streak: {daily.streak}
+                                </div>
                             </div>
                         </div>
 

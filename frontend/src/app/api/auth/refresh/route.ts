@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
+import { fetchApiJson } from "@/lib/api-proxy";
 import { applySessionCookies, clearSessionCookies } from "@/lib/server-session";
 
 function asRecord(data: unknown): Record<string, unknown> | null {
@@ -25,14 +26,21 @@ export async function POST() {
         return res;
     }
 
-    const response = await fetch(`${process.env.FASTAPI_INTERNAL_URL}/auth/refresh`, {
+    const { response, data, errorMessage } = await fetchApiJson("/auth/refresh", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refresh_token: refreshToken }),
         cache: "no-store",
     });
 
-    const data = await response.json().catch(() => ({}));
+    if (!response) {
+        const res = NextResponse.json(
+            { message: errorMessage ?? "Session refresh failed" },
+            { status: 503 }
+        );
+        clearSessionCookies(res);
+        return res;
+    }
 
     if (!response.ok) {
         const res = NextResponse.json(
