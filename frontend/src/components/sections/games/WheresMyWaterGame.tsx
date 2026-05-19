@@ -54,6 +54,16 @@ interface BoardPoint {
   y: number;
 }
 
+interface TunnelMaskShape {
+  key: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rx: number;
+  ry: number;
+}
+
 interface LevelDef {
   id: number;
   title: string;
@@ -714,7 +724,12 @@ export default function WheresMyWaterGame() {
     };
   }, [awardGlucose, flowing, layout, lvIdx, rewardClaimed, won, level]);
 
-  const dirtCutouts = useMemo(() => {
+  const tunnelMaskShapes = useMemo(() => {
+    const isOpenCell = (col: number, row: number) => {
+      if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return false;
+      return grid[ck(col, row)].kind !== "dirt";
+    };
+
     return grid.flatMap((cell, index) => {
       if (cell.kind === "dirt") return [];
 
@@ -722,34 +737,58 @@ export default function WheresMyWaterGame() {
       const row = Math.floor(index / COLS);
       const x = col * CELL;
       const y = row * CELL;
-      const seed = (col * 19 + row * 23) % 9;
-
-      return [
+      const seed = (col * 13 + row * 17) % 5;
+      const padX = CELL * (0.16 + seed * 0.012);
+      const padY = CELL * (0.16 + ((seed + 2) % 3) * 0.018);
+      const shapes: TunnelMaskShape[] = [
         {
-          key: `${index}-core`,
-          cx: x + CELL * 0.5,
-          cy: y + CELL * 0.52,
-          rx: CELL * (0.46 + (seed % 3) * 0.03),
-          ry: CELL * (0.47 + ((seed + 1) % 3) * 0.025),
-          rotate: seed * 7 - 18,
-        },
-        {
-          key: `${index}-left`,
-          cx: x + CELL * (0.26 + (seed % 4) * 0.03),
-          cy: y + CELL * (0.36 + ((seed + 2) % 3) * 0.07),
-          rx: CELL * 0.24,
-          ry: CELL * 0.2,
-          rotate: seed * 11,
-        },
-        {
-          key: `${index}-right`,
-          cx: x + CELL * (0.72 - (seed % 4) * 0.025),
-          cy: y + CELL * (0.68 - ((seed + 1) % 3) * 0.06),
-          rx: CELL * 0.26,
-          ry: CELL * 0.21,
-          rotate: 20 - seed * 9,
+          key: `${index}-base`,
+          x: x - padX,
+          y: y - padY,
+          width: CELL + padX * 2,
+          height: CELL + padY * 2,
+          rx: CELL * 0.34,
+          ry: CELL * 0.34,
         },
       ];
+
+      if (isOpenCell(col + 1, row)) {
+        shapes.push({
+          key: `${index}-right`,
+          x: x + CELL * 0.34,
+          y: y - CELL * 0.08,
+          width: CELL * 0.52,
+          height: CELL * 1.16,
+          rx: CELL * 0.2,
+          ry: CELL * 0.2,
+        });
+      }
+
+      if (isOpenCell(col, row + 1)) {
+        shapes.push({
+          key: `${index}-down`,
+          x: x - CELL * 0.08,
+          y: y + CELL * 0.34,
+          width: CELL * 1.16,
+          height: CELL * 0.52,
+          rx: CELL * 0.2,
+          ry: CELL * 0.2,
+        });
+      }
+
+      if (isOpenCell(col + 1, row + 1) && (isOpenCell(col + 1, row) || isOpenCell(col, row + 1))) {
+        shapes.push({
+          key: `${index}-corner`,
+          x: x + CELL * 0.28,
+          y: y + CELL * 0.28,
+          width: CELL * 0.72,
+          height: CELL * 0.72,
+          rx: CELL * 0.26,
+          ry: CELL * 0.26,
+        });
+      }
+
+      return shapes;
     });
   }, [grid]);
 
@@ -951,6 +990,14 @@ export default function WheresMyWaterGame() {
                     <stop offset="0%" stopColor="#22c55e" />
                     <stop offset="100%" stopColor="#166534" />
                   </linearGradient>
+                  <linearGradient id="gatorBellyFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#bbf7d0" />
+                    <stop offset="100%" stopColor="#4ade80" />
+                  </linearGradient>
+                  <linearGradient id="gatorJawFill" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#14532d" />
+                    <stop offset="100%" stopColor="#22c55e" />
+                  </linearGradient>
                   <filter id="softShadow">
                     <feDropShadow dx="1" dy="2" stdDeviation="2" floodOpacity="0.35" />
                   </filter>
@@ -965,15 +1012,16 @@ export default function WheresMyWaterGame() {
                   </pattern>
                   <mask id="dirtMask">
                     <rect width={W} height={H} fill="white" />
-                    {dirtCutouts.map((cutout) => (
-                      <ellipse
-                        key={cutout.key}
-                        cx={cutout.cx}
-                        cy={cutout.cy}
-                        rx={cutout.rx}
-                        ry={cutout.ry}
+                    {tunnelMaskShapes.map((shape) => (
+                      <rect
+                        key={shape.key}
+                        x={shape.x}
+                        y={shape.y}
+                        width={shape.width}
+                        height={shape.height}
+                        rx={shape.rx}
+                        ry={shape.ry}
                         fill="black"
-                        transform={`rotate(${cutout.rotate} ${cutout.cx} ${cutout.cy})`}
                       />
                     ))}
                   </mask>
@@ -1035,18 +1083,103 @@ export default function WheresMyWaterGame() {
                 )}
                 <g filter="url(#softShadow)">
                   <g transform={`translate(${layout.gatorFacing === -1 ? tubX + tubW : tubX}, 0) scale(${layout.gatorFacing}, 1)`}>
-                    <ellipse cx={tubW * 0.42} cy={tubY + tubH * 0.55} rx={tubW * 0.28} ry={tubH * 0.18} fill="url(#gatorFill)" />
-                    <ellipse cx={tubW * 0.72} cy={tubY + tubH * 0.48} rx={tubW * 0.13} ry={tubH * 0.16} fill="#16a34a" />
-                    <ellipse cx={tubW * 0.84} cy={tubY + tubH * 0.56} rx={tubW * 0.1} ry={tubH * 0.08} fill="#15803d" />
-                    <circle cx={tubW * 0.67} cy={tubY + tubH * 0.42} r={5} fill="#dcfce7" />
-                    <circle cx={tubW * 0.67} cy={tubY + tubH * 0.42} r={2.3} fill="#166534" />
-                    {[0, 1, 2].map((tooth) => (
+                    <path
+                      d={`
+                        M ${tubW * 0.18} ${tubY + tubH * 0.63}
+                        C ${tubW * 0.1} ${tubY + tubH * 0.58}, ${tubW * 0.12} ${tubY + tubH * 0.42}, ${tubW * 0.24} ${tubY + tubH * 0.38}
+                        C ${tubW * 0.36} ${tubY + tubH * 0.31}, ${tubW * 0.52} ${tubY + tubH * 0.28}, ${tubW * 0.68} ${tubY + tubH * 0.34}
+                        C ${tubW * 0.8} ${tubY + tubH * 0.39}, ${tubW * 0.92} ${tubY + tubH * 0.48}, ${tubW * 0.9} ${tubY + tubH * 0.58}
+                        C ${tubW * 0.88} ${tubY + tubH * 0.7}, ${tubW * 0.68} ${tubY + tubH * 0.77}, ${tubW * 0.45} ${tubY + tubH * 0.76}
+                        C ${tubW * 0.29} ${tubY + tubH * 0.75}, ${tubW * 0.18} ${tubY + tubH * 0.71}, ${tubW * 0.18} ${tubY + tubH * 0.63}
+                      `}
+                      fill="url(#gatorFill)"
+                    />
+                    <path
+                      d={`
+                        M ${tubW * 0.26} ${tubY + tubH * 0.67}
+                        C ${tubW * 0.36} ${tubY + tubH * 0.58}, ${tubW * 0.53} ${tubY + tubH * 0.56}, ${tubW * 0.71} ${tubY + tubH * 0.62}
+                        C ${tubW * 0.6} ${tubY + tubH * 0.73}, ${tubW * 0.42} ${tubY + tubH * 0.76}, ${tubW * 0.26} ${tubY + tubH * 0.67}
+                      `}
+                      fill="url(#gatorBellyFill)"
+                      opacity={0.95}
+                    />
+                    <path
+                      d={`
+                        M ${tubW * 0.58} ${tubY + tubH * 0.42}
+                        C ${tubW * 0.73} ${tubY + tubH * 0.34}, ${tubW * 0.89} ${tubY + tubH * 0.36}, ${tubW * 0.98} ${tubY + tubH * 0.49}
+                        C ${tubW * 0.93} ${tubY + tubH * 0.55}, ${tubW * 0.82} ${tubY + tubH * 0.56}, ${tubW * 0.69} ${tubY + tubH * 0.53}
+                        C ${tubW * 0.63} ${tubY + tubH * 0.51}, ${tubW * 0.58} ${tubY + tubH * 0.48}, ${tubW * 0.58} ${tubY + tubH * 0.42}
+                      `}
+                      fill="url(#gatorJawFill)"
+                    />
+                    <path
+                      d={`
+                        M ${tubW * 0.59} ${tubY + tubH * 0.54}
+                        C ${tubW * 0.73} ${tubY + tubH * 0.58}, ${tubW * 0.89} ${tubY + tubH * 0.6}, ${tubW * 0.97} ${tubY + tubH * 0.69}
+                        C ${tubW * 0.86} ${tubY + tubH * 0.76}, ${tubW * 0.7} ${tubY + tubH * 0.73}, ${tubW * 0.61} ${tubY + tubH * 0.65}
+                        C ${tubW * 0.58} ${tubY + tubH * 0.61}, ${tubW * 0.57} ${tubY + tubH * 0.58}, ${tubW * 0.59} ${tubY + tubH * 0.54}
+                      `}
+                      fill="#22c55e"
+                    />
+                    <path
+                      d={`M ${tubW * 0.62} ${tubY + tubH * 0.56} C ${tubW * 0.77} ${tubY + tubH * 0.55}, ${tubW * 0.88} ${tubY + tubH * 0.58}, ${tubW * 0.96} ${tubY + tubH * 0.62}`}
+                      fill="none"
+                      stroke="#0f172a"
+                      strokeWidth={2.2}
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d={`M ${tubW * 0.54} ${tubY + tubH * 0.39} C ${tubW * 0.61} ${tubY + tubH * 0.3}, ${tubW * 0.7} ${tubY + tubH * 0.29}, ${tubW * 0.78} ${tubY + tubH * 0.34}`}
+                      fill="none"
+                      stroke="#14532d"
+                      strokeWidth={7}
+                      strokeLinecap="round"
+                    />
+                    <ellipse cx={tubW * 0.67} cy={tubY + tubH * 0.39} rx={8.5} ry={6.5} fill="#ecfccb" />
+                    <circle cx={tubW * 0.675} cy={tubY + tubH * 0.392} r={3.1} fill="#14532d" />
+                    <circle cx={tubW * 0.679} cy={tubY + tubH * 0.388} r={1.1} fill="white" opacity={0.9} />
+                    <ellipse cx={tubW * 0.9} cy={tubY + tubH * 0.45} rx={3.1} ry={1.9} fill="#14532d" opacity={0.75} />
+                    <ellipse cx={tubW * 0.86} cy={tubY + tubH * 0.42} rx={2.7} ry={1.7} fill="#14532d" opacity={0.75} />
+                    {[0, 1, 2, 3].map((scale) => (
+                      <path
+                        key={`scale-${scale}`}
+                        d={`
+                          M ${tubW * (0.33 + scale * 0.09)} ${tubY + tubH * (0.35 - (scale % 2) * 0.015)}
+                          L ${tubW * (0.37 + scale * 0.09)} ${tubY + tubH * (0.24 - (scale % 2) * 0.012)}
+                          L ${tubW * (0.41 + scale * 0.09)} ${tubY + tubH * (0.35 - (scale % 2) * 0.015)}
+                        `}
+                        fill="#166534"
+                        opacity={0.9}
+                      />
+                    ))}
+                    {[0, 1, 2, 3].map((tooth) => (
                       <polygon
-                        key={`tooth-${tooth}`}
-                        points={`${tubW * 0.76 + tooth * 8},${tubY + tubH * 0.58} ${tubW * 0.79 + tooth * 8},${tubY + tubH * 0.68} ${tubW * 0.82 + tooth * 8},${tubY + tubH * 0.58}`}
+                        key={`top-tooth-${tooth}`}
+                        points={`${tubW * (0.71 + tooth * 0.055)},${tubY + tubH * 0.57} ${tubW * (0.725 + tooth * 0.055)},${tubY + tubH * 0.65} ${tubW * (0.74 + tooth * 0.055)},${tubY + tubH * 0.57}`}
                         fill="white"
                       />
                     ))}
+                    {[0, 1, 2].map((tooth) => (
+                      <polygon
+                        key={`bottom-tooth-${tooth}`}
+                        points={`${tubW * (0.74 + tooth * 0.06)},${tubY + tubH * 0.61} ${tubW * (0.755 + tooth * 0.06)},${tubY + tubH * 0.53} ${tubW * (0.77 + tooth * 0.06)},${tubY + tubH * 0.61}`}
+                        fill="#f8fafc"
+                      />
+                    ))}
+                    <path
+                      d={`M ${tubW * 0.29} ${tubY + tubH * 0.72} C ${tubW * 0.26} ${tubY + tubH * 0.82}, ${tubW * 0.25} ${tubY + tubH * 0.88}, ${tubW * 0.3} ${tubY + tubH * 0.92}`}
+                      fill="none"
+                      stroke="#166534"
+                      strokeWidth={6}
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d={`M ${tubW * 0.44} ${tubY + tubH * 0.73} C ${tubW * 0.42} ${tubY + tubH * 0.83}, ${tubW * 0.42} ${tubY + tubH * 0.88}, ${tubW * 0.47} ${tubY + tubH * 0.92}`}
+                      fill="none"
+                      stroke="#166534"
+                      strokeWidth={6}
+                      strokeLinecap="round"
+                    />
                   </g>
                   <text
                     x={tubX + tubW / 2}
