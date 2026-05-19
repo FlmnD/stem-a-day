@@ -13,6 +13,7 @@ const DROPLET_RADIUS = 7;
 const MAX_VISIBLE_DROPLETS = 26;
 const SPAWN_EVERY_TICKS = 3;
 const STUCK_TICKS_BEFORE_FADE = 18;
+const DIG_BRUSH_RADIUS = CELL * 0.72;
 
 type CellKind = "dirt" | "empty" | "source" | "tub";
 type Subshell = "1s" | "2s" | "2p" | "3s" | "3p" | "4s" | "3d";
@@ -46,6 +47,11 @@ interface Droplet {
   y: number;
   drift: number;
   settledTicks: number;
+}
+
+interface BoardPoint {
+  x: number;
+  y: number;
 }
 
 interface LevelDef {
@@ -184,6 +190,10 @@ const INTRO_STEPS = [
 ];
 
 const ck = (c: number, r: number) => r * COLS + c;
+
+function cloneGrid(grid: Cell[]) {
+  return grid.map((cell) => ({ kind: cell.kind }));
+}
 
 function randomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -356,7 +366,7 @@ export default function WheresMyWaterGame() {
   const [won, setWon] = useState(false);
   const [msg, setMsg] = useState("");
   const [rejId, setRejId] = useState<string | null>(null);
-  const [dragging, setDragging] = useState(false);
+  const [undoStack, setUndoStack] = useState<Cell[][]>([]);
   const [introStep, setIntroStep] = useState(0);
   const [showIntro, setShowIntro] = useState(true);
   const [seenIntro, setSeenIntro] = useState(false);
@@ -376,6 +386,10 @@ export default function WheresMyWaterGame() {
   const tubFillRef = useRef(0);
   const spawnCounterRef = useRef(0);
   const dropletIdRef = useRef(1);
+  const draggingRef = useRef(false);
+  const lastPointerRef = useRef<BoardPoint | null>(null);
+  const strokeSnapshotRef = useRef<Cell[] | null>(null);
+  const strokeChangedRef = useRef(false);
 
   const level = LEVELS[lvIdx];
 
@@ -396,10 +410,15 @@ export default function WheresMyWaterGame() {
       setFlowing(false);
       setWon(false);
       setTubFill(0);
+      setUndoStack([]);
       setMsg("");
       setRejId(null);
       spawnCounterRef.current = 0;
       dropletIdRef.current = 1;
+      draggingRef.current = false;
+      lastPointerRef.current = null;
+      strokeSnapshotRef.current = null;
+      strokeChangedRef.current = false;
     },
     []
   );
@@ -422,33 +441,97 @@ export default function WheresMyWaterGame() {
 
   const tubRatio = Math.min(1, tubFill / level.tubGoal);
   const collectedLabels = ducks.filter((duck) => duck.collected).map((duck) => duck.label);
+  const canUndo = undoStack.length > 0 && !flowing && !won;
 
-  const dig = useCallback((col: number, row: number) => {
+  const carveStrokeSegment = useCallback((from: BoardPoint, to: BoardPoint) => {
+    let changed = false;
+
     setGrid((prevGrid) => {
-      const nextGrid = [...prevGrid];
-      const index = ck(col, row);
-      const cell = nextGrid[index];
-      if (!cell) return prevGrid;
-      if (cell.kind !== "dirt") return prevGrid;
+      let nextGrid = prevGrid;
+      const dx = to.x - from.x;
+      const dy = to.y - from.y;
+      const sampleCount = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / (CELL * 0.2)));
 
-      nextGrid[index] = { kind: "empty" };
-      return nextGrid;
+      for (let step = 0; step <= sampleCount; step++) {
+        const t = step / sampleCount;
+        const sampleX = from.x + dx * t;
+        const sampleY = from.y + dy * t;
+
+        const colStart = Math.max(0, Math.floor((sampleX - DIG_BRUSH_RADIUS) / CELL));
+        const colEnd = Math.min(COLS - 1, Math.floor((sampleX + DIG_BRUSH_RADIUS) / CELL));
+        const rowStart = Math.max(0, Math.floor((sampleY - DIG_BRUSH_RADIUS) / CELL));
+        const rowEnd = Math.min(ROWS - 1, Math.floor((sampleY + DIG_BRUSH_RADIUS) / CELL));
+
+        for (let row = rowStart; row <= rowEnd; row++) {
+          for (let col = colStart; col <= colEnd; col++) {
+            const index = ck(col, row);
+            const cell = nextGrid[index];
+            if (!cell || cell.kind !== "dirt") continue;
+
+            const centerX = (col + 0.5) * CELL;
+            const centerY = (row + 0.5) * CELL;
+            const textureBias = ((col * 17 + row * 31) % 7) * 0.05;
+            const threshold = DIG_BRUSH_RADIUS * (0.78 + textureBias);
+            const distanceSq = (sampleX - centerX) ** 2 + (sampleY - centerY) ** 2;
+
+            if (distanceSq > threshold ** 2) continue;
+
+            if (nextGrid === prevGrid) {
+              nextGrid = [...prevGrid];
+            }
+
+            nextGrid[index] = { kind: "empty" };
+            changed = true;
+          }
+        }
+      }
+
+      return changed ? nextGrid : prevGrid;
     });
+
+    if (changed) {
+      strokeChangedRef.current = true;
+    }
   }, []);
 
-  const getCellFromPointer = (event: React.MouseEvent | React.TouchEvent) => {
+  const getBoardPointFromPointer = (event: React.PointerEvent<SVGSVGElement>) => {
     const svg = svgRef.current;
     if (!svg) return null;
 
     const rect = svg.getBoundingClientRect();
-    const clientX = "touches" in event ? event.touches[0]?.clientX ?? 0 : event.clientX;
-    const clientY = "touches" in event ? event.touches[0]?.clientY ?? 0 : event.clientY;
-    const col = Math.floor(((clientX - rect.left) / rect.width) * COLS);
-    const row = Math.floor(((clientY - rect.top) / rect.height) * ROWS);
+    const x = ((event.clientX - rect.left) / rect.width) * W;
+    const y = ((event.clientY - rect.top) / rect.height) * H;
 
-    if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return null;
-    return { col, row };
+    if (x < 0 || x > W || y < 0 || y > H) return null;
+
+    return { x, y };
   };
+
+  const finishStroke = useCallback(() => {
+    draggingRef.current = false;
+    lastPointerRef.current = null;
+
+    if (strokeChangedRef.current && strokeSnapshotRef.current) {
+      const snapshot = strokeSnapshotRef.current;
+      setUndoStack((prev) => [...prev, snapshot]);
+    }
+
+    strokeSnapshotRef.current = null;
+    strokeChangedRef.current = false;
+  }, []);
+
+  const undoLastDig = useCallback(() => {
+    if (!canUndo) return;
+
+    setUndoStack((prev) => {
+      const snapshot = prev[prev.length - 1];
+      if (!snapshot) return prev;
+
+      setGrid(cloneGrid(snapshot));
+      setMsg("Undid the last tunnel cut.");
+      return prev.slice(0, -1);
+    });
+  }, [canUndo]);
 
   const awardGlucose = useCallback(async (amount: number) => {
     setRewardAmt(amount);
@@ -631,12 +714,42 @@ export default function WheresMyWaterGame() {
     };
   }, [awardGlucose, flowing, layout, lvIdx, rewardClaimed, won, level]);
 
-  const dirtRects = useMemo(() => {
+  const dirtCutouts = useMemo(() => {
     return grid.flatMap((cell, index) => {
-      if (cell.kind !== "dirt") return [];
+      if (cell.kind === "dirt") return [];
+
       const col = index % COLS;
       const row = Math.floor(index / COLS);
-      return [{ x: col * CELL, y: row * CELL }];
+      const x = col * CELL;
+      const y = row * CELL;
+      const seed = (col * 19 + row * 23) % 9;
+
+      return [
+        {
+          key: `${index}-core`,
+          cx: x + CELL * 0.5,
+          cy: y + CELL * 0.52,
+          rx: CELL * (0.46 + (seed % 3) * 0.03),
+          ry: CELL * (0.47 + ((seed + 1) % 3) * 0.025),
+          rotate: seed * 7 - 18,
+        },
+        {
+          key: `${index}-left`,
+          cx: x + CELL * (0.26 + (seed % 4) * 0.03),
+          cy: y + CELL * (0.36 + ((seed + 2) % 3) * 0.07),
+          rx: CELL * 0.24,
+          ry: CELL * 0.2,
+          rotate: seed * 11,
+        },
+        {
+          key: `${index}-right`,
+          cx: x + CELL * (0.72 - (seed % 4) * 0.025),
+          cy: y + CELL * (0.68 - ((seed + 1) % 3) * 0.06),
+          rx: CELL * 0.26,
+          ry: CELL * 0.21,
+          rotate: 20 - seed * 9,
+        },
+      ];
     });
   }, [grid]);
 
@@ -679,6 +792,13 @@ export default function WheresMyWaterGame() {
             className="rounded-2xl bg-amber-500 px-5 py-2.5 text-sm font-bold text-white hover:bg-amber-600 dark:bg-amber-400 dark:text-black dark:hover:bg-amber-300"
           >
             Reset Level
+          </button>
+          <button
+            onClick={undoLastDig}
+            disabled={!canUndo}
+            className="rounded-2xl bg-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-300 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+          >
+            Undo Dig
           </button>
           {won && lvIdx < LEVELS.length - 1 && (
             <button
@@ -777,30 +897,42 @@ export default function WheresMyWaterGame() {
                 ref={svgRef}
                 viewBox={`0 0 ${W} ${H}`}
                 className="block h-full w-full touch-none select-none"
-                onMouseDown={(event) => {
-                  setDragging(true);
-                  const nextCell = getCellFromPointer(event);
-                  if (nextCell) dig(nextCell.col, nextCell.row);
-                }}
-                onMouseMove={(event) => {
-                  if (!dragging) return;
-                  const nextCell = getCellFromPointer(event);
-                  if (nextCell) dig(nextCell.col, nextCell.row);
-                }}
-                onMouseUp={() => setDragging(false)}
-                onMouseLeave={() => setDragging(false)}
-                onTouchStart={(event) => {
-                  setDragging(true);
-                  const nextCell = getCellFromPointer(event);
-                  if (nextCell) dig(nextCell.col, nextCell.row);
-                }}
-                onTouchMove={(event) => {
+                style={{ touchAction: "none", cursor: flowing ? "default" : "crosshair" }}
+                onPointerDown={(event) => {
+                  if (flowing || showIntro) return;
+                  if (event.pointerType === "mouse" && event.button !== 0) return;
+
                   event.preventDefault();
-                  if (!dragging) return;
-                  const nextCell = getCellFromPointer(event);
-                  if (nextCell) dig(nextCell.col, nextCell.row);
+                  event.currentTarget.setPointerCapture(event.pointerId);
+
+                  const point = getBoardPointFromPointer(event);
+                  if (!point) return;
+
+                  draggingRef.current = true;
+                  strokeSnapshotRef.current = cloneGrid(gridRef.current);
+                  strokeChangedRef.current = false;
+                  lastPointerRef.current = point;
+                  carveStrokeSegment(point, point);
                 }}
-                onTouchEnd={() => setDragging(false)}
+                onPointerMove={(event) => {
+                  if (!draggingRef.current || flowing) return;
+
+                  event.preventDefault();
+                  const point = getBoardPointFromPointer(event);
+                  const lastPoint = lastPointerRef.current;
+                  if (!point || !lastPoint) return;
+
+                  carveStrokeSegment(lastPoint, point);
+                  lastPointerRef.current = point;
+                }}
+                onPointerUp={(event) => {
+                  if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+                    event.currentTarget.releasePointerCapture(event.pointerId);
+                  }
+                  finishStroke();
+                }}
+                onPointerCancel={finishStroke}
+                onLostPointerCapture={finishStroke}
               >
                 <defs>
                   <linearGradient id="caveFill" x1="0" y1="0" x2="0" y2="1">
@@ -822,6 +954,29 @@ export default function WheresMyWaterGame() {
                   <filter id="softShadow">
                     <feDropShadow dx="1" dy="2" stdDeviation="2" floodOpacity="0.35" />
                   </filter>
+                  <pattern id="dirtTexture" width="88" height="88" patternUnits="userSpaceOnUse">
+                    <circle cx="12" cy="14" r="4.4" fill="#5b391d" opacity="0.35" />
+                    <circle cx="30" cy="28" r="3" fill="#9c7750" opacity="0.28" />
+                    <circle cx="55" cy="18" r="2.6" fill="#4b2d16" opacity="0.32" />
+                    <circle cx="71" cy="35" r="4.8" fill="#7f5b36" opacity="0.22" />
+                    <circle cx="16" cy="58" r="3.4" fill="#9a7349" opacity="0.2" />
+                    <circle cx="45" cy="63" r="4.1" fill="#4b2d16" opacity="0.25" />
+                    <circle cx="74" cy="69" r="2.8" fill="#a47b51" opacity="0.24" />
+                  </pattern>
+                  <mask id="dirtMask">
+                    <rect width={W} height={H} fill="white" />
+                    {dirtCutouts.map((cutout) => (
+                      <ellipse
+                        key={cutout.key}
+                        cx={cutout.cx}
+                        cy={cutout.cy}
+                        rx={cutout.rx}
+                        ry={cutout.ry}
+                        fill="black"
+                        transform={`rotate(${cutout.rotate} ${cutout.cx} ${cutout.cy})`}
+                      />
+                    ))}
+                  </mask>
                 </defs>
 
                 <rect width={W} height={H} fill="url(#caveFill)" />
@@ -842,15 +997,10 @@ export default function WheresMyWaterGame() {
                   );
                 })}
 
-                {dirtRects.map(({ x, y }, index) => (
-                  <g key={`dirt-${x}-${y}-${index}`}>
-                    <rect x={x - 0.6} y={y - 0.6} width={CELL + 1.2} height={CELL + 1.2} rx={4} fill="url(#dirtFill)" />
-                    <circle cx={x + 9} cy={y + 12} r={3.4} fill="#5a391e" opacity={0.5} />
-                    <circle cx={x + 30} cy={y + 27} r={2.6} fill="#8b6744" opacity={0.35} />
-                    <circle cx={x + 18} cy={y + 35} r={2.8} fill="#5a391e" opacity={0.35} />
-                    <circle cx={x + 36} cy={y + 10} r={2} fill="#9f7a51" opacity={0.28} />
-                  </g>
-                ))}
+                <g mask="url(#dirtMask)">
+                  <rect width={W} height={H} fill="url(#dirtFill)" />
+                  <rect width={W} height={H} fill="url(#dirtTexture)" opacity={0.95} />
+                </g>
 
                 <rect
                   x={tubX - 8}
