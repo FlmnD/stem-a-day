@@ -508,6 +508,33 @@ export default function WheresMyWaterGame() {
     strokeChangedRef.current = false;
   }, [layout, level]);
 
+  const awardGlucose = useCallback(async (amount: number) => {
+    setRewardAmt(amount);
+    setRewardStatus("loading");
+    setRewardMsg("");
+
+    try {
+      const response = await fetch("/api/glucose/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount }),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setRewardStatus("error");
+        setRewardMsg(data?.message ?? "Failed to update glucose.");
+        return;
+      }
+
+      setRewardStatus("ok");
+      setRewardMsg(`You earned ${amount} glucose.`);
+    } catch {
+      setRewardStatus("error");
+      setRewardMsg("Network error while updating glucose.");
+    }
+  }, []);
+
   const concludeRound = useCallback(
     (result: "win" | "lose", reason: string, nextDucks: Duck[], nextTubFill: number) => {
       if (tickRef.current) clearInterval(tickRef.current);
@@ -646,33 +673,6 @@ export default function WheresMyWaterGame() {
       return prev.slice(0, -1);
     });
   }, [canUndo]);
-
-  const awardGlucose = useCallback(async (amount: number) => {
-    setRewardAmt(amount);
-    setRewardStatus("loading");
-    setRewardMsg("");
-
-    try {
-      const response = await fetch("/api/glucose/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount }),
-      });
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        setRewardStatus("error");
-        setRewardMsg(data?.message ?? "Failed to update glucose.");
-        return;
-      }
-
-      setRewardStatus("ok");
-      setRewardMsg(`You earned ${amount} glucose.`);
-    } catch {
-      setRewardStatus("error");
-      setRewardMsg("Network error while updating glucose.");
-    }
-  }, []);
 
   useEffect(() => {
     if (!flowing || won || lost || !layout) return;
