@@ -15,6 +15,7 @@ const MAX_VISIBLE_DROPLETS = 12;
 const SPAWN_EVERY_TICKS = 4;
 const STUCK_TICKS_BEFORE_FADE = 9;
 const DIG_BRUSH_RADIUS = CELL * 0.72;
+const EASY_WMW_PROGRESS_KEY = "wmw_easy_progress_v1";
 
 type CellKind = "dirt" | "empty" | "source" | "tub";
 type Subshell = "1s" | "2s" | "2p" | "3s" | "3p" | "4s" | "3d";
@@ -92,6 +93,11 @@ interface LevelLayout {
   ducks: Duck[];
 }
 
+interface SavedProgress {
+  currentLevelIndex: number;
+  highestUnlockedLevelIndex: number;
+}
+
 const SUBSHELL_COLORS: Record<Subshell, string> = {
   "1s": "#e2e8f0",
   "2s": "#fde68a",
@@ -119,7 +125,7 @@ const LEVELS: LevelDef[] = [
     elementName: "Neon",
     symbol: "Ne",
     targetConfig: "1s2 2s2 2p6",
-    hint: "Follow Aufbau order all the way through 2p6. The ducks are randomized each reset.",
+    hint: "Follow Aufbau order all the way through 2p6. The duck path now stays consistent so you can plan a clean route.",
     orbitals: [
       { subshell: "1s", count: 2 },
       { subshell: "2s", count: 2 },
@@ -203,7 +209,7 @@ const INTRO_STEPS = [
     title: "Fill the alligator tub",
     body:
       "Collect every required duck for the element and send enough droplets into the alligator's bathtub to clear the level.",
-    sub: "Duck positions and the alligator tub re-roll each reset.",
+    sub: "The level layout stays stable, so resets keep the same solvable setup.",
   },
 ];
 
@@ -248,42 +254,58 @@ function getWaterBudget(level: LevelDef) {
   return level.tubGoal + Math.ceil(duckCount * 0.5) + 5;
 }
 
+function buildSolvableDuckSlots(count: number) {
+  const columns =
+    count <= 2
+      ? [6, 14]
+      : count <= 10
+        ? [5, 10, 15]
+        : count <= 20
+          ? [3, 7, 11, 15, 18]
+          : [2, 5, 8, 11, 14, 17];
+
+  const rows =
+    columns.length <= 3
+      ? [3, 5, 7, 9]
+      : columns.length === 5
+        ? [2, 4, 6, 8, 10]
+        : [2, 4, 6, 8, 10];
+
+  const slots: Array<{ col: number; row: number }> = [];
+
+  for (let rowIndex = 0; rowIndex < rows.length && slots.length < count; rowIndex++) {
+    const row = rows[rowIndex];
+    const lane = rowIndex % 2 === 0 ? columns : [...columns].reverse();
+
+    for (const col of lane) {
+      slots.push({ col, row });
+      if (slots.length >= count) {
+        break;
+      }
+    }
+  }
+
+  if (slots.length < count) {
+    throw new Error(`Not enough duck slots configured for ${count} ducks.`);
+  }
+
+  return slots;
+}
+
 function buildLevelLayout(level: LevelDef): LevelLayout {
   const sourceRow = 0;
   const tubRows: [number, number] = [12, 15];
   const tubWidth = 6;
   const seeds = buildDuckSeeds(level.orbitals);
-  const slotsPerRow = seeds.length > 14 ? 3 : 2;
-  const rowsNeeded = Math.ceil(seeds.length / slotsPerRow);
-  const baseColumns = slotsPerRow === 3 ? [4, 10, 16] : [6, 15];
-  const rowOffsets = [0, 1, -1, 0, 1, -1];
-  const rowPositions =
-    rowsNeeded === 1
-      ? [5]
-      : Array.from({ length: rowsNeeded }, (_, rowIndex) =>
-          Math.round(2 + (rowIndex / (rowsNeeded - 1)) * 8)
-        );
+  const slots = buildSolvableDuckSlots(seeds.length);
 
-  const placed: Duck[] = [];
-
-  rowPositions.forEach((row, rowIndex) => {
-    const offset = rowOffsets[rowIndex % rowOffsets.length];
-    const lane = baseColumns.map((column) => Math.max(2, Math.min(COLS - 3, column + offset)));
-    const orderedLane = rowIndex % 2 === 0 ? lane : [...lane].reverse();
-
-    orderedLane.forEach((col) => {
-      const seed = seeds[placed.length];
-      if (!seed) return;
-
-      placed.push({
-        ...seed,
-        col,
-        row,
-        color: SUBSHELL_COLORS[seed.subshell],
-        collected: false,
-      });
-    });
-  });
+  const placed: Duck[] = seeds.map((seed, index) => ({
+    ...seed,
+    col: slots[index].col,
+    row: slots[index].row,
+    color: SUBSHELL_COLORS[seed.subshell],
+    collected: false,
+  }));
 
   const sourceCol = placed[0]?.col ?? 4;
   const lastDuckCol = placed[placed.length - 1]?.col ?? 15;
@@ -384,6 +406,8 @@ export default function WheresMyWaterGame() {
   const [rewardClaimed, setRewardClaimed] = useState(false);
   const [pendingResult, setPendingResult] = useState(false);
   const [resultModal, setResultModal] = useState<ResultModalState | null>(null);
+  const [progressLoaded, setProgressLoaded] = useState(false);
+  const [highestUnlockedLevelIndex, setHighestUnlockedLevelIndex] = useState(0);
 
   const svgRef = useRef<SVGSVGElement>(null);
   const tickRef = useRef<NodeJS.Timeout | null>(null);
@@ -443,8 +467,53 @@ export default function WheresMyWaterGame() {
   );
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      setProgressLoaded(true);
+      return;
+    }
+
+    try {
+      const raw = window.localStorage.getItem(EASY_WMW_PROGRESS_KEY);
+      if (!raw) {
+        setProgressLoaded(true);
+        return;
+      }
+
+      const parsed = JSON.parse(raw) as Partial<SavedProgress>;
+      const savedCurrent =
+        typeof parsed.currentLevelIndex === "number"
+          ? Math.max(0, Math.min(LEVELS.length - 1, parsed.currentLevelIndex))
+          : 0;
+      const savedHighest =
+        typeof parsed.highestUnlockedLevelIndex === "number"
+          ? Math.max(savedCurrent, Math.min(LEVELS.length - 1, parsed.highestUnlockedLevelIndex))
+          : savedCurrent;
+
+      setLvIdx(savedCurrent);
+      setHighestUnlockedLevelIndex(savedHighest);
+    } catch {
+      setLvIdx(0);
+      setHighestUnlockedLevelIndex(0);
+    } finally {
+      setProgressLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!progressLoaded) return;
     initLevel(LEVELS[lvIdx]);
-  }, [initLevel, lvIdx]);
+  }, [initLevel, lvIdx, progressLoaded]);
+
+  useEffect(() => {
+    if (!progressLoaded || typeof window === "undefined") return;
+
+    const savedProgress: SavedProgress = {
+      currentLevelIndex: lvIdx,
+      highestUnlockedLevelIndex: highestUnlockedLevelIndex,
+    };
+
+    window.localStorage.setItem(EASY_WMW_PROGRESS_KEY, JSON.stringify(savedProgress));
+  }, [highestUnlockedLevelIndex, lvIdx, progressLoaded]);
 
   useEffect(() => {
     return () => {
@@ -546,6 +615,7 @@ export default function WheresMyWaterGame() {
         }
 
         if (lvIdx === LEVELS.length - 1) {
+          setHighestUnlockedLevelIndex(LEVELS.length - 1);
           scheduleResultModal({
             type: "final",
             title: "You win!",
@@ -553,6 +623,7 @@ export default function WheresMyWaterGame() {
             actionLabel: "Play again",
           });
         } else {
+          setHighestUnlockedLevelIndex((current) => Math.max(current, lvIdx + 1));
           scheduleResultModal({
             type: "next",
             title: `${level.elementName} cleared`,

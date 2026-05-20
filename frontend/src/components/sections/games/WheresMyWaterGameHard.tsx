@@ -41,6 +41,7 @@ interface TunnelMaskShape {
 interface IonSeed {
   id: string;
   label: string;
+  formattedLabel: string;
   displayLabel: string;
   role: IonRole;
   color: string;
@@ -110,68 +111,107 @@ const SPECTATOR_SLOTS = [
 const LEVELS: LevelDef[] = [
   {
     id: 1,
-    title: "Net Ionic 1 - Silver Chloride",
+    title: "Precipitation 1 - Silver Chloride",
     reactionName: "Silver chloride precipitation",
     reactants: "AgNO3(aq) + NaCl(aq)",
-    netIonic: "Ag+ + Cl- -> AgCl(s)",
+    netIonic: "Ag^+ + Cl^- -> AgCl(s)",
     productFormula: "AgCl(s)",
     productName: "Silver chloride",
-    reactive: ["Ag+", "Cl-"],
-    spectators: ["Na+", "NO3-"],
+    reactive: ["Ag^+", "Cl^-"],
+    spectators: ["Na^+", "NO3^-"],
     tubGoal: 6,
-    hint: "Collect only the ions that belong in the net ionic equation and avoid spectators.",
+    hint: "Only the ions that form the precipitate belong in the path.",
   },
   {
     id: 2,
-    title: "Net Ionic 2 - Lead Iodide",
+    title: "Precipitation 2 - Lead Iodide",
     reactionName: "Lead(II) iodide precipitation",
-    reactants: "Pb(NO3)2(aq) + KI(aq)",
-    netIonic: "Pb2+ + 2I- -> PbI2(s)",
+    reactants: "Pb(NO3)2(aq) + 2KI(aq)",
+    netIonic: "Pb^2+ + 2I^- -> PbI2(s)",
     productFormula: "PbI2(s)",
     productName: "Lead(II) iodide",
-    reactive: ["Pb2+", "I-", "I-"],
-    spectators: ["K+", "NO3-"],
+    reactive: ["Pb^2+", "I^-", "I^-"],
+    spectators: ["K^+", "NO3^-"],
     tubGoal: 7,
-    hint: "This one needs two iodide ions, so the order matters all the way through the second I-.",
+    hint: "This one needs two iodide ions, so the route has to preserve the second pickup.",
   },
   {
     id: 3,
-    title: "Net Ionic 3 - Calcium Carbonate",
-    reactionName: "Calcium carbonate precipitation",
-    reactants: "CaCl2(aq) + Na2CO3(aq)",
-    netIonic: "Ca2+ + CO3^2- -> CaCO3(s)",
-    productFormula: "CaCO3(s)",
-    productName: "Calcium carbonate",
-    reactive: ["Ca2+", "CO3^2-"],
-    spectators: ["Na+", "Cl-"],
+    title: "Precipitation 3 - Barium Sulfate",
+    reactionName: "Barium sulfate precipitation",
+    reactants: "BaCl2(aq) + Na2SO4(aq)",
+    netIonic: "Ba^2+ + SO4^2- -> BaSO4(s)",
+    productFormula: "BaSO4(s)",
+    productName: "Barium sulfate",
+    reactive: ["Ba^2+", "SO4^2-"],
+    spectators: ["Na^+", "Cl^-"],
     tubGoal: 8,
-    hint: "Remember that sodium and chloride stay dissolved here. They should cancel out.",
+    hint: "Sulfate stays together as one ion. Guide the stream through the correct pair only.",
   },
   {
     id: 4,
-    title: "Net Ionic 4 - Barium Sulfate",
-    reactionName: "Barium sulfate precipitation",
-    reactants: "BaCl2(aq) + Na2SO4(aq)",
-    netIonic: "Ba2+ + SO4^2- -> BaSO4(s)",
-    productFormula: "BaSO4(s)",
-    productName: "Barium sulfate",
-    reactive: ["Ba2+", "SO4^2-"],
-    spectators: ["Na+", "Cl-"],
+    title: "Acid-Base 1 - Strong Acid + Strong Base",
+    reactionName: "Hydrochloric acid neutralization",
+    reactants: "HCl(aq) + NaOH(aq)",
+    netIonic: "H^+ + OH^- -> H2O(l)",
+    productFormula: "H2O(l)",
+    productName: "Water",
+    reactive: ["H^+", "OH^-"],
+    spectators: ["Na^+", "Cl^-"],
     tubGoal: 9,
-    hint: "Guide the stream through the precipitate-forming ions, then finish by filling the product tub.",
+    hint: "This is the classic one-proton, one-hydroxide neutralization path.",
   },
   {
     id: 5,
-    title: "Net Ionic 5 - Iron(III) Hydroxide",
-    reactionName: "Iron(III) hydroxide precipitation",
-    reactants: "Fe(NO3)3(aq) + KOH(aq)",
-    netIonic: "Fe3+ + 3OH- -> Fe(OH)3(s)",
-    productFormula: "Fe(OH)3(s)",
-    productName: "Iron(III) hydroxide",
-    reactive: ["Fe3+", "OH-", "OH-", "OH-"],
-    spectators: ["K+", "NO3-"],
+    title: "Acid-Base 2 - Strong Acid + Weak Base",
+    reactionName: "Hydrochloric acid with ammonia",
+    reactants: "HCl(aq) + NH3(aq)",
+    netIonic: "H^+ + NH3 -> NH4^+",
+    productFormula: "NH4^+(aq)",
+    productName: "Ammonium ion",
+    reactive: ["H^+", "NH3"],
+    spectators: ["Cl^-", "NH4^+"],
     tubGoal: 10,
-    hint: "This final level uses repeated hydroxide ions. Collect all three before the water budget runs out.",
+    hint: "The acid dissociates, but the weak base stays molecular until it grabs the proton.",
+  },
+  {
+    id: 6,
+    title: "Acid-Base 3 - Weak Acid + Strong Base",
+    reactionName: "Acetic acid with sodium hydroxide",
+    reactants: "HC2H3O2(aq) + NaOH(aq)",
+    netIonic: "HC2H3O2 + OH^- -> C2H3O2^- + H2O(l)",
+    productFormula: "C2H3O2^-(aq)",
+    productName: "Acetate ion",
+    reactive: ["HC2H3O2", "OH^-"],
+    spectators: ["Na^+", "H^+"],
+    tubGoal: 10,
+    hint: "Weak acids stay together in the net ionic equation, even though the base fully dissociates.",
+  },
+  {
+    id: 7,
+    title: "Acid-Base 4 - Weak Acid + Weak Base",
+    reactionName: "Hydrofluoric acid with ammonia",
+    reactants: "HF(aq) + NH3(aq)",
+    netIonic: "HF + NH3 -> F^- + NH4^+",
+    productFormula: "NH4F(aq)",
+    productName: "Ammonium fluoride",
+    reactive: ["HF", "NH3"],
+    spectators: ["F^-", "NH4^+"],
+    tubGoal: 11,
+    hint: "Neither reactant fully ionizes, so both required pickups stay molecular.",
+  },
+  {
+    id: 8,
+    title: "Acid-Base 5 - Double Neutralization",
+    reactionName: "Sulfuric acid with sodium hydroxide",
+    reactants: "H2SO4(aq) + 2NaOH(aq)",
+    netIonic: "H^+ + OH^- + H^+ + OH^- -> 2H2O(l)",
+    productFormula: "2H2O(l)",
+    productName: "Water",
+    reactive: ["H^+", "OH^-", "H^+", "OH^-"],
+    spectators: ["Na^+", "SO4^2-"],
+    tubGoal: 12,
+    hint: "Treat this like two linked neutralization steps. The order still matters all the way through.",
   },
 ];
 
@@ -183,26 +223,89 @@ const INTRO_STEPS = [
     sub: "No prebuilt channels and no infinite source.",
   },
   {
-    title: "Collect only the net ionic species",
+    title: "Build the hidden net ionic path",
     body:
-      "Each ion marker shows either a reactive ion or a spectator ion. Touch only the ions that belong in the net ionic equation.",
-    sub: "Spectator ions should cancel out, so they waste water if you hit them.",
+      "Only some species belong in the real net ionic equation. Others are decoys, so you have to reason from the molecular reactants.",
+    sub: "No more collect or avoid guide at the top.",
   },
   {
     title: "Respect the stoichiometric order",
     body:
-      "Repeated ions like I- or OH- appear as separate steps. You still have to collect them in sequence to build the correct precipitate path.",
+      "Repeated ions like I- or OH- appear as separate steps. You still have to collect them in sequence to build the correct reaction path.",
     sub: "Think in terms of the reaction coefficients.",
   },
   {
-    title: "Fill the precipitate tub",
+    title: "Finish the reaction in the tub",
     body:
-      "After collecting the full net ionic set, enough droplets still need to reach the alligator bathtub to clear the level.",
-    sub: "Winning means correct ions plus enough product flow.",
+      "After collecting the full path, enough droplets still need to reach the alligator bathtub to clear the level.",
+    sub: "Winning means correct chemistry plus enough product flow.",
   },
 ];
 
 const ck = (c: number, r: number) => r * COLS + c;
+
+const SUBSCRIPT_MAP: Record<string, string> = {
+  "0": "₀",
+  "1": "₁",
+  "2": "₂",
+  "3": "₃",
+  "4": "₄",
+  "5": "₅",
+  "6": "₆",
+  "7": "₇",
+  "8": "₈",
+  "9": "₉",
+};
+
+const SUPERSCRIPT_MAP: Record<string, string> = {
+  "0": "⁰",
+  "1": "¹",
+  "2": "²",
+  "3": "³",
+  "4": "⁴",
+  "5": "⁵",
+  "6": "⁶",
+  "7": "⁷",
+  "8": "⁸",
+  "9": "⁹",
+  "+": "⁺",
+  "-": "⁻",
+};
+
+function formatChemText(value: string) {
+  const normalized = value.replace(/<->/g, "⇌").replace(/->/g, "→");
+  let formatted = "";
+
+  for (let index = 0; index < normalized.length; index++) {
+    const ch = normalized[index];
+
+    if (ch === "^") {
+      let cursor = index + 1;
+      while (
+        cursor < normalized.length &&
+        (/\d/.test(normalized[cursor]) || normalized[cursor] === "+" || normalized[cursor] === "-")
+      ) {
+        formatted += SUPERSCRIPT_MAP[normalized[cursor]] ?? normalized[cursor];
+        cursor += 1;
+      }
+      index = cursor - 1;
+      continue;
+    }
+
+    if (
+      /\d/.test(ch) &&
+      index > 0 &&
+      /[A-Za-z)\]]/.test(normalized[index - 1])
+    ) {
+      formatted += SUBSCRIPT_MAP[ch] ?? ch;
+      continue;
+    }
+
+    formatted += ch;
+  }
+
+  return formatted;
+}
 
 function cloneGrid(grid: Cell[]) {
   return grid.map((cell) => ({ kind: cell.kind }));
@@ -212,12 +315,20 @@ function getIonColor(label: string, role: IonRole) {
   if (role === "spectator") {
     if (label.includes("NO3")) return "#fda4af";
     if (label.includes("Na") || label.includes("K")) return "#fdba74";
+    if (label.includes("NH4")) return "#c4b5fd";
     return "#f9a8d4";
   }
 
+  if (label.includes("H^+") || label === "HF" || label === "HC2H3O2") {
+    return "#fda4af";
+  }
+  if (label.includes("OH") || label === "NH3") {
+    return "#86efac";
+  }
   if (label.includes("Cl") || label.includes("I") || label.includes("OH") || label.includes("SO4") || label.includes("CO3")) {
     return "#67e8f9";
   }
+  if (label.includes("C2H3O2") || label.includes("F^-")) return "#93c5fd";
 
   if (label.includes("Ag")) return "#f8fafc";
   if (label.includes("Pb")) return "#cbd5e1";
@@ -245,11 +356,13 @@ function buildIonSeeds(level: LevelDef) {
     const seen = (reactiveSeen.get(label) ?? 0) + 1;
     reactiveSeen.set(label, seen);
     const total = reactiveTotals.get(label) ?? 1;
+    const formattedLabel = formatChemText(label);
 
     return {
       id: `reactive_${label}_${index + 1}`,
       label,
-      displayLabel: total > 1 ? `${label} ${seen}` : label,
+      formattedLabel,
+      displayLabel: total > 1 ? `${formattedLabel} ${seen}` : formattedLabel,
       role: "reactive",
       color: getIonColor(label, "reactive"),
     };
@@ -259,11 +372,13 @@ function buildIonSeeds(level: LevelDef) {
     const seen = (spectatorSeen.get(label) ?? 0) + 1;
     spectatorSeen.set(label, seen);
     const total = spectatorTotals.get(label) ?? 1;
+    const formattedLabel = formatChemText(label);
 
     return {
       id: `spectator_${label}_${index + 1}`,
       label,
-      displayLabel: total > 1 ? `${label} ${seen}` : label,
+      formattedLabel,
+      displayLabel: total > 1 ? `${formattedLabel} ${seen}` : formattedLabel,
       role: "spectator",
       color: getIonColor(label, "spectator"),
     };
@@ -482,11 +597,6 @@ export default function WheresMyWaterGameHard() {
     };
   }, []);
 
-  const nextRequiredIon = useMemo(
-    () => ions.find((ion) => ion.role === "reactive" && !ion.collected) ?? null,
-    [ions]
-  );
-
   const dugCellCount = useMemo(
     () => grid.reduce((count, cell) => count + (cell.kind === "empty" ? 1 : 0), 0),
     [grid]
@@ -578,14 +688,14 @@ export default function WheresMyWaterGameHard() {
           scheduleResultModal({
             type: "final",
             title: "You win!",
-            body: `You cleared every hard level and built each precipitate's net ionic equation.`,
+            body: `You cleared every hard reaction level and finished the path for ${formatChemText(level.netIonic)}.`,
             actionLabel: "Play again",
           });
         } else {
           scheduleResultModal({
             type: "next",
             title: `${level.productName} cleared`,
-            body: `You collected the correct reactive ions and filled the product tub.`,
+            body: `You built ${formatChemText(level.netIonic)} and filled the tub.`,
             actionLabel: "Next level",
           });
         }
@@ -601,7 +711,7 @@ export default function WheresMyWaterGameHard() {
         actionLabel: "Reset level",
       });
     },
-    [awardGlucose, level.productName, lvIdx, rewardClaimed, scheduleResultModal]
+    [awardGlucose, level.netIonic, level.productName, lvIdx, rewardClaimed, scheduleResultModal]
   );
 
   const carveStrokeSegment = useCallback((from: BoardPoint, to: BoardPoint) => {
@@ -735,7 +845,7 @@ export default function WheresMyWaterGameHard() {
           if (ionHere) {
             if (ionHere.role === "spectator") {
               nextRejectedId = ionHere.id;
-              nextMessage = `${ionHere.label} is a spectator ion. It should cancel out.`;
+              nextMessage = `${ionHere.displayLabel} does not belong in the net ionic path.`;
               removed = true;
               break;
             }
@@ -829,7 +939,7 @@ export default function WheresMyWaterGameHard() {
         .every((ion) => ion.collected);
 
       if (ionsChanged && allReactiveCollected && nextTubFill < level.tubGoal) {
-        setMsg("Net ionic path complete. Keep feeding the product tub.");
+        setMsg("Path complete. Keep feeding the tub.");
       }
 
       if (nextTubFill !== tubFillRef.current) {
@@ -844,7 +954,7 @@ export default function WheresMyWaterGameHard() {
       if (allReactiveCollected && nextTubFill >= level.tubGoal) {
         concludeRound(
           "win",
-          `${level.productName} formed. Net ionic equation complete.`,
+          `${formatChemText(level.netIonic)} complete.`,
           nextIons,
           nextTubFill
         );
@@ -947,29 +1057,26 @@ export default function WheresMyWaterGameHard() {
   const tubWaterHeight = tubH * tubRatio;
   const boardAspectRatio = W / H;
   const boardWidth = `min(100%, 1080px, calc((100dvh - 240px) * ${boardAspectRatio}))`;
-  const reactiveLabels = ions.filter((ion) => ion.role === "reactive").map((ion) => ion.displayLabel).join(" -> ");
+  const formattedReactants = formatChemText(level.reactants);
+  const formattedProductFormula = formatChemText(level.productFormula);
 
   return (
     <>
       <div className="flex min-h-screen w-full flex-col items-center bg-white px-3 py-4 text-slate-900 dark:bg-black dark:text-slate-100 sm:px-5">
         <div className="mb-2 text-center">
           <h2 className="text-xl font-black tracking-tight sm:text-2xl">
-            Where&apos;s My Water?: Net Ionic Equations
+            Where&apos;s My Water?: Hard Reactions
           </h2>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Level {level.id}/5 - {level.productName}
+            Level {level.id}/{LEVELS.length} - {level.reactionName}
           </p>
         </div>
 
         <div className="mb-1 max-w-5xl text-center text-[11px] font-semibold leading-relaxed text-slate-600 dark:text-slate-300 sm:text-xs">
-          <div>{level.reactants}</div>
-          <div>Net ionic target: {level.netIonic}</div>
+          <div>{formattedReactants}</div>
         </div>
 
         <div className="mb-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-xs font-semibold text-slate-600 dark:text-slate-300 sm:text-sm">
-          <span>Collect {reactiveLabels}</span>
-          <span>Avoid {level.spectators.join(", ")}</span>
-          <span>Next {nextRequiredIon ? nextRequiredIon.displayLabel : won ? "Level clear" : "Fill tub"}</span>
           <span>Tub {Math.min(tubFill, level.tubGoal)}/{level.tubGoal}</span>
           <span>Water {waterLeft}</span>
         </div>
@@ -1316,7 +1423,7 @@ export default function WheresMyWaterGameHard() {
                   ))}
                 </g>
                 <text x={tubX + tubW / 2} y={tubY + tubH - 20} textAnchor="middle" fontSize={18} fontWeight={900} fill="#0f172a">
-                  {level.productFormula}
+                  {formattedProductFormula}
                 </text>
                 <text x={tubX + tubW / 2} y={tubY + tubH - 2} textAnchor="middle" fontSize={12} fontWeight={800} fill="#334155">
                   {level.productName}
@@ -1421,20 +1528,8 @@ export default function WheresMyWaterGameHard() {
                       fill="#0f172a"
                       fontFamily="'Courier New', monospace"
                     >
-                      {ion.label}
+                      {ion.formattedLabel}
                     </text>
-                    {!ion.collected && (
-                      <text
-                        x={centerX}
-                        y={centerY - 21}
-                        textAnchor="middle"
-                        fontSize={8}
-                        fontWeight={900}
-                        fill={ion.role === "reactive" ? "#f97316" : "#a855f7"}
-                      >
-                        {ion.role === "reactive" ? "react" : "spectator"}
-                      </text>
-                    )}
                     {ion.collected && (
                       <text x={centerX + 1} y={centerY + 5} textAnchor="middle" fontSize={18} fill="#16a34a" fontWeight={900}>
                         OK
