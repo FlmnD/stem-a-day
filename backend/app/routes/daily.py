@@ -10,7 +10,7 @@ from app.database import get_db
 from app.deps import get_current_verified_user
 from app.models import DailyQuestionState, User
 from app.schemas.daily import DailyAnswerIn, DailyAnswerOut, DailyQuestionOut
-from app.streaks import get_effective_streak, get_next_streak_after_daily_answer
+from app.streaks import get_effective_streak, get_next_streak_after_activity
 
 router = APIRouter(prefix="/daily", tags=["daily"])
 
@@ -136,10 +136,11 @@ def answer_daily_question(
 
     correct = payload.selected_option_index == question["correct_option_index"]
     glucose_earned = DAILY_GLUCOSE_REWARD if correct else 0
-    next_streak = get_next_streak_after_daily_answer(current_user, state.effective_date)
+    next_streak = get_next_streak_after_activity(current_user, state.effective_date)
 
     values = {
         "daily_question_answered_on": state.effective_date,
+        "last_streak_activity_on": state.effective_date,
         "streak": next_streak,
     }
     if correct:

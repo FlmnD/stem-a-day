@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+
 import {
     applySessionCookies,
     clearSessionCookies,
@@ -7,24 +8,19 @@ import {
 
 export async function POST(req: Request) {
     const body = await req.json().catch(() => null);
-    const amount = body?.amount;
+    const gameId = body?.game_id;
 
-    if (
-        typeof amount !== "number" ||
-        !Number.isFinite(amount) ||
-        !Number.isInteger(amount) ||
-        amount <= 0
-    ) {
+    if (typeof gameId !== "string" || gameId.trim() === "") {
         return NextResponse.json(
-            { message: "amount must be a positive integer" },
+            { message: "game_id must be a non-empty string" },
             { status: 400 }
         );
     }
 
-    const result = await fetchBackendWithSession("/users/me/glucose/add", {
+    const result = await fetchBackendWithSession("/users/me/games/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount }),
+        body: JSON.stringify({ game_id: gameId }),
     });
 
     if (!result.response) {

@@ -100,6 +100,11 @@ class User(Base):
         nullable=True,
     )
 
+    last_streak_activity_on: Mapped[date | None] = mapped_column(
+        Date,
+        nullable=True,
+    )
+
 
 class DailyQuestionState(Base):
     __tablename__ = "daily_question_state"

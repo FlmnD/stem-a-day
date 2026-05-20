@@ -147,7 +147,7 @@ export default function DailyPage() {
                         Daily
                     </h1>
                     <p className="mt-2 max-w-2xl text-gray-600 dark:text-slate-300">
-                        Answer the daily chemistry question for 25 glucose and to keep your streak going.
+                        Answer the daily chemistry question for 25 glucose. Your first daily answer or game win each day keeps your streak going.
                     </p>
                 </div>
 

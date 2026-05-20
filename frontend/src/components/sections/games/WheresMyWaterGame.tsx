@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { claimGameReward } from "@/lib/game-rewards";
 
 const COLS = 22;
 const ROWS = 16;
@@ -8,7 +9,7 @@ const CELL = 44;
 const W = COLS * CELL;
 const H = ROWS * CELL;
 const TICK_MS = 55;
-const GLUCOSE_REWARD = 20;
+const GLUCOSE_REWARD = 15;
 const DROPLET_RADIUS = 7;
 const MAX_VISIBLE_DROPLETS = 12;
 const SPAWN_EVERY_TICKS = 4;
@@ -508,31 +509,21 @@ export default function WheresMyWaterGame() {
     strokeChangedRef.current = false;
   }, [layout, level]);
 
-  const awardGlucose = useCallback(async (amount: number) => {
-    setRewardAmt(amount);
+  const awardGlucose = useCallback(async () => {
+    setRewardAmt(GLUCOSE_REWARD);
     setRewardStatus("loading");
     setRewardMsg("");
 
-    try {
-      const response = await fetch("/api/glucose/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount }),
-      });
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        setRewardStatus("error");
-        setRewardMsg(data?.message ?? "Failed to update glucose.");
-        return;
-      }
-
-      setRewardStatus("ok");
-      setRewardMsg(`You earned ${amount} glucose.`);
-    } catch {
+    const result = await claimGameReward(GLUCOSE_REWARD);
+    if (!result.ok) {
       setRewardStatus("error");
-      setRewardMsg("Network error while updating glucose.");
+      setRewardMsg(result.message);
+      return;
     }
+
+    setRewardAmt(result.rewardGlucose);
+    setRewardStatus("ok");
+    setRewardMsg(result.message);
   }, []);
 
   const concludeRound = useCallback(
@@ -549,6 +540,11 @@ export default function WheresMyWaterGame() {
         setWon(true);
         setLost(false);
 
+        if (!rewardClaimed) {
+          setRewardClaimed(true);
+          void awardGlucose();
+        }
+
         if (lvIdx === LEVELS.length - 1) {
           scheduleResultModal({
             type: "final",
@@ -556,11 +552,6 @@ export default function WheresMyWaterGame() {
             body: `You cleared every electron configuration level, including ${level.elementName} (${level.symbol}).`,
             actionLabel: "Play again",
           });
-
-          if (!rewardClaimed) {
-            setRewardClaimed(true);
-            void awardGlucose(GLUCOSE_REWARD);
-          }
         } else {
           scheduleResultModal({
             type: "next",
@@ -1468,19 +1459,19 @@ export default function WheresMyWaterGame() {
               {resultModal.title}
             </h2>
             <p className="mt-3 text-lg text-slate-700 dark:text-slate-300">{resultModal.body}</p>
-            {resultModal.type === "final" && (
+            {resultModal.type !== "lose" && (
               <p className="mt-3 text-base text-slate-700 dark:text-slate-300">
-                Final reward: <span className="font-bold">{rewardAmt}</span> glucose.
+                Level reward: <span className="font-bold">{rewardAmt}</span> glucose.
               </p>
             )}
             <div className="mt-4 text-sm">
-              {resultModal.type === "final" && rewardStatus === "loading" && (
+              {resultModal.type !== "lose" && rewardStatus === "loading" && (
                 <p className="text-slate-600 dark:text-slate-300">Updating glucose...</p>
               )}
-              {resultModal.type === "final" && rewardStatus === "ok" && (
+              {resultModal.type !== "lose" && rewardStatus === "ok" && (
                 <p className="text-emerald-700 dark:text-emerald-300">{rewardMsg}</p>
               )}
-              {resultModal.type === "final" && rewardStatus === "error" && (
+              {resultModal.type !== "lose" && rewardStatus === "error" && (
                 <p className="text-red-700 dark:text-red-300">{rewardMsg}</p>
               )}
             </div>

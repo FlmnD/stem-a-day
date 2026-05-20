@@ -104,7 +104,7 @@ export default function SignedInHome({
                                     {user.streak}
                                 </div>
                                 <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                                    Keep the chain alive by answering today&apos;s daily question.
+                                    Keep the chain alive by answering today&apos;s daily question or beating a game.
                                 </p>
                             </Card>
 

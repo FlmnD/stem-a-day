@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState, useRef } from "react";
+import { claimGameReward } from "@/lib/game-rewards";
 
 
 type StoichUnit =
@@ -124,7 +125,7 @@ const REACTIONS: RawReaction[] = [
   },
 ];
 
-const GLUCOSE_REWARD = 20;
+const GLUCOSE_REWARD = 35;
 const MAP_W = 1100;
 const MAP_H = 520;
 const ST_W = 138;
@@ -700,14 +701,11 @@ export default function RailboundHard() {
     setSelectedId(null); setResult(null); setWrongSlots(new Set()); setCorrectRevealedSlots(new Set());
   };
 
-  async function awardGlucose(amount: number) {
-    setRewardAmount(amount); setRewardPopupOpen(true); setRewardStatus("loading"); setRewardMessage("");
-    try {
-      const r = await fetch("/api/glucose/add", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ amount }) });
-      const data = await r.json().catch(() => ({}));
-      if (!r.ok) { setRewardStatus("error"); setRewardMessage(data?.message ?? "Failed."); return; }
-      setRewardStatus("ok"); setRewardMessage(`You earned ${amount} glucose!`);
-    } catch { setRewardStatus("error"); setRewardMessage("Network error."); }
+  async function awardGlucose() {
+    setRewardAmount(GLUCOSE_REWARD); setRewardPopupOpen(true); setRewardStatus("loading"); setRewardMessage("");
+    const result = await claimGameReward(GLUCOSE_REWARD);
+    if (!result.ok) { setRewardStatus("error"); setRewardMessage(result.message); return; }
+    setRewardAmount(result.rewardGlucose); setRewardStatus("ok"); setRewardMessage(result.message);
   }
 
   const checkSolution = () => {
@@ -762,7 +760,7 @@ export default function RailboundHard() {
 
       if (tier === 3 && !rewardClaimed) {
         setRewardClaimed(true);
-        void awardGlucose(GLUCOSE_REWARD);
+        void awardGlucose();
       }
 
       runAnimation(-1, new Set(), true, nextTier, nextSub, nextDemoted);

@@ -55,6 +55,14 @@ def bootstrap_database() -> None:
                 )
             )
 
+        if "last_streak_activity_on" not in user_columns:
+            connection.execute(
+                text(
+                    "ALTER TABLE users "
+                    "ADD COLUMN IF NOT EXISTS last_streak_activity_on DATE"
+                )
+            )
+
         if "daily_debug_offset_days" not in user_columns:
             connection.execute(
                 text(
@@ -62,6 +70,15 @@ def bootstrap_database() -> None:
                     "ADD COLUMN IF NOT EXISTS daily_debug_offset_days INTEGER NOT NULL DEFAULT 0"
                 )
             )
+
+        connection.execute(
+            text(
+                "UPDATE users "
+                "SET last_streak_activity_on = daily_question_answered_on "
+                "WHERE last_streak_activity_on IS NULL "
+                "AND daily_question_answered_on IS NOT NULL"
+            )
+        )
 
         if "daily_question_state" not in inspector.get_table_names():
             return

@@ -1,6 +1,7 @@
 'use client'
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSnakeTheme, type SnakeTheme } from "@/components/sections/games/snakeTheme";
+import { claimGameReward } from "@/lib/game-rewards";
 
 const COMPOUNDS = [
   { formula: "NaCl", name: "sodium chloride", type: "ionic compound" },
@@ -207,14 +208,11 @@ export default function SnakeGame() {
     });
   };
 
-  const awardGlucose = useCallback(async (amount: number) => {
-    setRewardAmount(amount); setRewardPopupOpen(true); setRewardStatus("loading"); setRewardMessage("");
-    try {
-      const r = await fetch("/api/glucose/add", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ amount }) });
-      const data = await r.json().catch(() => ({}));
-      if (!r.ok) { setRewardStatus("error"); setRewardMessage(data?.message ?? data?.detail ?? "Failed to add glucose."); return; }
-      setRewardStatus("ok"); setRewardMessage(`You earned ${amount} glucose!`);
-    } catch { setRewardStatus("error"); setRewardMessage("Network error. Could not update glucose."); }
+  const awardGlucose = useCallback(async () => {
+    setRewardAmount(GLUCOSE_REWARD); setRewardPopupOpen(true); setRewardStatus("loading"); setRewardMessage("");
+    const result = await claimGameReward(GLUCOSE_REWARD);
+    if (!result.ok) { setRewardStatus("error"); setRewardMessage(result.message); return; }
+    setRewardAmount(result.rewardGlucose); setRewardStatus("ok"); setRewardMessage(result.message);
   }, []);
 
   const startGameFresh = () => {
@@ -277,7 +275,7 @@ export default function SnakeGame() {
   useEffect(() => {
     if (snakeLength >= WIN_LENGTH) {
       setRunningSync(false); setMsg("You Won!"); setPrompt(null);
-      if (!rewardClaimed) { setRewardClaimed(true); void awardGlucose(GLUCOSE_REWARD); }
+      if (!rewardClaimed) { setRewardClaimed(true); void awardGlucose(); }
     }
     if (snakeLength < MIN_LENGTH) { setRunningSync(false); setMsg("You Lost!"); setPrompt(null); }
   }, [snakeLength, rewardClaimed, awardGlucose]);

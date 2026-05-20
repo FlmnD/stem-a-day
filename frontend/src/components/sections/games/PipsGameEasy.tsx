@@ -1,6 +1,7 @@
 
 'use client'
 import React, { useEffect, useState } from "react";
+import { claimGameReward } from "@/lib/game-rewards";
 
 type MolarVar =
   | 'M' | 'V' | 'n'
@@ -216,33 +217,22 @@ export default function EasyPips() {
     return [{ x: d.x, y: d.y }, { x: tx, y: ty }];
   };
 
-  async function awardGlucose(amount: number) {
-    setRewardAmount(amount);
+  async function awardGlucose() {
+    setRewardAmount(GLUCOSE_REWARD);
     setRewardPopupOpen(true);
     setRewardStatus("loading");
     setRewardMessage("");
 
-    try {
-      const r = await fetch("/api/glucose/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount }),
-      });
-
-      const data = await r.json().catch(() => ({}));
-
-      if (!r.ok) {
-        setRewardStatus("error");
-        setRewardMessage(data?.message ?? data?.detail ?? "Failed to add glucose.");
-        return;
-      }
-
-      setRewardStatus("ok");
-      setRewardMessage(`You earned ${amount} glucose!`);
-    } catch {
+    const result = await claimGameReward(GLUCOSE_REWARD);
+    if (!result.ok) {
       setRewardStatus("error");
-      setRewardMessage("Network error. Could not update glucose.");
+      setRewardMessage(result.message);
+      return;
     }
+
+    setRewardAmount(result.rewardGlucose);
+    setRewardStatus("ok");
+    setRewardMessage(result.message);
   }
 
   const checkSolution = () => {
@@ -267,7 +257,7 @@ export default function EasyPips() {
 
     if (correct && !rewardClaimed) {
       setRewardClaimed(true);
-      void awardGlucose(GLUCOSE_REWARD);
+      void awardGlucose();
     }
   };
 

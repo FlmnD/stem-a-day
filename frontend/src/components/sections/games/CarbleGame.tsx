@@ -17,6 +17,7 @@ import PeriodicTable from "@/components/sections/games/PeriodicTable";
 import React from "react";
 import StemLink from "@/components/ui/StemLink";
 import Collapsible from "@/components/ui/Collapsible";
+import { claimGameReward } from "@/lib/game-rewards";
 
 interface Props {
     yellowRange: ElementRange;
@@ -52,7 +53,6 @@ export default function CarbleGame({
     const [rewardAmount, setRewardAmount] = useState(0);
     const [rewardStatus, setRewardStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
     const [rewardMessage, setRewardMessage] = useState("");
-
     const startNewGame = () => {
         const sAndPElements = elementsData.filter((e) => e.block !== "d" && e.block !== "f");
         const randomIndex = Math.floor(Math.random() * sAndPElements.length);
@@ -94,33 +94,24 @@ export default function CarbleGame({
         return matches;
     }, [input]);
 
-    async function awardGlucose(amount: number) {
-        setRewardAmount(amount);
+    async function awardGlucose() {
         setRewardPopupOpen(true);
         setRewardStatus("loading");
         setRewardMessage("");
+        const rewardAmount =
+            guessFormat === Guess.EasyGuess ? 15 : 35;
+        setRewardAmount(rewardAmount);
 
-        try {
-            const r = await fetch("/api/glucose/add", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount }),
-            });
-
-            const data = await r.json().catch(() => ({}));
-
-            if (!r.ok) {
-                setRewardStatus("error");
-                setRewardMessage(data?.message ?? data?.detail ?? "Failed to add glucose.");
-                return;
-            }
-
-            setRewardStatus("ok");
-            setRewardMessage(`You earned ${amount} glucose!`);
-        } catch {
+        const result = await claimGameReward(rewardAmount);
+        if (!result.ok) {
             setRewardStatus("error");
-            setRewardMessage("Network error. Could not update glucose.");
+            setRewardMessage(result.message);
+            return;
         }
+
+        setRewardAmount(result.rewardGlucose);
+        setRewardStatus("ok");
+        setRewardMessage(result.message);
     }
 
     const guessLength = guessFormat == Guess.EasyGuess ? 8 : 16;
@@ -162,8 +153,7 @@ export default function CarbleGame({
             setWon(true);
             setGameOver(true);
 
-            const glucoseEarned = guessFormat === Guess.EasyGuess ? 15 : 35;
-            void awardGlucose(glucoseEarned);
+            void awardGlucose();
         } else if (guesses.length + 1 >= guessLength) {
             setGameOver(true);
         }
