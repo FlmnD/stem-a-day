@@ -10,9 +10,9 @@ const H = ROWS * CELL;
 const TICK_MS = 55;
 const GLUCOSE_REWARD = 20;
 const DROPLET_RADIUS = 7;
-const MAX_VISIBLE_DROPLETS = 26;
-const SPAWN_EVERY_TICKS = 3;
-const STUCK_TICKS_BEFORE_FADE = 18;
+const MAX_VISIBLE_DROPLETS = 12;
+const SPAWN_EVERY_TICKS = 4;
+const STUCK_TICKS_BEFORE_FADE = 9;
 const DIG_BRUSH_RADIUS = CELL * 0.72;
 
 type CellKind = "dirt" | "empty" | "source" | "tub";
@@ -62,6 +62,13 @@ interface TunnelMaskShape {
   height: number;
   rx: number;
   ry: number;
+}
+
+interface ResultModalState {
+  type: "next" | "final" | "lose";
+  title: string;
+  body: string;
+  actionLabel: string;
 }
 
 interface LevelDef {
@@ -209,10 +216,6 @@ function randomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function shuffle<T>(items: T[]) {
-  return [...items].sort(() => Math.random() - 0.5);
-}
-
 function buildDuckSeeds(orbitals: OrbitalSpec[]): DuckSeed[] {
   let sequence = 1;
   return orbitals.flatMap(({ subshell, count }) =>
@@ -239,62 +242,53 @@ function initGrid(layout: LevelLayout): Cell[] {
   return grid;
 }
 
-function buildRandomLayout(level: LevelDef): LevelLayout {
-  const sourceCol = randomInt(2, COLS - 3);
+function getWaterBudget(level: LevelDef) {
+  const duckCount = level.orbitals.reduce((sum, orbital) => sum + orbital.count, 0);
+  return level.tubGoal + Math.ceil(duckCount * 0.5) + 5;
+}
+
+function buildLevelLayout(level: LevelDef): LevelLayout {
   const sourceRow = 0;
-  const tubWidth = 5;
-  const tubStart = randomInt(1, COLS - tubWidth - 1);
-  const tubCols: [number, number] = [tubStart, tubStart + tubWidth - 1];
   const tubRows: [number, number] = [12, 15];
-  const gatorFacing: -1 | 1 = Math.random() < 0.5 ? -1 : 1;
-
+  const tubWidth = 6;
   const seeds = buildDuckSeeds(level.orbitals);
+  const slotsPerRow = seeds.length > 14 ? 3 : 2;
+  const rowsNeeded = Math.ceil(seeds.length / slotsPerRow);
+  const baseColumns = slotsPerRow === 3 ? [4, 10, 16] : [6, 15];
+  const rowOffsets = [0, 1, -1, 0, 1, -1];
+  const rowPositions =
+    rowsNeeded === 1
+      ? [5]
+      : Array.from({ length: rowsNeeded }, (_, rowIndex) =>
+          Math.round(2 + (rowIndex / (rowsNeeded - 1)) * 8)
+        );
+
   const placed: Duck[] = [];
-  const allCells: Array<{ col: number; row: number }> = [];
 
-  for (let row = 2; row <= 11; row++) {
-    for (let col = 1; col <= COLS - 2; col++) {
-      const inTubLane =
-        row >= tubRows[0] - 1 &&
-        col >= tubCols[0] - 1 &&
-        col <= tubCols[1] + 1;
-      const tooCloseToSource = row <= 2 && Math.abs(col - sourceCol) <= 1;
-      if (!inTubLane && !tooCloseToSource) {
-        allCells.push({ col, row });
-      }
-    }
-  }
+  rowPositions.forEach((row, rowIndex) => {
+    const offset = rowOffsets[rowIndex % rowOffsets.length];
+    const lane = baseColumns.map((column) => Math.max(2, Math.min(COLS - 3, column + offset)));
+    const orderedLane = rowIndex % 2 === 0 ? lane : [...lane].reverse();
 
-  const shuffledCells = shuffle(allCells);
+    orderedLane.forEach((col) => {
+      const seed = seeds[placed.length];
+      if (!seed) return;
 
-  for (let index = 0; index < seeds.length; index++) {
-    const seed = seeds[index];
-    const progress = seeds.length === 1 ? 0.5 : index / (seeds.length - 1);
-    const preferredRow = 2 + Math.floor(progress * 9);
-
-    const strictCandidate = shuffledCells.find(({ col, row }) => {
-      return (
-        Math.abs(row - preferredRow) <= 2 &&
-        placed.every((duck) => Math.max(Math.abs(duck.col - col), Math.abs(duck.row - row)) > 1)
-      );
-    });
-
-    const looseCandidate =
-      strictCandidate ??
-      shuffledCells.find(({ col, row }) => {
-        return placed.every((duck) => duck.col !== col || duck.row !== row);
+      placed.push({
+        ...seed,
+        col,
+        row,
+        color: SUBSHELL_COLORS[seed.subshell],
+        collected: false,
       });
-
-    const fallback = looseCandidate ?? { col: 2 + (index % (COLS - 4)), row: 2 + Math.floor(index / (COLS - 4)) };
-
-    placed.push({
-      ...seed,
-      col: fallback.col,
-      row: fallback.row,
-      color: SUBSHELL_COLORS[seed.subshell],
-      collected: false,
     });
-  }
+  });
+
+  const sourceCol = placed[0]?.col ?? 4;
+  const lastDuckCol = placed[placed.length - 1]?.col ?? 15;
+  const tubStart = Math.max(1, Math.min(COLS - tubWidth - 1, lastDuckCol - Math.floor(tubWidth / 2)));
+  const tubCols: [number, number] = [tubStart, tubStart + tubWidth - 1];
+  const gatorFacing: -1 | 1 = tubStart + tubWidth / 2 > COLS / 2 ? -1 : 1;
 
   return {
     sourceCol,
@@ -374,6 +368,7 @@ export default function WheresMyWaterGame() {
   const [droplets, setDroplets] = useState<Droplet[]>([]);
   const [flowing, setFlowing] = useState(false);
   const [won, setWon] = useState(false);
+  const [lost, setLost] = useState(false);
   const [msg, setMsg] = useState("");
   const [rejId, setRejId] = useState<string | null>(null);
   const [undoStack, setUndoStack] = useState<Cell[][]>([]);
@@ -381,19 +376,23 @@ export default function WheresMyWaterGame() {
   const [showIntro, setShowIntro] = useState(true);
   const [seenIntro, setSeenIntro] = useState(false);
   const [tubFill, setTubFill] = useState(0);
-  const [rewardOpen, setRewardOpen] = useState(false);
+  const [waterLeft, setWaterLeft] = useState(0);
   const [rewardAmt, setRewardAmt] = useState(0);
   const [rewardStatus, setRewardStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [rewardMsg, setRewardMsg] = useState("");
   const [rewardClaimed, setRewardClaimed] = useState(false);
+  const [pendingResult, setPendingResult] = useState(false);
+  const [resultModal, setResultModal] = useState<ResultModalState | null>(null);
 
   const svgRef = useRef<SVGSVGElement>(null);
   const tickRef = useRef<NodeJS.Timeout | null>(null);
   const rejectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resultTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const gridRef = useRef<Cell[]>([]);
   const ducksRef = useRef<Duck[]>([]);
   const dropletsRef = useRef<Droplet[]>([]);
   const tubFillRef = useRef(0);
+  const waterLeftRef = useRef(0);
   const spawnCounterRef = useRef(0);
   const dropletIdRef = useRef(1);
   const draggingRef = useRef(false);
@@ -407,22 +406,31 @@ export default function WheresMyWaterGame() {
   ducksRef.current = ducks;
   dropletsRef.current = droplets;
   tubFillRef.current = tubFill;
+  waterLeftRef.current = waterLeft;
 
   const initLevel = useCallback(
     (nextLevel: LevelDef) => {
       if (tickRef.current) clearInterval(tickRef.current);
-      const nextLayout = buildRandomLayout(nextLevel);
+      if (resultTimeoutRef.current) clearTimeout(resultTimeoutRef.current);
+      const nextLayout = buildLevelLayout(nextLevel);
+      const nextWaterBudget = getWaterBudget(nextLevel);
 
       setLayout(nextLayout);
       setGrid(initGrid(nextLayout));
-      setDucks(nextLayout.ducks);
+      setDucks(nextLayout.ducks.map((duck) => ({ ...duck, collected: false })));
       setDroplets([]);
       setFlowing(false);
       setWon(false);
+      setLost(false);
       setTubFill(0);
+      setWaterLeft(nextWaterBudget);
       setUndoStack([]);
+      setPendingResult(false);
+      setResultModal(null);
       setMsg("");
       setRejId(null);
+      setRewardStatus("idle");
+      setRewardMsg("");
       spawnCounterRef.current = 0;
       dropletIdRef.current = 1;
       draggingRef.current = false;
@@ -441,6 +449,7 @@ export default function WheresMyWaterGame() {
     return () => {
       if (tickRef.current) clearInterval(tickRef.current);
       if (rejectTimeoutRef.current) clearTimeout(rejectTimeoutRef.current);
+      if (resultTimeoutRef.current) clearTimeout(resultTimeoutRef.current);
     };
   }, []);
 
@@ -449,9 +458,104 @@ export default function WheresMyWaterGame() {
     [ducks]
   );
 
+  const dugCellCount = useMemo(
+    () => grid.reduce((count, cell) => count + (cell.kind === "empty" ? 1 : 0), 0),
+    [grid]
+  );
+  const hasStartedDigging = dugCellCount > 0;
   const tubRatio = Math.min(1, tubFill / level.tubGoal);
-  const collectedLabels = ducks.filter((duck) => duck.collected).map((duck) => duck.label);
-  const canUndo = undoStack.length > 0 && !flowing && !won;
+  const canUndo = undoStack.length > 0 && !flowing && !won && !lost;
+  const buttonsLocked = showIntro || pendingResult || !!resultModal;
+  const startDisabled = buttonsLocked || !hasStartedDigging || flowing || won || lost;
+  const resetDisabled = buttonsLocked || !hasStartedDigging || won;
+  const undoDisabled = buttonsLocked || !canUndo;
+  const howToDisabled = showIntro || pendingResult || !!resultModal;
+
+  const scheduleResultModal = useCallback((modal: ResultModalState) => {
+    if (resultTimeoutRef.current) clearTimeout(resultTimeoutRef.current);
+    setPendingResult(true);
+    resultTimeoutRef.current = setTimeout(() => {
+      setPendingResult(false);
+      setResultModal(modal);
+    }, 2000);
+  }, []);
+
+  const resetAttempt = useCallback(() => {
+    if (!layout) return;
+    if (tickRef.current) clearInterval(tickRef.current);
+    if (resultTimeoutRef.current) clearTimeout(resultTimeoutRef.current);
+
+    setGrid(initGrid(layout));
+    setDucks(layout.ducks.map((duck) => ({ ...duck, collected: false })));
+    setDroplets([]);
+    setFlowing(false);
+    setWon(false);
+    setLost(false);
+    setTubFill(0);
+    setWaterLeft(getWaterBudget(level));
+    setUndoStack([]);
+    setPendingResult(false);
+    setResultModal(null);
+    setMsg("");
+    setRejId(null);
+    setRewardStatus("idle");
+    setRewardMsg("");
+    spawnCounterRef.current = 0;
+    dropletIdRef.current = 1;
+    draggingRef.current = false;
+    lastPointerRef.current = null;
+    strokeSnapshotRef.current = null;
+    strokeChangedRef.current = false;
+  }, [layout, level]);
+
+  const concludeRound = useCallback(
+    (result: "win" | "lose", reason: string, nextDucks: Duck[], nextTubFill: number) => {
+      if (tickRef.current) clearInterval(tickRef.current);
+
+      setFlowing(false);
+      setDucks(nextDucks);
+      setDroplets([]);
+      setTubFill(nextTubFill);
+      setMsg(reason);
+
+      if (result === "win") {
+        setWon(true);
+        setLost(false);
+
+        if (lvIdx === LEVELS.length - 1) {
+          scheduleResultModal({
+            type: "final",
+            title: "You win!",
+            body: `You cleared every electron configuration level, including ${level.elementName} (${level.symbol}).`,
+            actionLabel: "Play again",
+          });
+
+          if (!rewardClaimed) {
+            setRewardClaimed(true);
+            void awardGlucose(GLUCOSE_REWARD);
+          }
+        } else {
+          scheduleResultModal({
+            type: "next",
+            title: `${level.elementName} cleared`,
+            body: `You collected every orbital duck and filled the tub.`,
+            actionLabel: "Next level",
+          });
+        }
+        return;
+      }
+
+      setWon(false);
+      setLost(true);
+      scheduleResultModal({
+        type: "lose",
+        title: "Try again",
+        body: reason,
+        actionLabel: "Reset level",
+      });
+    },
+    [awardGlucose, level.elementName, level.symbol, lvIdx, rewardClaimed, scheduleResultModal]
+  );
 
   const carveStrokeSegment = useCallback((from: BoardPoint, to: BoardPoint) => {
     let changed = false;
@@ -545,7 +649,6 @@ export default function WheresMyWaterGame() {
 
   const awardGlucose = useCallback(async (amount: number) => {
     setRewardAmt(amount);
-    setRewardOpen(true);
     setRewardStatus("loading");
     setRewardMsg("");
 
@@ -572,7 +675,7 @@ export default function WheresMyWaterGame() {
   }, []);
 
   useEffect(() => {
-    if (!flowing || won || !layout) return;
+    if (!flowing || won || lost || !layout) return;
 
     tickRef.current = setInterval(() => {
       const currentGrid = gridRef.current;
@@ -583,6 +686,7 @@ export default function WheresMyWaterGame() {
       const nextDucks = currentDucks.map((duck) => ({ ...duck }));
       const nextDroplets: Droplet[] = [];
       let nextTubFill = tubFillRef.current;
+      let nextWaterLeft = waterLeftRef.current;
       let nextMessage = "";
       let nextRejectedId: string | null = null;
       const occupancy = new Map<string, number>();
@@ -674,8 +778,13 @@ export default function WheresMyWaterGame() {
       }
 
       spawnCounterRef.current += 1;
-      if (spawnCounterRef.current >= SPAWN_EVERY_TICKS && nextDroplets.length < MAX_VISIBLE_DROPLETS) {
+      if (
+        nextWaterLeft > 0 &&
+        spawnCounterRef.current >= SPAWN_EVERY_TICKS &&
+        nextDroplets.length < MAX_VISIBLE_DROPLETS
+      ) {
         nextDroplets.push(createDroplet(layout, dropletIdRef.current++));
+        nextWaterLeft -= 1;
         spawnCounterRef.current = 0;
       }
 
@@ -700,29 +809,39 @@ export default function WheresMyWaterGame() {
       if (nextTubFill !== tubFillRef.current) {
         setTubFill(nextTubFill);
       }
+      if (nextWaterLeft !== waterLeftRef.current) {
+        setWaterLeft(nextWaterLeft);
+      }
 
       setDroplets(nextDroplets);
 
       const allCollected = nextDucks.every((duck) => duck.collected);
       if (allCollected && nextTubFill >= level.tubGoal) {
-        if (tickRef.current) clearInterval(tickRef.current);
-        setWon(true);
-        setFlowing(false);
-        setDucks(nextDucks);
-        setDroplets(nextDroplets);
-        setMsg(`${level.elementName} (${level.symbol}) complete.`);
+        concludeRound(
+          "win",
+          `${level.elementName} (${level.symbol}) complete.`,
+          nextDucks,
+          nextTubFill
+        );
+        return;
+      }
 
-        if (!rewardClaimed && lvIdx === LEVELS.length - 1) {
-          setRewardClaimed(true);
-          void awardGlucose(GLUCOSE_REWARD);
-        }
+      if (nextWaterLeft <= 0 && nextDroplets.length === 0) {
+        const remainingDuck = nextDucks.find((duck) => !duck.collected);
+        const reason = !allCollected && nextTubFill < level.tubGoal
+          ? `You ran out of water before collecting every duck and filling the tub. Next required duck: ${remainingDuck?.label ?? "none"}.`
+          : !allCollected
+            ? `You ran out of water before collecting every duck. Next required duck: ${remainingDuck?.label ?? "none"}.`
+            : `You collected all ducks, but only ${nextTubFill}/${level.tubGoal} water reached the tub.`;
+
+        concludeRound("lose", reason, nextDucks, nextTubFill);
       }
     }, TICK_MS);
 
     return () => {
       if (tickRef.current) clearInterval(tickRef.current);
     };
-  }, [awardGlucose, flowing, layout, lvIdx, rewardClaimed, won, level]);
+  }, [concludeRound, flowing, layout, lost, won, level]);
 
   const tunnelMaskShapes = useMemo(() => {
     const isOpenCell = (col: number, row: number) => {
@@ -814,46 +933,49 @@ export default function WheresMyWaterGame() {
           </p>
         </div>
 
+        <div className="mb-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-sm font-semibold text-slate-600 dark:text-slate-300">
+          <span>{level.elementName} ({level.symbol})</span>
+          <span>Target {level.targetConfig}</span>
+          <span>Next {nextRequiredDuck ? nextRequiredDuck.label : won ? "Level clear" : "Fill tub"}</span>
+          <span>Tub {Math.min(tubFill, level.tubGoal)}/{level.tubGoal}</span>
+          <span>Water {waterLeft}</span>
+        </div>
+
         <div className="mb-4 flex flex-wrap items-center justify-center gap-3">
-          {!flowing && !won && (
+          {!flowing && !won && !lost && (
             <button
               onClick={() => {
                 setFlowing(true);
-                setMsg("Flow started.");
+                setMsg("Water released.");
               }}
-              className="rounded-2xl bg-sky-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-sky-700 dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400"
+              disabled={startDisabled}
+              className="rounded-2xl bg-sky-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400"
             >
               Start Flow
             </button>
           )}
           <button
-            onClick={() => initLevel(level)}
-            className="rounded-2xl bg-amber-500 px-5 py-2.5 text-sm font-bold text-white hover:bg-amber-600 dark:bg-amber-400 dark:text-black dark:hover:bg-amber-300"
+            onClick={resetAttempt}
+            disabled={resetDisabled}
+            className="rounded-2xl bg-amber-500 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-amber-400 dark:text-black dark:hover:bg-amber-300"
           >
             Reset Level
           </button>
           <button
             onClick={undoLastDig}
-            disabled={!canUndo}
+            disabled={undoDisabled}
             className="rounded-2xl bg-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-300 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
           >
             Undo Dig
           </button>
-          {won && lvIdx < LEVELS.length - 1 && (
-            <button
-              onClick={() => setLvIdx((current) => current + 1)}
-              className="rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400"
-            >
-              Next Level
-            </button>
-          )}
           {seenIntro && (
             <button
               onClick={() => {
                 setIntroStep(0);
                 setShowIntro(true);
               }}
-              className="rounded-2xl bg-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+              disabled={howToDisabled}
+              className="rounded-2xl bg-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-300 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
             >
               How to Play
             </button>
@@ -869,16 +991,8 @@ export default function WheresMyWaterGame() {
           )}
         </div>
 
-        <div className="mx-auto flex w-full max-w-[1320px] flex-col gap-5 xl:flex-row xl:items-start">
-          <div className="flex min-w-0 flex-1 flex-col gap-3">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-950/70">
-              <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                {level.title}
-              </div>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{level.hint}</p>
-            </div>
-
-            <div className="relative w-full overflow-hidden rounded-2xl border-4 border-[#3f2e1a]" style={{ aspectRatio: `${W} / ${H}` }}>
+        <div className="mx-auto w-full max-w-[1320px]">
+          <div className="relative w-full overflow-hidden rounded-2xl border-4 border-[#3f2e1a]" style={{ aspectRatio: `${W} / ${H}` }}>
               {showIntro && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
                   <div className="w-full max-w-md rounded-3xl border border-slate-700 bg-slate-950/95 p-6 text-center text-white shadow-2xl">
@@ -1083,111 +1197,135 @@ export default function WheresMyWaterGame() {
                 )}
                 <g filter="url(#softShadow)">
                   <g transform={`translate(${layout.gatorFacing === -1 ? tubX + tubW : tubX}, 0) scale(${layout.gatorFacing}, 1)`}>
-                    <path
-                      d={`
-                        M ${tubW * 0.18} ${tubY + tubH * 0.63}
-                        C ${tubW * 0.1} ${tubY + tubH * 0.58}, ${tubW * 0.12} ${tubY + tubH * 0.42}, ${tubW * 0.24} ${tubY + tubH * 0.38}
-                        C ${tubW * 0.36} ${tubY + tubH * 0.31}, ${tubW * 0.52} ${tubY + tubH * 0.28}, ${tubW * 0.68} ${tubY + tubH * 0.34}
-                        C ${tubW * 0.8} ${tubY + tubH * 0.39}, ${tubW * 0.92} ${tubY + tubH * 0.48}, ${tubW * 0.9} ${tubY + tubH * 0.58}
-                        C ${tubW * 0.88} ${tubY + tubH * 0.7}, ${tubW * 0.68} ${tubY + tubH * 0.77}, ${tubW * 0.45} ${tubY + tubH * 0.76}
-                        C ${tubW * 0.29} ${tubY + tubH * 0.75}, ${tubW * 0.18} ${tubY + tubH * 0.71}, ${tubW * 0.18} ${tubY + tubH * 0.63}
-                      `}
-                      fill="url(#gatorFill)"
-                    />
-                    <path
-                      d={`
-                        M ${tubW * 0.26} ${tubY + tubH * 0.67}
-                        C ${tubW * 0.36} ${tubY + tubH * 0.58}, ${tubW * 0.53} ${tubY + tubH * 0.56}, ${tubW * 0.71} ${tubY + tubH * 0.62}
-                        C ${tubW * 0.6} ${tubY + tubH * 0.73}, ${tubW * 0.42} ${tubY + tubH * 0.76}, ${tubW * 0.26} ${tubY + tubH * 0.67}
-                      `}
-                      fill="url(#gatorBellyFill)"
-                      opacity={0.95}
-                    />
-                    <path
-                      d={`
-                        M ${tubW * 0.58} ${tubY + tubH * 0.42}
-                        C ${tubW * 0.73} ${tubY + tubH * 0.34}, ${tubW * 0.89} ${tubY + tubH * 0.36}, ${tubW * 0.98} ${tubY + tubH * 0.49}
-                        C ${tubW * 0.93} ${tubY + tubH * 0.55}, ${tubW * 0.82} ${tubY + tubH * 0.56}, ${tubW * 0.69} ${tubY + tubH * 0.53}
-                        C ${tubW * 0.63} ${tubY + tubH * 0.51}, ${tubW * 0.58} ${tubY + tubH * 0.48}, ${tubW * 0.58} ${tubY + tubH * 0.42}
-                      `}
-                      fill="url(#gatorJawFill)"
-                    />
-                    <path
-                      d={`
-                        M ${tubW * 0.59} ${tubY + tubH * 0.54}
-                        C ${tubW * 0.73} ${tubY + tubH * 0.58}, ${tubW * 0.89} ${tubY + tubH * 0.6}, ${tubW * 0.97} ${tubY + tubH * 0.69}
-                        C ${tubW * 0.86} ${tubY + tubH * 0.76}, ${tubW * 0.7} ${tubY + tubH * 0.73}, ${tubW * 0.61} ${tubY + tubH * 0.65}
-                        C ${tubW * 0.58} ${tubY + tubH * 0.61}, ${tubW * 0.57} ${tubY + tubH * 0.58}, ${tubW * 0.59} ${tubY + tubH * 0.54}
-                      `}
-                      fill="#22c55e"
-                    />
-                    <path
-                      d={`M ${tubW * 0.62} ${tubY + tubH * 0.56} C ${tubW * 0.77} ${tubY + tubH * 0.55}, ${tubW * 0.88} ${tubY + tubH * 0.58}, ${tubW * 0.96} ${tubY + tubH * 0.62}`}
-                      fill="none"
-                      stroke="#0f172a"
-                      strokeWidth={2.2}
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d={`M ${tubW * 0.54} ${tubY + tubH * 0.39} C ${tubW * 0.61} ${tubY + tubH * 0.3}, ${tubW * 0.7} ${tubY + tubH * 0.29}, ${tubW * 0.78} ${tubY + tubH * 0.34}`}
-                      fill="none"
-                      stroke="#14532d"
-                      strokeWidth={7}
-                      strokeLinecap="round"
-                    />
-                    <ellipse cx={tubW * 0.67} cy={tubY + tubH * 0.39} rx={8.5} ry={6.5} fill="#ecfccb" />
-                    <circle cx={tubW * 0.675} cy={tubY + tubH * 0.392} r={3.1} fill="#14532d" />
-                    <circle cx={tubW * 0.679} cy={tubY + tubH * 0.388} r={1.1} fill="white" opacity={0.9} />
-                    <ellipse cx={tubW * 0.9} cy={tubY + tubH * 0.45} rx={3.1} ry={1.9} fill="#14532d" opacity={0.75} />
-                    <ellipse cx={tubW * 0.86} cy={tubY + tubH * 0.42} rx={2.7} ry={1.7} fill="#14532d" opacity={0.75} />
-                    {[0, 1, 2, 3].map((scale) => (
+                    <g>
+                      <animateTransform
+                        attributeName="transform"
+                        type="translate"
+                        values="0 0; 0 -3; 0 0"
+                        dur="2.6s"
+                        repeatCount="indefinite"
+                      />
                       <path
-                        key={`scale-${scale}`}
                         d={`
-                          M ${tubW * (0.33 + scale * 0.09)} ${tubY + tubH * (0.35 - (scale % 2) * 0.015)}
-                          L ${tubW * (0.37 + scale * 0.09)} ${tubY + tubH * (0.24 - (scale % 2) * 0.012)}
-                          L ${tubW * (0.41 + scale * 0.09)} ${tubY + tubH * (0.35 - (scale % 2) * 0.015)}
+                          M ${tubW * 0.18} ${tubY + tubH * 0.63}
+                          C ${tubW * 0.1} ${tubY + tubH * 0.58}, ${tubW * 0.12} ${tubY + tubH * 0.42}, ${tubW * 0.24} ${tubY + tubH * 0.38}
+                          C ${tubW * 0.36} ${tubY + tubH * 0.31}, ${tubW * 0.52} ${tubY + tubH * 0.28}, ${tubW * 0.68} ${tubY + tubH * 0.34}
+                          C ${tubW * 0.8} ${tubY + tubH * 0.39}, ${tubW * 0.92} ${tubY + tubH * 0.48}, ${tubW * 0.9} ${tubY + tubH * 0.58}
+                          C ${tubW * 0.88} ${tubY + tubH * 0.7}, ${tubW * 0.68} ${tubY + tubH * 0.77}, ${tubW * 0.45} ${tubY + tubH * 0.76}
+                          C ${tubW * 0.29} ${tubY + tubH * 0.75}, ${tubW * 0.18} ${tubY + tubH * 0.71}, ${tubW * 0.18} ${tubY + tubH * 0.63}
                         `}
-                        fill="#166534"
-                        opacity={0.9}
+                        fill="url(#gatorFill)"
                       />
-                    ))}
-                    {[0, 1, 2, 3].map((tooth) => (
-                      <polygon
-                        key={`top-tooth-${tooth}`}
-                        points={`${tubW * (0.71 + tooth * 0.055)},${tubY + tubH * 0.57} ${tubW * (0.725 + tooth * 0.055)},${tubY + tubH * 0.65} ${tubW * (0.74 + tooth * 0.055)},${tubY + tubH * 0.57}`}
-                        fill="white"
+                      <path
+                        d={`
+                          M ${tubW * 0.26} ${tubY + tubH * 0.67}
+                          C ${tubW * 0.36} ${tubY + tubH * 0.58}, ${tubW * 0.53} ${tubY + tubH * 0.56}, ${tubW * 0.71} ${tubY + tubH * 0.62}
+                          C ${tubW * 0.6} ${tubY + tubH * 0.73}, ${tubW * 0.42} ${tubY + tubH * 0.76}, ${tubW * 0.26} ${tubY + tubH * 0.67}
+                        `}
+                        fill="url(#gatorBellyFill)"
+                        opacity={0.95}
                       />
-                    ))}
-                    {[0, 1, 2].map((tooth) => (
-                      <polygon
-                        key={`bottom-tooth-${tooth}`}
-                        points={`${tubW * (0.74 + tooth * 0.06)},${tubY + tubH * 0.61} ${tubW * (0.755 + tooth * 0.06)},${tubY + tubH * 0.53} ${tubW * (0.77 + tooth * 0.06)},${tubY + tubH * 0.61}`}
-                        fill="#f8fafc"
+                      <path
+                        d={`
+                          M ${tubW * 0.58} ${tubY + tubH * 0.42}
+                          C ${tubW * 0.73} ${tubY + tubH * 0.34}, ${tubW * 0.89} ${tubY + tubH * 0.36}, ${tubW * 0.98} ${tubY + tubH * 0.49}
+                          C ${tubW * 0.93} ${tubY + tubH * 0.55}, ${tubW * 0.82} ${tubY + tubH * 0.56}, ${tubW * 0.69} ${tubY + tubH * 0.53}
+                          C ${tubW * 0.63} ${tubY + tubH * 0.51}, ${tubW * 0.58} ${tubY + tubH * 0.48}, ${tubW * 0.58} ${tubY + tubH * 0.42}
+                        `}
+                        fill="url(#gatorJawFill)"
                       />
+                      <path
+                        d={`
+                          M ${tubW * 0.59} ${tubY + tubH * 0.54}
+                          C ${tubW * 0.73} ${tubY + tubH * 0.58}, ${tubW * 0.89} ${tubY + tubH * 0.6}, ${tubW * 0.97} ${tubY + tubH * 0.69}
+                          C ${tubW * 0.86} ${tubY + tubH * 0.76}, ${tubW * 0.7} ${tubY + tubH * 0.73}, ${tubW * 0.61} ${tubY + tubH * 0.65}
+                          C ${tubW * 0.58} ${tubY + tubH * 0.61}, ${tubW * 0.57} ${tubY + tubH * 0.58}, ${tubW * 0.59} ${tubY + tubH * 0.54}
+                        `}
+                        fill="#22c55e"
+                      />
+                      <path
+                        d={`M ${tubW * 0.62} ${tubY + tubH * 0.56} C ${tubW * 0.77} ${tubY + tubH * 0.55}, ${tubW * 0.88} ${tubY + tubH * 0.58}, ${tubW * 0.96} ${tubY + tubH * 0.62}`}
+                        fill="none"
+                        stroke="#0f172a"
+                        strokeWidth={2.2}
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d={`M ${tubW * 0.54} ${tubY + tubH * 0.39} C ${tubW * 0.61} ${tubY + tubH * 0.3}, ${tubW * 0.7} ${tubY + tubH * 0.29}, ${tubW * 0.78} ${tubY + tubH * 0.34}`}
+                        fill="none"
+                        stroke="#14532d"
+                        strokeWidth={7}
+                        strokeLinecap="round"
+                      />
+                      <ellipse cx={tubW * 0.67} cy={tubY + tubH * 0.39} rx={8.5} ry={6.5} fill="#ecfccb">
+                        <animate attributeName="ry" values="6.5;6.5;6.5;1.1;6.5;6.5" dur="4s" repeatCount="indefinite" />
+                      </ellipse>
+                      <circle cx={tubW * 0.675} cy={tubY + tubH * 0.392} r={3.1} fill="#14532d" />
+                      <circle cx={tubW * 0.679} cy={tubY + tubH * 0.388} r={1.1} fill="white" opacity={0.9} />
+                      <ellipse cx={tubW * 0.9} cy={tubY + tubH * 0.45} rx={3.1} ry={1.9} fill="#14532d" opacity={0.75} />
+                      <ellipse cx={tubW * 0.86} cy={tubY + tubH * 0.42} rx={2.7} ry={1.7} fill="#14532d" opacity={0.75} />
+                      {[0, 1, 2, 3].map((scale) => (
+                        <path
+                          key={`scale-${scale}`}
+                          d={`
+                            M ${tubW * (0.33 + scale * 0.09)} ${tubY + tubH * (0.35 - (scale % 2) * 0.015)}
+                            L ${tubW * (0.37 + scale * 0.09)} ${tubY + tubH * (0.24 - (scale % 2) * 0.012)}
+                            L ${tubW * (0.41 + scale * 0.09)} ${tubY + tubH * (0.35 - (scale % 2) * 0.015)}
+                          `}
+                          fill="#166534"
+                          opacity={0.9}
+                        />
+                      ))}
+                      {[0, 1, 2, 3].map((tooth) => (
+                        <polygon
+                          key={`top-tooth-${tooth}`}
+                          points={`${tubW * (0.71 + tooth * 0.055)},${tubY + tubH * 0.57} ${tubW * (0.725 + tooth * 0.055)},${tubY + tubH * 0.65} ${tubW * (0.74 + tooth * 0.055)},${tubY + tubH * 0.57}`}
+                          fill="white"
+                        />
+                      ))}
+                      {[0, 1, 2].map((tooth) => (
+                        <polygon
+                          key={`bottom-tooth-${tooth}`}
+                          points={`${tubW * (0.74 + tooth * 0.06)},${tubY + tubH * 0.61} ${tubW * (0.755 + tooth * 0.06)},${tubY + tubH * 0.53} ${tubW * (0.77 + tooth * 0.06)},${tubY + tubH * 0.61}`}
+                          fill="#f8fafc"
+                        />
+                      ))}
+                      <path
+                        d={`M ${tubW * 0.29} ${tubY + tubH * 0.72} C ${tubW * 0.26} ${tubY + tubH * 0.82}, ${tubW * 0.25} ${tubY + tubH * 0.88}, ${tubW * 0.3} ${tubY + tubH * 0.92}`}
+                        fill="none"
+                        stroke="#166534"
+                        strokeWidth={6}
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d={`M ${tubW * 0.44} ${tubY + tubH * 0.73} C ${tubW * 0.42} ${tubY + tubH * 0.83}, ${tubW * 0.42} ${tubY + tubH * 0.88}, ${tubW * 0.47} ${tubY + tubH * 0.92}`}
+                        fill="none"
+                        stroke="#166534"
+                        strokeWidth={6}
+                        strokeLinecap="round"
+                      />
+                    </g>
+                    {Array.from({ length: 3 }, (_, bubble) => (
+                      <circle
+                        key={`bubble-${bubble}`}
+                        cx={tubW * (0.28 + bubble * 0.12)}
+                        cy={tubY + tubH * 0.8}
+                        r={4 - bubble * 0.6}
+                        fill="#e0f2fe"
+                        opacity={0.75}
+                      >
+                        <animate attributeName="cy" values={`${tubY + tubH * 0.82};${tubY + tubH * (0.56 - bubble * 0.04)};${tubY + tubH * 0.82}`} dur={`${2 + bubble * 0.4}s`} begin={`${bubble * 0.35}s`} repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0;0.8;0" dur={`${2 + bubble * 0.4}s`} begin={`${bubble * 0.35}s`} repeatCount="indefinite" />
+                      </circle>
                     ))}
-                    <path
-                      d={`M ${tubW * 0.29} ${tubY + tubH * 0.72} C ${tubW * 0.26} ${tubY + tubH * 0.82}, ${tubW * 0.25} ${tubY + tubH * 0.88}, ${tubW * 0.3} ${tubY + tubH * 0.92}`}
-                      fill="none"
-                      stroke="#166534"
-                      strokeWidth={6}
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d={`M ${tubW * 0.44} ${tubY + tubH * 0.73} C ${tubW * 0.42} ${tubY + tubH * 0.83}, ${tubW * 0.42} ${tubY + tubH * 0.88}, ${tubW * 0.47} ${tubY + tubH * 0.92}`}
-                      fill="none"
-                      stroke="#166534"
-                      strokeWidth={6}
-                      strokeLinecap="round"
-                    />
                   </g>
                   <text
                     x={tubX + tubW / 2}
-                    y={tubY - 16}
+                    y={tubY + tubH - 10}
                     textAnchor="middle"
-                    fontSize={12}
+                    fontSize={18}
                     fontWeight={900}
-                    fill="#15803d"
+                    fill="#0f172a"
                   >
                     {level.elementName} ({level.symbol})
                   </text>
@@ -1216,7 +1354,9 @@ export default function WheresMyWaterGame() {
                     r={13}
                     fill="#38bdf8"
                   >
-                    <animate attributeName="r" values="11;14;11" dur="1.6s" repeatCount="indefinite" />
+                    {flowing && waterLeft > 0 && (
+                      <animate attributeName="r" values="11;14;11" dur="1.6s" repeatCount="indefinite" />
+                    )}
                   </circle>
                   <text
                     x={(layout.sourceCol + 0.5) * CELL}
@@ -1307,156 +1447,49 @@ export default function WheresMyWaterGame() {
                     </circle>
                   ))}
               </svg>
-            </div>
-          </div>
-
-          <div className="flex w-full shrink-0 flex-col gap-4 xl:w-[270px]">
-            <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
-              <div className="text-xs font-black uppercase tracking-widest text-slate-400">Element</div>
-              <div className="mt-2 text-lg font-black text-slate-900 dark:text-slate-100">
-                {level.elementName} ({level.symbol})
-              </div>
-              <div className="mt-2 text-xs font-semibold text-amber-600 dark:text-amber-400">
-                Target: {level.targetConfig}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
-              <div className="text-xs font-black uppercase tracking-widest text-slate-400">Collected</div>
-              <div className="mt-2 min-h-10 font-mono text-sm leading-relaxed text-slate-700 dark:text-slate-300">
-                {collectedLabels.length === 0 ? (
-                  <span className="italic text-slate-400">No orbitals collected yet.</span>
-                ) : (
-                  collectedLabels.join(" ")
-                )}
-              </div>
-              <div className="mt-3 text-xs font-semibold text-sky-700 dark:text-sky-300">
-                Next: {nextRequiredDuck ? nextRequiredDuck.label : "Tub fill"}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
-              <div className="flex items-center justify-between">
-                <div className="text-xs font-black uppercase tracking-widest text-slate-400">Tub progress</div>
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                  {Math.min(tubFill, level.tubGoal)}/{level.tubGoal}
-                </span>
-              </div>
-              <div className="mt-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800">
-                <div
-                  className="h-full rounded-full bg-sky-500 transition-all"
-                  style={{ width: `${tubRatio * 100}%` }}
-                />
-              </div>
-              <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
-                Enough droplets must reach the bathtub after the ducks are collected.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
-              <div className="text-xs font-black uppercase tracking-widest text-slate-400">Orbital ducks</div>
-              <div className="mt-3 flex flex-col gap-2">
-                {ducks.map((duck) => (
-                  <div key={duck.id} className="flex items-center gap-2">
-                    <div
-                      style={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: "50%",
-                        background: duck.collected ? "#22c55e" : duck.color,
-                        border: "1px solid #334155",
-                        flexShrink: 0,
-                      }}
-                    />
-                    <span className="font-mono text-xs font-bold text-slate-700 dark:text-slate-300">
-                      {duck.label}
-                    </span>
-                    {duck.collected && <span className="ml-auto text-xs font-bold text-emerald-500">done</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950">
-              <div className="text-xs font-black uppercase tracking-widest text-amber-500">Hint</div>
-              <p className="mt-2 text-xs leading-relaxed text-amber-700 dark:text-amber-300">
-                {level.hint}
-              </p>
-            </div>
-
-            <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
-              <div className="text-xs font-black uppercase tracking-widest text-slate-400">Order reference</div>
-              <div className="mt-2 flex flex-wrap gap-1">
-                {ducks.map((duck) => (
-                  <span
-                    key={`order-${duck.id}`}
-                    className="rounded-full px-2 py-1 font-mono text-[11px] font-black"
-                    style={{
-                      background: duck.collected ? "rgba(34,197,94,0.14)" : "rgba(15,23,42,0.08)",
-                      color: duck.collected ? "#16a34a" : SUBSHELL_COLORS[duck.subshell],
-                    }}
-                  >
-                    {duck.label}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
-              <div className="text-xs font-black uppercase tracking-widest text-slate-400">Legend</div>
-              <div className="mt-3 flex flex-col gap-2 text-xs text-slate-500 dark:text-slate-400">
-                {[
-                  { color: "#7c5c38", label: "Natural dirt - drag to carve tunnels" },
-                  { color: "#38bdf8", label: "Electron droplets" },
-                  { color: "#e2e8f0", label: "Alligator tub goal" },
-                ].map(({ color, label }) => (
-                  <div key={label} className="flex items-center gap-2">
-                    <div
-                      style={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: 2,
-                        background: color,
-                        border: "1px solid #475569",
-                        flexShrink: 0,
-                      }}
-                    />
-                    <span>{label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
-      {rewardOpen && (
+      {resultModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
           <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-950">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-              All 5 levels complete
+              {resultModal.title}
             </h2>
-            <p className="mt-3 text-lg text-slate-700 dark:text-slate-300">
-              You cleared every electron configuration level and earned{" "}
-              <span className="font-bold">{rewardAmt}</span> glucose.
-            </p>
+            <p className="mt-3 text-lg text-slate-700 dark:text-slate-300">{resultModal.body}</p>
+            {resultModal.type === "final" && (
+              <p className="mt-3 text-base text-slate-700 dark:text-slate-300">
+                Final reward: <span className="font-bold">{rewardAmt}</span> glucose.
+              </p>
+            )}
             <div className="mt-4 text-sm">
-              {rewardStatus === "loading" && (
+              {resultModal.type === "final" && rewardStatus === "loading" && (
                 <p className="text-slate-600 dark:text-slate-300">Updating glucose...</p>
               )}
-              {rewardStatus === "ok" && (
+              {resultModal.type === "final" && rewardStatus === "ok" && (
                 <p className="text-emerald-700 dark:text-emerald-300">{rewardMsg}</p>
               )}
-              {rewardStatus === "error" && (
+              {resultModal.type === "final" && rewardStatus === "error" && (
                 <p className="text-red-700 dark:text-red-300">{rewardMsg}</p>
               )}
             </div>
             <div className="mt-6 flex justify-end">
               <button
-                onClick={() => setRewardOpen(false)}
+                onClick={() => {
+                  const modalType = resultModal.type;
+                  setResultModal(null);
+                  if (modalType === "next") {
+                    setLvIdx((current) => current + 1);
+                  } else if (modalType === "lose") {
+                    resetAttempt();
+                  } else {
+                    setLvIdx(0);
+                  }
+                }}
                 className="rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white hover:bg-sky-700 dark:bg-teal-500 dark:text-black dark:hover:bg-teal-400"
               >
-                Close
+                {resultModal.actionLabel}
               </button>
             </div>
           </div>
