@@ -15,6 +15,7 @@ const MAX_VISIBLE_DROPLETS = 11;
 const SPAWN_EVERY_TICKS = 4;
 const STUCK_TICKS_BEFORE_FADE = 9;
 const DIG_BRUSH_RADIUS = CELL * 0.72;
+const HARD_WMW_PROGRESS_KEY = "wmw_hard_progress_v1";
 
 type CellKind = "dirt" | "empty" | "source" | "tub";
 type IonRole = "reactive" | "spectator";
@@ -89,6 +90,11 @@ interface ResultModalState {
   title: string;
   body: string;
   actionLabel: string;
+}
+
+interface SavedProgress {
+  currentLevelIndex: number;
+  highestUnlockedLevelIndex: number;
 }
 
 const REACTIVE_SLOTS = [
@@ -526,6 +532,8 @@ export default function WheresMyWaterGameHard() {
   const [rewardClaimed, setRewardClaimed] = useState(false);
   const [pendingResult, setPendingResult] = useState(false);
   const [resultModal, setResultModal] = useState<ResultModalState | null>(null);
+  const [progressLoaded, setProgressLoaded] = useState(false);
+  const [highestUnlockedLevelIndex, setHighestUnlockedLevelIndex] = useState(0);
 
   const svgRef = useRef<SVGSVGElement>(null);
   const tickRef = useRef<NodeJS.Timeout | null>(null);
@@ -586,8 +594,53 @@ export default function WheresMyWaterGameHard() {
   );
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      setProgressLoaded(true);
+      return;
+    }
+
+    try {
+      const raw = window.localStorage.getItem(HARD_WMW_PROGRESS_KEY);
+      if (!raw) {
+        setProgressLoaded(true);
+        return;
+      }
+
+      const parsed = JSON.parse(raw) as Partial<SavedProgress>;
+      const savedCurrent =
+        typeof parsed.currentLevelIndex === "number"
+          ? Math.max(0, Math.min(LEVELS.length - 1, parsed.currentLevelIndex))
+          : 0;
+      const savedHighest =
+        typeof parsed.highestUnlockedLevelIndex === "number"
+          ? Math.max(savedCurrent, Math.min(LEVELS.length - 1, parsed.highestUnlockedLevelIndex))
+          : savedCurrent;
+
+      setLvIdx(savedCurrent);
+      setHighestUnlockedLevelIndex(savedHighest);
+    } catch {
+      setLvIdx(0);
+      setHighestUnlockedLevelIndex(0);
+    } finally {
+      setProgressLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!progressLoaded) return;
     initLevel(LEVELS[lvIdx]);
-  }, [initLevel, lvIdx]);
+  }, [initLevel, lvIdx, progressLoaded]);
+
+  useEffect(() => {
+    if (!progressLoaded || typeof window === "undefined") return;
+
+    const savedProgress: SavedProgress = {
+      currentLevelIndex: lvIdx,
+      highestUnlockedLevelIndex: highestUnlockedLevelIndex,
+    };
+
+    window.localStorage.setItem(HARD_WMW_PROGRESS_KEY, JSON.stringify(savedProgress));
+  }, [highestUnlockedLevelIndex, lvIdx, progressLoaded]);
 
   useEffect(() => {
     return () => {
@@ -610,6 +663,10 @@ export default function WheresMyWaterGameHard() {
   const resetDisabled = buttonsLocked || !hasStartedDigging || won;
   const undoDisabled = buttonsLocked || !canUndo;
   const howToDisabled = showIntro || pendingResult || !!resultModal;
+  const resetProgressDisabled =
+    buttonsLocked ||
+    !progressLoaded ||
+    (lvIdx === 0 && highestUnlockedLevelIndex === 0);
 
   const scheduleResultModal = useCallback((modal: ResultModalState) => {
     if (resultTimeoutRef.current) clearTimeout(resultTimeoutRef.current);
@@ -648,6 +705,14 @@ export default function WheresMyWaterGameHard() {
     strokeChangedRef.current = false;
   }, [layout, level]);
 
+  const resetProgress = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(HARD_WMW_PROGRESS_KEY);
+    }
+    setHighestUnlockedLevelIndex(0);
+    setLvIdx(0);
+  }, []);
+
   const awardGlucose = useCallback(async () => {
     setRewardAmt(GLUCOSE_REWARD);
     setRewardStatus("loading");
@@ -685,6 +750,7 @@ export default function WheresMyWaterGameHard() {
         }
 
         if (lvIdx === LEVELS.length - 1) {
+          setHighestUnlockedLevelIndex(LEVELS.length - 1);
           scheduleResultModal({
             type: "final",
             title: "You win!",
@@ -692,6 +758,7 @@ export default function WheresMyWaterGameHard() {
             actionLabel: "Play again",
           });
         } else {
+          setHighestUnlockedLevelIndex((current) => Math.max(current, lvIdx + 1));
           scheduleResultModal({
             type: "next",
             title: `${level.productName} cleared`,
@@ -1107,6 +1174,13 @@ export default function WheresMyWaterGameHard() {
             className="rounded-2xl bg-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-300 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
           >
             Undo Dig
+          </button>
+          <button
+            onClick={resetProgress}
+            disabled={resetProgressDisabled}
+            className="rounded-2xl bg-rose-100 px-5 py-2.5 text-sm font-bold text-rose-700 transition hover:bg-rose-200 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-rose-950/60 dark:text-rose-200 dark:hover:bg-rose-900/70"
+          >
+            Reset Progress
           </button>
           {seenIntro && (
             <button

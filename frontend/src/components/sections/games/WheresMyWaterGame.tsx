@@ -540,6 +540,10 @@ export default function WheresMyWaterGame() {
   const resetDisabled = buttonsLocked || !hasStartedDigging || won;
   const undoDisabled = buttonsLocked || !canUndo;
   const howToDisabled = showIntro || pendingResult || !!resultModal;
+  const resetProgressDisabled =
+    buttonsLocked ||
+    !progressLoaded ||
+    (lvIdx === 0 && highestUnlockedLevelIndex === 0);
 
   const scheduleResultModal = useCallback((modal: ResultModalState) => {
     if (resultTimeoutRef.current) clearTimeout(resultTimeoutRef.current);
@@ -577,6 +581,14 @@ export default function WheresMyWaterGame() {
     strokeSnapshotRef.current = null;
     strokeChangedRef.current = false;
   }, [layout, level]);
+
+  const resetProgress = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(EASY_WMW_PROGRESS_KEY);
+    }
+    setHighestUnlockedLevelIndex(0);
+    setLvIdx(0);
+  }, []);
 
   const awardGlucose = useCallback(async () => {
     setRewardAmt(GLUCOSE_REWARD);
@@ -1031,6 +1043,13 @@ export default function WheresMyWaterGame() {
             className="rounded-2xl bg-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-300 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
           >
             Undo Dig
+          </button>
+          <button
+            onClick={resetProgress}
+            disabled={resetProgressDisabled}
+            className="rounded-2xl bg-rose-100 px-5 py-2.5 text-sm font-bold text-rose-700 transition hover:bg-rose-200 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-rose-950/60 dark:text-rose-200 dark:hover:bg-rose-900/70"
+          >
+            Reset Progress
           </button>
           {seenIntro && (
             <button
