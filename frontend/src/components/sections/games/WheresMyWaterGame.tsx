@@ -920,12 +920,14 @@ export default function WheresMyWaterGame() {
   const tubW = (layout.tubCols[1] - layout.tubCols[0] + 1) * CELL;
   const tubH = (layout.tubRows[1] - layout.tubRows[0] + 1) * CELL;
   const tubWaterHeight = tubH * tubRatio;
+  const boardAspectRatio = W / H;
+  const boardWidth = `min(100%, 1080px, calc((100dvh - 220px) * ${boardAspectRatio}))`;
 
   return (
     <>
-      <div className="flex min-h-screen w-full flex-col items-center bg-white px-4 py-6 text-slate-900 dark:bg-black dark:text-slate-100 sm:px-6">
-        <div className="mb-3 text-center">
-          <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
+      <div className="flex min-h-screen w-full flex-col items-center bg-white px-3 py-4 text-slate-900 dark:bg-black dark:text-slate-100 sm:px-5">
+        <div className="mb-2 text-center">
+          <h2 className="text-xl font-black tracking-tight sm:text-2xl">
             Where&apos;s My Water?: Electron Configuration
           </h2>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -933,7 +935,7 @@ export default function WheresMyWaterGame() {
           </p>
         </div>
 
-        <div className="mb-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-sm font-semibold text-slate-600 dark:text-slate-300">
+        <div className="mb-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-xs font-semibold text-slate-600 dark:text-slate-300 sm:text-sm">
           <span>{level.elementName} ({level.symbol})</span>
           <span>Target {level.targetConfig}</span>
           <span>Next {nextRequiredDuck ? nextRequiredDuck.label : won ? "Level clear" : "Fill tub"}</span>
@@ -941,7 +943,7 @@ export default function WheresMyWaterGame() {
           <span>Water {waterLeft}</span>
         </div>
 
-        <div className="mb-4 flex flex-wrap items-center justify-center gap-3">
+        <div className="mb-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
           {!flowing && !won && !lost && (
             <button
               onClick={() => {
@@ -991,8 +993,16 @@ export default function WheresMyWaterGame() {
           )}
         </div>
 
-        <div className="mx-auto w-full max-w-[1320px]">
-          <div className="relative w-full overflow-hidden rounded-2xl border-4 border-[#3f2e1a]" style={{ aspectRatio: `${W} / ${H}` }}>
+        <div className="mx-auto flex w-full justify-center">
+          <div
+            className="relative overflow-hidden rounded-2xl border-4 border-[#3f2e1a]"
+            style={{
+              width: boardWidth,
+              maxWidth: "100%",
+              maxHeight: "calc(100dvh - 220px)",
+              aspectRatio: `${W} / ${H}`,
+            }}
+          >
               {showIntro && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
                   <div className="w-full max-w-md rounded-3xl border border-slate-700 bg-slate-950/95 p-6 text-center text-white shadow-2xl">

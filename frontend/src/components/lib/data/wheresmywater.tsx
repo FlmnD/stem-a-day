@@ -91,12 +91,12 @@ export const WheresMyWaterHardArticle: Article = () => {
         <>
             <div className="max-w-7xl mx-auto mb-8 rounded-lg bg-white p-4 text-sm leading-6 shadow dark:border dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-200">
                 <h2 className="mb-3 text-xl font-bold text-slate-900 dark:text-slate-100">
-                    Hard Mode: Solubility and Net Ionic Equations
+                    Hard Mode: Net Ionic Equations Through Precipitation
                 </h2>
                 <p className="mb-4 text-slate-700 dark:text-slate-200">
-                    The hard mode is about <strong>aqueous ions, spectator ions, and precipitation reactions</strong>.
-                    You are watching dissolved ions move through solution and deciding which ions matter to the actual
-                    chemical change.
+                    The hard mode is about <strong>precipitation reactions, spectator ions, and net ionic equations</strong>.
+                    You dig the path yourself, guide a limited stream of droplets through the correct ions, and build
+                    the reaction that actually forms the solid product.
                 </p>
 
                 <h3 className="font-semibold text-slate-900 dark:text-slate-100">Soluble vs. Insoluble</h3>
@@ -145,9 +145,10 @@ export const WheresMyWaterHardArticle: Article = () => {
 
                 <h3 className="font-semibold text-slate-900 dark:text-slate-100">What the Hard Game Is Testing</h3>
                 <ul className="ml-6 list-disc text-slate-700 dark:text-slate-200">
-                    <li>Can you recognize which ions are spectators?</li>
-                    <li>Can you tell when a precipitate should form?</li>
-                    <li>Can you connect the observed solid to the correct net ionic equation?</li>
+                    <li>Can you recognize which ions belong in the net ionic equation?</li>
+                    <li>Can you avoid spectator ions that should cancel out?</li>
+                    <li>Can you collect repeated ions in the correct stoichiometric order before the water runs out?</li>
+                    <li>Can you connect the precipitate in the tub to the correct net ionic equation?</li>
                 </ul>
             </div>
         </>
@@ -188,8 +189,8 @@ export const WheresMyWaterEasyLesson: Lesson = () => {
                         must still make it into the bathtub after the duck sequence is complete.
                     </li>
                     <li>
-                        <strong>Reset rerandomizes the board:</strong> the duck positions and the alligator tub shift
-                        when the level resets, so you have to adapt your tunnel plan.
+                        <strong>Reset keeps the same layout:</strong> resetting clears the dug path and restarts the
+                        water attempt, but it does not reroll the ducks or the tub position for that level.
                     </li>
                     <li>
                         <strong>Reward:</strong> finish all five element levels to earn glucose.
@@ -205,31 +206,32 @@ export const WheresMyWaterHardLesson: Lesson = () => {
         <>
             <div className="w-full max-w-5xl mt-6 mb-6 rounded shadow bg-white p-4 dark:border dark:border-slate-800 dark:bg-slate-950/60">
                 <h2 className="mb-3 text-2xl font-semibold text-slate-900 dark:text-slate-100">
-                    Play Where&apos;s My Water?: Solubility
+                    Play Where&apos;s My Water?: Net Ionic Equations
                 </h2>
                 <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-slate-200">
                     <li>
-                        <strong>Goal:</strong> identify the spectator ions and connect the moving ions to the correct
-                        precipitation result.
+                        <strong>Goal:</strong> collect the ions that belong in the net ionic equation, avoid the
+                        spectator ions, and still send enough water into the precipitate tub to finish the level.
                     </li>
                     <li>
-                        <strong>Watch the ions move:</strong> dissolved ions drift through the water from opposite sides
-                        of the tank.
+                        <strong>Dig the path:</strong> carve tunnels through the dirt so the droplets can reach the
+                        ions you want in the right order.
                     </li>
                     <li>
-                        <strong>Click spectator ions:</strong> ions that stay dissolved should be collected as
-                        spectators. Those are the ions that cancel from the net ionic equation.
+                        <strong>Collect only reacting ions:</strong> each ion marker is either reactive or a
+                        spectator. Spectators should cancel out of the net ionic equation, so hitting them wastes the
+                        run.
                     </li>
                     <li>
-                        <strong>Trigger the precipitate:</strong> when the reacting ions meet, the solid product should
-                        appear if the pair is insoluble.
+                        <strong>Respect coefficients:</strong> if the equation needs repeated ions like
+                        <strong> I-</strong> or <strong>OH-</strong>, you have to collect every copy in sequence.
                     </li>
                     <li>
-                        <strong>Read the equations:</strong> the side panel shows the molecular equation first and then
-                        reveals the net ionic equation once the spectator ions are handled.
+                        <strong>Finish the reaction:</strong> collecting the right ions is not enough by itself.
+                        Enough water still has to make it into the bathtub to represent forming the precipitate.
                     </li>
                     <li>
-                        <strong>Watch for no-reaction cases:</strong> not every pair of aqueous ions forms a precipitate.
+                        <strong>Reward:</strong> finish every precipitation level to earn glucose.
                     </li>
                 </ul>
             </div>

@@ -322,7 +322,7 @@ export default function Games() {
                     <div className="flex items-center gap-3 mb-2">
                         <Atom className="text-red-500 dark:text-rose-300" size={24} />
                         <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100">
-                            Where&apos;s My Water?: Solubility
+                            Where&apos;s My Water?: Net Ionic Equations
                         </h2>
                     </div>
 
@@ -331,8 +331,8 @@ export default function Games() {
                     </p>
 
                     <p className="text-gray-700 dark:text-slate-200 mb-6">
-                        Track dissolved ions, spot the spectator ions, and reveal the correct precipitate and net
-                        ionic equation in this solubility challenge.
+                        Dig a reaction path, collect only the ions that belong in the net ionic equation, avoid
+                        spectator ions, and fill the precipitate tub before the water runs out.
                     </p>
 
                     <Link

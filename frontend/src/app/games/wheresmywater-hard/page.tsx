@@ -10,7 +10,7 @@ export default function WheresMyWaterHardPage() {
   return (
     <div className="min-h-screen flex flex-col items-center py-10 bg-gray-100 dark:bg-slate-950">
       <h1 className="text-3xl font-bold mb-6 text-slate-900 dark:text-slate-100">
-        Where's My Water?: Solubility
+        Where&apos;s My Water?: Net Ionic Equations
       </h1>
 
       <Collapsible
