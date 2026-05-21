@@ -920,11 +920,12 @@ export default function WheresMyWaterGame() {
   const tunnelMaskShapes = useMemo(() => {
     const isOpenCell = (col: number, row: number) => {
       if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return false;
-      return grid[ck(col, row)].kind !== "dirt";
+      const k = grid[ck(col, row)].kind;
+      return k === "empty" || k === "source";
     };
 
     return grid.flatMap((cell, index) => {
-      if (cell.kind === "dirt") return [];
+      if (cell.kind === "dirt" || cell.kind === "tub") return [];
 
       const col = index % COLS;
       const row = Math.floor(index / COLS);
@@ -1255,172 +1256,60 @@ export default function WheresMyWaterGame() {
                   <rect width={W} height={H} fill="url(#dirtTexture)" opacity={0.95} />
                 </g>
 
-                <rect
-                  x={tubX - 8}
-                  y={tubY - 10}
-                  width={tubW + 16}
-                  height={tubH + 18}
-                  rx={18}
-                  fill="#e2e8f0"
-                  stroke="#94a3b8"
-                  strokeWidth={4}
-                />
-                <rect
-                  x={tubX + 2}
-                  y={tubY + 2}
-                  width={tubW - 4}
-                  height={tubH - 4}
-                  rx={12}
-                  fill="#f0f9ff"
-                  stroke="#cbd5e1"
-                  strokeWidth={1.5}
-                />
-                {tubRatio > 0 && (
-                  <rect
-                    x={tubX + 2}
-                    y={tubY + tubH - tubWaterHeight - 2}
-                    width={tubW - 4}
-                    height={tubWaterHeight}
-                    rx={12}
-                    fill="url(#tubWaterFill)"
-                    opacity={0.92}
+                <image
+                  href="/wmw-tub.png"
+                  x={tubX - 20}
+                  y={tubY - 20}
+                  width={tubW + 40}
+                  height={tubH + 70}
+                  preserveAspectRatio="xMidYMid meet"
+                  style={{ mixBlendMode: 'screen' }}
+                >
+                  <animateTransform
+                    attributeName="transform"
+                    type="translate"
+                    values="0 0; 0 -4; 0 0"
+                    dur="2.6s"
+                    repeatCount="indefinite"
                   />
-                )}
-                <g filter="url(#softShadow)">
-                  <g transform={`translate(${layout.gatorFacing === -1 ? tubX + tubW : tubX}, 0) scale(${layout.gatorFacing}, 1)`}>
-                    <g>
-                      <animateTransform
-                        attributeName="transform"
-                        type="translate"
-                        values="0 0; 0 -3; 0 0"
-                        dur="2.6s"
-                        repeatCount="indefinite"
-                      />
-                      <path
-                        d={`
-                          M ${tubW * 0.18} ${tubY + tubH * 0.63}
-                          C ${tubW * 0.1} ${tubY + tubH * 0.58}, ${tubW * 0.12} ${tubY + tubH * 0.42}, ${tubW * 0.24} ${tubY + tubH * 0.38}
-                          C ${tubW * 0.36} ${tubY + tubH * 0.31}, ${tubW * 0.52} ${tubY + tubH * 0.28}, ${tubW * 0.68} ${tubY + tubH * 0.34}
-                          C ${tubW * 0.8} ${tubY + tubH * 0.39}, ${tubW * 0.92} ${tubY + tubH * 0.48}, ${tubW * 0.9} ${tubY + tubH * 0.58}
-                          C ${tubW * 0.88} ${tubY + tubH * 0.7}, ${tubW * 0.68} ${tubY + tubH * 0.77}, ${tubW * 0.45} ${tubY + tubH * 0.76}
-                          C ${tubW * 0.29} ${tubY + tubH * 0.75}, ${tubW * 0.18} ${tubY + tubH * 0.71}, ${tubW * 0.18} ${tubY + tubH * 0.63}
-                        `}
-                        fill="url(#gatorFill)"
-                      />
-                      <path
-                        d={`
-                          M ${tubW * 0.26} ${tubY + tubH * 0.67}
-                          C ${tubW * 0.36} ${tubY + tubH * 0.58}, ${tubW * 0.53} ${tubY + tubH * 0.56}, ${tubW * 0.71} ${tubY + tubH * 0.62}
-                          C ${tubW * 0.6} ${tubY + tubH * 0.73}, ${tubW * 0.42} ${tubY + tubH * 0.76}, ${tubW * 0.26} ${tubY + tubH * 0.67}
-                        `}
-                        fill="url(#gatorBellyFill)"
-                        opacity={0.95}
-                      />
-                      <path
-                        d={`
-                          M ${tubW * 0.58} ${tubY + tubH * 0.42}
-                          C ${tubW * 0.73} ${tubY + tubH * 0.34}, ${tubW * 0.89} ${tubY + tubH * 0.36}, ${tubW * 0.98} ${tubY + tubH * 0.49}
-                          C ${tubW * 0.93} ${tubY + tubH * 0.55}, ${tubW * 0.82} ${tubY + tubH * 0.56}, ${tubW * 0.69} ${tubY + tubH * 0.53}
-                          C ${tubW * 0.63} ${tubY + tubH * 0.51}, ${tubW * 0.58} ${tubY + tubH * 0.48}, ${tubW * 0.58} ${tubY + tubH * 0.42}
-                        `}
-                        fill="url(#gatorJawFill)"
-                      />
-                      <path
-                        d={`
-                          M ${tubW * 0.59} ${tubY + tubH * 0.54}
-                          C ${tubW * 0.73} ${tubY + tubH * 0.58}, ${tubW * 0.89} ${tubY + tubH * 0.6}, ${tubW * 0.97} ${tubY + tubH * 0.69}
-                          C ${tubW * 0.86} ${tubY + tubH * 0.76}, ${tubW * 0.7} ${tubY + tubH * 0.73}, ${tubW * 0.61} ${tubY + tubH * 0.65}
-                          C ${tubW * 0.58} ${tubY + tubH * 0.61}, ${tubW * 0.57} ${tubY + tubH * 0.58}, ${tubW * 0.59} ${tubY + tubH * 0.54}
-                        `}
-                        fill="#22c55e"
-                      />
-                      <path
-                        d={`M ${tubW * 0.62} ${tubY + tubH * 0.56} C ${tubW * 0.77} ${tubY + tubH * 0.55}, ${tubW * 0.88} ${tubY + tubH * 0.58}, ${tubW * 0.96} ${tubY + tubH * 0.62}`}
-                        fill="none"
-                        stroke="#0f172a"
-                        strokeWidth={2.2}
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d={`M ${tubW * 0.54} ${tubY + tubH * 0.39} C ${tubW * 0.61} ${tubY + tubH * 0.3}, ${tubW * 0.7} ${tubY + tubH * 0.29}, ${tubW * 0.78} ${tubY + tubH * 0.34}`}
-                        fill="none"
-                        stroke="#14532d"
-                        strokeWidth={7}
-                        strokeLinecap="round"
-                      />
-                      <ellipse cx={tubW * 0.67} cy={tubY + tubH * 0.39} rx={8.5} ry={6.5} fill="#ecfccb">
-                        <animate attributeName="ry" values="6.5;6.5;6.5;1.1;6.5;6.5" dur="4s" repeatCount="indefinite" />
-                      </ellipse>
-                      <circle cx={tubW * 0.675} cy={tubY + tubH * 0.392} r={3.1} fill="#14532d" />
-                      <circle cx={tubW * 0.679} cy={tubY + tubH * 0.388} r={1.1} fill="white" opacity={0.9} />
-                      <ellipse cx={tubW * 0.9} cy={tubY + tubH * 0.45} rx={3.1} ry={1.9} fill="#14532d" opacity={0.75} />
-                      <ellipse cx={tubW * 0.86} cy={tubY + tubH * 0.42} rx={2.7} ry={1.7} fill="#14532d" opacity={0.75} />
-                      {[0, 1, 2, 3].map((scale) => (
-                        <path
-                          key={`scale-${scale}`}
-                          d={`
-                            M ${tubW * (0.33 + scale * 0.09)} ${tubY + tubH * (0.35 - (scale % 2) * 0.015)}
-                            L ${tubW * (0.37 + scale * 0.09)} ${tubY + tubH * (0.24 - (scale % 2) * 0.012)}
-                            L ${tubW * (0.41 + scale * 0.09)} ${tubY + tubH * (0.35 - (scale % 2) * 0.015)}
-                          `}
-                          fill="#166534"
-                          opacity={0.9}
-                        />
-                      ))}
-                      {[0, 1, 2, 3].map((tooth) => (
-                        <polygon
-                          key={`top-tooth-${tooth}`}
-                          points={`${tubW * (0.71 + tooth * 0.055)},${tubY + tubH * 0.57} ${tubW * (0.725 + tooth * 0.055)},${tubY + tubH * 0.65} ${tubW * (0.74 + tooth * 0.055)},${tubY + tubH * 0.57}`}
-                          fill="white"
-                        />
-                      ))}
-                      {[0, 1, 2].map((tooth) => (
-                        <polygon
-                          key={`bottom-tooth-${tooth}`}
-                          points={`${tubW * (0.74 + tooth * 0.06)},${tubY + tubH * 0.61} ${tubW * (0.755 + tooth * 0.06)},${tubY + tubH * 0.53} ${tubW * (0.77 + tooth * 0.06)},${tubY + tubH * 0.61}`}
-                          fill="#f8fafc"
-                        />
-                      ))}
-                      <path
-                        d={`M ${tubW * 0.29} ${tubY + tubH * 0.72} C ${tubW * 0.26} ${tubY + tubH * 0.82}, ${tubW * 0.25} ${tubY + tubH * 0.88}, ${tubW * 0.3} ${tubY + tubH * 0.92}`}
-                        fill="none"
-                        stroke="#166534"
-                        strokeWidth={6}
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d={`M ${tubW * 0.44} ${tubY + tubH * 0.73} C ${tubW * 0.42} ${tubY + tubH * 0.83}, ${tubW * 0.42} ${tubY + tubH * 0.88}, ${tubW * 0.47} ${tubY + tubH * 0.92}`}
-                        fill="none"
-                        stroke="#166534"
-                        strokeWidth={6}
-                        strokeLinecap="round"
-                      />
-                    </g>
-                    {Array.from({ length: 3 }, (_, bubble) => (
-                      <circle
-                        key={`bubble-${bubble}`}
-                        cx={tubW * (0.28 + bubble * 0.12)}
-                        cy={tubY + tubH * 0.8}
-                        r={4 - bubble * 0.6}
-                        fill="#e0f2fe"
-                        opacity={0.75}
-                      >
-                        <animate attributeName="cy" values={`${tubY + tubH * 0.82};${tubY + tubH * (0.56 - bubble * 0.04)};${tubY + tubH * 0.82}`} dur={`${2 + bubble * 0.4}s`} begin={`${bubble * 0.35}s`} repeatCount="indefinite" />
-                        <animate attributeName="opacity" values="0;0.8;0" dur={`${2 + bubble * 0.4}s`} begin={`${bubble * 0.35}s`} repeatCount="indefinite" />
-                      </circle>
-                    ))}
-                  </g>
-                  <text
-                    x={tubX + tubW / 2}
-                    y={tubY + tubH - 10}
-                    textAnchor="middle"
-                    fontSize={18}
-                    fontWeight={900}
-                    fill="#0f172a"
+                </image>
+
+                {tubRatio > 0 && [0, 1, 2].map((b) => (
+                  <circle
+                    key={`bubble-${b}`}
+                    cx={tubX + tubW * (0.28 + b * 0.18)}
+                    cy={tubY + tubH * 0.8}
+                    r={4 - b * 0.6}
+                    fill="#e0f2fe"
+                    opacity={0}
                   >
-                    {level.elementName} ({level.symbol})
-                  </text>
-                </g>
+                    <animate
+                      attributeName="cy"
+                      values={`${tubY + tubH * 0.85};${tubY + tubH * 0.3};${tubY + tubH * 0.85}`}
+                      dur={`${2 + b * 0.5}s`}
+                      begin={`${b * 0.4}s`}
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0;0.85;0"
+                      dur={`${2 + b * 0.5}s`}
+                      begin={`${b * 0.4}s`}
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                ))}
+
+                <text
+                  x={tubX + tubW / 2}
+                  y={tubY - 16}
+                  textAnchor="middle"
+                  fontSize={12}
+                  fontWeight={900}
+                  fill="#4ade80"
+                >
+                  {level.elementName} ({level.symbol})
+                </text>
 
                 <g filter="url(#softShadow)">
                   <rect
